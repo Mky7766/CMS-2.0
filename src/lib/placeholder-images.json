@@ -1,3 +1,76 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "media-1",
+      "description": "Abstract architecture",
+      "imageUrl": "https://picsum.photos/seed/101/400/300",
+      "imageHint": "abstract architecture"
+    },
+    {
+      "id": "media-2",
+      "description": "Mountain landscape",
+      "imageUrl": "https://picsum.photos/seed/102/400/300",
+      "imageHint": "mountain landscape"
+    },
+    {
+      "id": "media-3",
+      "description": "City at night",
+      "imageUrl": "https://picsum.photos/seed/103/400/300",
+      "imageHint": "city night"
+    },
+    {
+      "id": "media-4",
+      "description": "Forest path",
+      "imageUrl": "https://picsum.photos/seed/104/400/300",
+      "imageHint": "forest path"
+    },
+    {
+      "id": "media-5",
+      "description": "Coastal waves",
+      "imageUrl": "https://picsum.photos/seed/105/400/300",
+      "imageHint": "coastal waves"
+    },
+    {
+      "id": "media-6",
+      "description": "Minimalist interior",
+      "imageUrl": "https://picsum.photos/seed/106/400/300",
+      "imageHint": "minimalist interior"
+    },
+    {
+      "id": "media-7",
+      "description": "Laptop on a desk",
+      "imageUrl": "https://picsum.photos/seed/107/400/300",
+      "imageHint": "laptop desk"
+    },
+    {
+      "id": "media-8",
+      "description": "Coffee and book",
+      "imageUrl": "https://picsum.photos/seed/108/400/300",
+      "imageHint": "coffee book"
+    },
+    {
+      "id": "media-9",
+      "description": "Modern building facade",
+      "imageUrl": "https://picsum.photos/seed/109/400/300",
+      "imageHint": "building facade"
+    },
+    {
+      "id": "media-10",
+      "description": "Desert dunes",
+      "imageUrl": "https://picsum.photos/seed/110/400/300",
+      "imageHint": "desert dunes"
+    },
+    {
+      "id": "media-11",
+      "description": "Neon sign",
+      "imageUrl": "https://picsum.photos/seed/111/400/300",
+      "imageHint": "neon sign"
+    },
+    {
+      "id": "media-12",
+      "description": "Person working on a laptop",
+      "imageUrl": "https://picsum.photos/seed/112/400/300",
+      "imageHint": "person laptop"
+    }
+  ]
 }
