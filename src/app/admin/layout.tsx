@@ -4,8 +4,6 @@
 import AppHeader from "@/components/admin/header";
 import AppSidebar from "@/components/admin/sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { getSession } from "@/lib/session";
-import { redirect } from 'next/navigation';
 import { useEffect, useState } from "react";
 
 export default function AdminLayout({
@@ -13,20 +11,7 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [sessionChecked, setSessionChecked] = useState(false);
   const [themeStyles, setThemeStyles] = useState('');
-
-  useEffect(() => {
-    const checkSession = async () => {
-      const session = await getSession();
-      if (!session) {
-        redirect('/login');
-      } else {
-        setSessionChecked(true);
-      }
-    };
-    checkSession();
-  }, []);
 
   useEffect(() => {
     const storedTheme = localStorage.getItem('selected-theme');
@@ -34,11 +19,6 @@ export default function AdminLayout({
         setThemeStyles(storedTheme);
     }
   }, []);
-
-
-  if (!sessionChecked) {
-    return null; // Or a loading spinner
-  }
 
   return (
     <>

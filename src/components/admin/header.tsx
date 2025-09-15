@@ -1,3 +1,4 @@
+
 "use client"
 
 import {
@@ -69,7 +70,11 @@ export default function AppHeader() {
             <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={() => logout()}>Logout</DropdownMenuItem>
+             <form action={logout}>
+                <DropdownMenuItem asChild>
+                    <button type="submit" className="w-full">Logout</button>
+                </DropdownMenuItem>
+             </form>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

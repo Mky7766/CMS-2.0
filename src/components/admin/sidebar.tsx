@@ -1,3 +1,4 @@
+
 "use client"
 
 import Link from "next/link"
@@ -30,14 +31,7 @@ const menuItems = [
 
 export default function AppSidebar() {
   const pathname = usePathname()
-  const [theme, setTheme] = React.useState("light");
-
-  const toggleTheme = () => {
-    const newTheme = theme === "light" ? "dark" : "light";
-    setTheme(newTheme);
-    document.documentElement.classList.toggle("dark", newTheme === "dark");
-  };
-
+  
   return (
     <Sidebar>
       <SidebarHeader>
@@ -67,13 +61,6 @@ export default function AppSidebar() {
       <Separator className="my-2 bg-sidebar-border" />
       <SidebarFooter>
          <SidebarMenu>
-            <SidebarMenuItem>
-                <SidebarMenuButton tooltip={{ children: 'Toggle Theme' }} onClick={toggleTheme}>
-                    <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                    <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                    <span>Theme</span>
-                </SidebarMenuButton>
-            </SidebarMenuItem>
              <SidebarMenuItem>
                 <form action={logout}>
                     <SidebarMenuButton asChild tooltip={{ children: 'Logout' }}>
