@@ -100,16 +100,23 @@ export async function savePost(prevState: any, formData: FormData) {
         return { error: "User not found." };
     }
 
+    const permalink = formData.get('permalink') as string;
     const title = formData.get('title') as string;
     const content = formData.get('content') as string;
     const status = formData.get('status') as 'Draft' | 'Published' | 'Scheduled';
 
-    if (!title || !content || !status) {
-        return { error: 'Title, content, and status are required.' };
+    if (!title || !content || !status || !permalink) {
+        return { error: 'Title, content, status and permalink are required.' };
+    }
+    
+    const existingPost = posts.find(p => p.id === permalink);
+    if (existingPost) {
+        return { error: 'A post with this permalink already exists.' };
     }
 
+
     const newPost: Post = {
-        id: (posts.length + 1).toString(),
+        id: permalink,
         title,
         content,
         status,
@@ -145,13 +152,14 @@ export async function updatePost(prevState: any, formData: FormData) {
     }
 
     const postId = formData.get('postId') as string;
+    const permalink = formData.get('permalink') as string;
     const title = formData.get('title') as string;
     const content = formData.get('content') as string;
     const status = formData.get('status') as 'Draft' | 'Published' | 'Scheduled';
     const tags = (formData.get('tags-hidden') as string)?.split(',') || [];
 
-    if (!postId || !title || !content || !status) {
-        return { error: 'Post ID, title, content, and status are required.' };
+    if (!postId || !title || !content || !status || !permalink) {
+        return { error: 'Post ID, permalink, title, content, and status are required.' };
     }
 
     const postIndex = posts.findIndex(p => p.id === postId);
@@ -159,9 +167,16 @@ export async function updatePost(prevState: any, formData: FormData) {
     if (postIndex === -1) {
         return { error: 'Post not found.' };
     }
+    
+    // Check if another post already has the new permalink
+    if (permalink !== postId && posts.some(p => p.id === permalink)) {
+        return { error: 'Another post with this permalink already exists.' };
+    }
+
 
     const updatedPost: Post = {
         ...posts[postIndex],
+        id: permalink,
         title,
         content,
         status,
@@ -181,8 +196,8 @@ export async function updatePost(prevState: any, formData: FormData) {
     }
     
     revalidatePath('/admin/posts');
-    revalidatePath(`/admin/posts/${postId}/edit`);
-    revalidatePath(`/blog/${postId}`);
+    revalidatePath(`/admin/posts/${permalink}/edit`);
+    revalidatePath(`/blog/${permalink}`);
     revalidatePath('/');
     redirect('/admin/posts');
 }

@@ -28,7 +28,19 @@ type PostFormProps = {
     post?: Post;
 }
 
+function slugify(text: string) {
+    return text
+        .toString()
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, '-')
+        .replace(/[^\w-]+/g, '')
+        .replace(/--+/g, '-');
+}
+
 export default function PostForm({ post }: PostFormProps) {
+  const [title, setTitle] = useState(post?.title || "");
+  const [permalink, setPermalink] = useState(post?.id ? (post.id.startsWith("new-post-") ? slugify(post.title) : post.id) : "");
   const [tags, setTags] = useState(post?.tags || ["Technology", "CMS"]);
   const [tagInput, setTagInput] = useState("");
 
@@ -45,6 +57,12 @@ export default function PostForm({ post }: PostFormProps) {
       });
     }
   }, [state, toast]);
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTitle = e.target.value;
+    setTitle(newTitle);
+    setPermalink(slugify(newTitle));
+  };
 
 
   const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -64,7 +82,11 @@ export default function PostForm({ post }: PostFormProps) {
 
   return (
     <form action={formAction} className="grid gap-6 lg:grid-cols-3">
-      {post && <input type="hidden" name="postId" value={post.id} />}
+      {post ? (
+          <input type="hidden" name="postId" value={post.id} />
+      ) : (
+          <input type="hidden" name="postId" value={`new-post-${Date.now()}`} />
+      )}
       <div className="lg:col-span-2 space-y-6">
         <Card>
           <CardHeader>
@@ -73,11 +95,23 @@ export default function PostForm({ post }: PostFormProps) {
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="title">Post Title</Label>
-              <Input id="title" name="title" placeholder="Your amazing post title" defaultValue={post?.title} />
+              <Input 
+                id="title" 
+                name="title" 
+                placeholder="Your amazing post title" 
+                value={title}
+                onChange={handleTitleChange} 
+              />
             </div>
             <div>
               <Label htmlFor="permalink">Permalink</Label>
-              <Input id="permalink" name="permalink" placeholder="your-amazing-post-title" defaultValue={post?.id} />
+              <Input 
+                id="permalink" 
+                name="permalink" 
+                placeholder="your-amazing-post-title" 
+                value={permalink}
+                onChange={(e) => setPermalink(e.target.value)}
+              />
               <p className="text-sm text-muted-foreground">The URL-friendly version of the name.</p>
             </div>
             <div>
