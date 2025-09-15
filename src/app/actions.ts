@@ -4,7 +4,7 @@ import { customizeTheme } from "@/ai/flows/theme-customization";
 import fs from "fs/promises";
 import path from "path";
 import { redirect } from 'next/navigation';
-import { User, users, setUsers } from "@/lib/data";
+import { User, users, setUsers, posts, Post } from "@/lib/data";
 import { createSession, deleteSession, getSession } from "@/lib/session";
 
 export async function applyTheme(customThemeCss: string) {
@@ -85,4 +85,42 @@ export async function login(prevState: any, formData: FormData) {
 export async function logout() {
     await deleteSession();
     redirect('/login');
+}
+
+
+export async function savePost(prevState: any, formData: FormData) {
+    const session = await getSession();
+    if (!session || !session.userId) {
+        return { error: "You must be logged in to create a post." };
+    }
+    
+    const user = users.find(u => u.id === session.userId);
+    if (!user) {
+        return { error: "User not found." };
+    }
+
+    const title = formData.get('title') as string;
+    const content = formData.get('content') as string;
+    const status = formData.get('status') as 'Draft' | 'Published' | 'Scheduled';
+
+    if (!title || !content || !status) {
+        return { error: 'Title, content, and status are required.' };
+    }
+
+    const newPost: Post = {
+        id: (posts.length + 1).toString(),
+        title,
+        status,
+        createdAt: new Date().toISOString().split('T')[0],
+        author: {
+            name: user.name,
+            avatarUrl: user.avatarUrl,
+        },
+    };
+
+    console.log("New Post Data:", newPost);
+    // Here you would typically save the new post to your data store (e.g., a file or database)
+    // For now, we just log it.
+
+    redirect('/admin/posts');
 }

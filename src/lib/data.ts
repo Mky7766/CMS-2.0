@@ -21,7 +21,7 @@ export type User = {
     createdAt: string;
 }
 
-export const posts: Post[] = [
+let posts: Post[] = [
   {
     id: '1',
     title: 'The Future of Web Development with Static Site Generators',
@@ -81,7 +81,7 @@ export function setUsers(newUsers: User[]) {
   users = newUsers;
 }
 
-export { users };
+export { users, posts };
 
 
 export const dashboardStats = [

@@ -1,5 +1,7 @@
 "use client";
 
+import { useActionState, useEffect } from "react";
+import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,10 +11,38 @@ import { Textarea } from "@/components/ui/textarea";
 import { Calendar, Save, UploadCloud } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { useState } from "react";
+import { savePost } from "@/app/actions";
+import { useToast } from "@/hooks/use-toast";
+
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" disabled={pending}>
+        <Save className="mr-2 h-4 w-4" /> 
+        {pending ? "Saving..." : "Save"}
+    </Button>
+  );
+}
+
 
 export default function PostForm() {
   const [tags, setTags] = useState(["Technology", "CMS"]);
   const [tagInput, setTagInput] = useState("");
+
+  const [state, formAction] = useActionState(savePost, null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (state?.error) {
+      toast({
+        title: "Error",
+        description: state.error,
+        variant: "destructive",
+      });
+    }
+  }, [state, toast]);
+
 
   const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && tagInput.trim() !== "") {
@@ -30,7 +60,7 @@ export default function PostForm() {
 
 
   return (
-    <div className="grid gap-6 lg:grid-cols-3">
+    <form action={formAction} className="grid gap-6 lg:grid-cols-3">
       <div className="lg:col-span-2 space-y-6">
         <Card>
           <CardHeader>
@@ -39,11 +69,11 @@ export default function PostForm() {
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="title">Post Title</Label>
-              <Input id="title" placeholder="Your amazing post title" />
+              <Input id="title" name="title" placeholder="Your amazing post title" />
             </div>
             <div>
               <Label htmlFor="content">Content</Label>
-              <Textarea id="content" placeholder="Start writing your content here. Markdown is supported." rows={15} />
+              <Textarea id="content" name="content" placeholder="Start writing your content here. Markdown is supported." rows={15} />
             </div>
           </CardContent>
         </Card>
@@ -55,11 +85,11 @@ export default function PostForm() {
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="seo-title">Meta Title</Label>
-              <Input id="seo-title" placeholder="A catchy title for SEO" />
+              <Input id="seo-title" name="seo-title" placeholder="A catchy title for SEO" />
             </div>
             <div>
               <Label htmlFor="seo-description">Meta Description</Label>
-              <Textarea id="seo-description" placeholder="A brief summary for search results" rows={3} />
+              <Textarea id="seo-description" name="seo-description" placeholder="A brief summary for search results" rows={3} />
             </div>
           </CardContent>
         </Card>
@@ -72,7 +102,7 @@ export default function PostForm() {
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="status">Status</Label>
-              <Select defaultValue="draft">
+              <Select defaultValue="draft" name="status">
                 <SelectTrigger id="status">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
@@ -93,7 +123,7 @@ export default function PostForm() {
           </CardContent>
           <div className="p-6 pt-0 flex justify-between items-center">
             <span className="text-sm text-muted-foreground">Auto-saved</span>
-            <Button><Save className="mr-2 h-4 w-4" /> Save</Button>
+            <SubmitButton />
           </div>
         </Card>
         <Card>
@@ -105,16 +135,18 @@ export default function PostForm() {
                 <Label htmlFor="tags">Tags</Label>
                 <Input 
                     id="tags" 
+                    name="tags"
                     placeholder="Add tags..." 
                     value={tagInput}
                     onChange={(e) => setTagInput(e.target.value)}
                     onKeyDown={handleTagInputKeyDown}
                 />
+                 <input type="hidden" name="tags-hidden" value={tags.join(',')} />
                 <div className="mt-2 flex flex-wrap gap-2">
                     {tags.map(tag => (
                         <Badge key={tag} variant="secondary" className="flex items-center gap-1">
                             {tag}
-                            <button onClick={() => removeTag(tag)} className="text-muted-foreground hover:text-foreground">
+                            <button type="button" onClick={() => removeTag(tag)} className="text-muted-foreground hover:text-foreground">
                                 <span className="sr-only">Remove {tag}</span>
                                 &times;
                             </button>
@@ -141,6 +173,6 @@ export default function PostForm() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </form>
   );
 }
