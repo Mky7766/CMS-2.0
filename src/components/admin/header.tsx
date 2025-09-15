@@ -14,6 +14,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Search, Bell, Moon, Sun } from "lucide-react"
 import React from "react"
+import { logout } from "@/app/actions"
 
 export default function AppHeader() {
   const [theme, setTheme] = React.useState("light");
@@ -68,7 +69,7 @@ export default function AppHeader() {
             <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Logout</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => logout()}>Logout</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

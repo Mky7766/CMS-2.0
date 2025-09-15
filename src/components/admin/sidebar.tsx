@@ -15,6 +15,8 @@ import { Icons } from "@/components/icons"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { LayoutDashboard, FileText, Image as ImageIcon, Settings, Users, LogOut } from "lucide-react"
 import { Separator } from "../ui/separator"
+import { logout } from "@/app/actions"
+import { Button } from "../ui/button"
 
 const menuItems = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -69,12 +71,14 @@ export default function AppSidebar() {
                 </SidebarMenuButton>
             </SidebarMenuItem>
              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip={{ children: 'Logout' }}>
-                    <Link href="/login">
-                        <LogOut className="h-4 w-4" />
-                        <span>Logout</span>
-                    </Link>
-                </SidebarMenuButton>
+                <form action={logout}>
+                    <SidebarMenuButton asChild tooltip={{ children: 'Logout' }}>
+                        <Button type="submit" variant="ghost" className="w-full justify-start">
+                            <LogOut className="h-4 w-4" />
+                            <span>Logout</span>
+                        </Button>
+                    </SidebarMenuButton>
+                </form>
             </SidebarMenuItem>
          </SidebarMenu>
       </SidebarFooter>

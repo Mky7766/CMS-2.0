@@ -1,13 +1,14 @@
+import { getSession } from "@/lib/session";
 import { redirect } from 'next/navigation';
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const userLoggedIn = false; 
+  const session = await getSession();
 
-  if (!userLoggedIn) {
+  if (!session) {
     redirect('/login');
   }
 

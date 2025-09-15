@@ -5,6 +5,7 @@ import fs from "fs/promises";
 import path from "path";
 import { redirect } from 'next/navigation';
 import { User, users, setUsers } from "@/lib/data";
+import { createSession, deleteSession, getSession } from "@/lib/session";
 
 export async function applyTheme(customThemeCss: string) {
     try {
@@ -58,7 +59,8 @@ export async function signup(prevState: any, formData: FormData) {
         console.error("Failed to save user:", error);
         return { error: 'Failed to create account. Please try again.' };
     }
-
+    
+    await createSession(newUser.id);
     redirect('/admin/dashboard');
 }
 
@@ -73,8 +75,14 @@ export async function login(prevState: any, formData: FormData) {
     const user = users.find(u => u.email === email && u.password === password);
 
     if (user) {
+        await createSession(user.id);
         redirect('/admin/dashboard');
     } else {
         return { error: 'Invalid email or password.' };
     }
+}
+
+export async function logout() {
+    await deleteSession();
+    redirect('/login');
 }
