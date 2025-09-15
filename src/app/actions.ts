@@ -284,3 +284,35 @@ export async function uploadMedia(fileDataUrl: string, fileName: string) {
       return { error: 'Failed to upload media. Please try again.' };
     }
   }
+
+
+  export async function deleteMedia(imageId: string) {
+    const session = await getSession();
+    if (!session) {
+      return { error: "Unauthorized" };
+    }
+  
+    try {
+      const imagesFilePath = path.join(process.cwd(), 'src', 'lib', 'placeholder-images.json');
+      const currentImagesData = await fs.readFile(imagesFilePath, 'utf-8');
+      const currentImagesJson = JSON.parse(currentImagesData);
+  
+      const initialLength = currentImagesJson.placeholderImages.length;
+      const updatedImages = currentImagesJson.placeholderImages.filter((img: ImagePlaceholder) => img.id !== imageId);
+      
+      if (updatedImages.length === initialLength) {
+        return { error: 'Image not found.' };
+      }
+      
+      currentImagesJson.placeholderImages = updatedImages;
+  
+      await fs.writeFile(imagesFilePath, JSON.stringify(currentImagesJson, null, 2));
+      
+      revalidatePath('/admin/media');
+      return { success: true };
+  
+    } catch (error) {
+      console.error("Failed to delete media:", error);
+      return { error: 'Failed to delete media. Please try again.' };
+    }
+  }

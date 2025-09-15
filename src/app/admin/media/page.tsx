@@ -6,18 +6,27 @@ import { useState, useTransition, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { type ImagePlaceholder } from "@/lib/placeholder-images";
-import { MoreVertical, UploadCloud } from "lucide-react";
+import { MoreVertical, UploadCloud, Loader } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getImages, uploadMedia } from "@/app/actions";
+import { getImages, uploadMedia, deleteMedia } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
-import { Loader } from "lucide-react";
 
 export default function MediaPage() {
   const [images, setImages] = useState<ImagePlaceholder[]>([]);
@@ -25,6 +34,10 @@ export default function MediaPage() {
   const [isPending, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  // State for delete confirmation
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [imageToDelete, setImageToDelete] = useState<ImagePlaceholder | null>(null);
 
   useEffect(() => {
     async function loadImages() {
@@ -59,11 +72,32 @@ export default function MediaPage() {
         toast({ title: "Error", description: "Failed to read file.", variant: "destructive" });
     };
 
-    // Reset file input to allow uploading the same file again
     if(fileInputRef.current) {
         fileInputRef.current.value = "";
     }
   };
+
+  const openDeleteDialog = (image: ImagePlaceholder) => {
+    setImageToDelete(image);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDelete = () => {
+    if (!imageToDelete) return;
+    
+    startTransition(async () => {
+      const result = await deleteMedia(imageToDelete.id);
+      if (result.success) {
+        setImages(prevImages => prevImages.filter(img => img.id !== imageToDelete.id));
+        toast({ title: "Success", description: "Image deleted successfully." });
+        setIsDeleteDialogOpen(false);
+        setImageToDelete(null);
+      } else {
+        toast({ title: "Error", description: result.error, variant: "destructive" });
+      }
+    });
+  }
+
 
   if (isLoading) {
     return (
@@ -90,61 +124,89 @@ export default function MediaPage() {
   }
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Media Library</h1>
-          <p className="text-muted-foreground">Manage your images and other media files.</p>
+    <>
+      <div className="space-y-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Media Library</h1>
+            <p className="text-muted-foreground">Manage your images and other media files.</p>
+          </div>
+          <div>
+            <Button asChild disabled={isPending}>
+              <Label htmlFor="file-upload" className="cursor-pointer">
+                {isPending ? <Loader className="mr-2 h-4 w-4 animate-spin" /> : <UploadCloud className="mr-2 h-4 w-4" />}
+                {isPending ? "Uploading..." : "Upload Media"}
+              </Label>
+            </Button>
+            <Input 
+              id="file-upload" 
+              type="file" 
+              className="sr-only" 
+              onChange={handleFileChange}
+              accept="image/*"
+              ref={fileInputRef}
+              disabled={isPending}
+            />
+          </div>
         </div>
-        <div>
-           <Button asChild disabled={isPending}>
-            <Label htmlFor="file-upload" className="cursor-pointer">
-              {isPending ? <Loader className="mr-2 h-4 w-4 animate-spin" /> : <UploadCloud className="mr-2 h-4 w-4" />}
-              {isPending ? "Uploading..." : "Upload Media"}
-            </Label>
-          </Button>
-          <Input 
-            id="file-upload" 
-            type="file" 
-            className="sr-only" 
-            onChange={handleFileChange}
-            accept="image/*"
-            ref={fileInputRef}
-            disabled={isPending}
-          />
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          {images.map((image) => (
+            <Card key={image.id} className="group relative overflow-hidden">
+              <CardContent className="p-0">
+                <Image
+                  src={image.imageUrl}
+                  alt={image.description}
+                  width={400}
+                  height={300}
+                  className="aspect-[4/3] w-full object-cover transition-transform group-hover:scale-105"
+                  data-ai-hint={image.imageHint}
+                  unoptimized={image.imageUrl.startsWith('data:')}
+                />
+              </CardContent>
+              <div className="absolute top-2 right-2">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="secondary" size="icon" className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem>View details</DropdownMenuItem>
+                      <DropdownMenuItem>Replace</DropdownMenuItem>
+                      <DropdownMenuItem 
+                        className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/40"
+                        onSelect={() => openDeleteDialog(image)}
+                      >
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+            </Card>
+          ))}
         </div>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-        {images.map((image) => (
-          <Card key={image.id} className="group relative overflow-hidden">
-            <CardContent className="p-0">
-              <Image
-                src={image.imageUrl}
-                alt={image.description}
-                width={400}
-                height={300}
-                className="aspect-[4/3] w-full object-cover transition-transform group-hover:scale-105"
-                data-ai-hint={image.imageHint}
-                unoptimized={image.imageUrl.startsWith('data:')} // unoptimize data urls
-              />
-            </CardContent>
-             <div className="absolute top-2 right-2">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="secondary" size="icon" className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>View details</DropdownMenuItem>
-                    <DropdownMenuItem>Replace</DropdownMenuItem>
-                    <DropdownMenuItem className="text-red-600">Delete</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-          </Card>
-        ))}
-      </div>
-    </div>
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the media file.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={isPending}
+              className="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800"
+            >
+              {isPending ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
