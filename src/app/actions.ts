@@ -8,7 +8,7 @@ import { redirect } from 'next/navigation';
 import { User, users, setUsers, posts, setPosts, Post } from "@/lib/data";
 import { createSession, deleteSession, getSession } from "@/lib/session";
 import { revalidatePath } from "next/cache";
-import { PlaceHolderImages, ImagePlaceholder } from "@/lib/placeholder-images";
+import { ImagePlaceholder } from "@/lib/placeholder-images";
 
 export async function applyTheme(customThemeCss: string) {
     try {
@@ -232,6 +232,18 @@ export async function deletePost(postId: string) {
     } catch (error) {
         console.error("Failed to delete post:", error);
         return { error: 'Failed to delete post. Please try again.' };
+    }
+}
+
+export async function getImages(): Promise<ImagePlaceholder[]> {
+    try {
+        const imagesFilePath = path.join(process.cwd(), 'src', 'lib', 'placeholder-images.json');
+        const currentImagesData = await fs.readFile(imagesFilePath, 'utf-8');
+        const currentImagesJson = JSON.parse(currentImagesData);
+        return currentImagesJson.placeholderImages as ImagePlaceholder[];
+    } catch (error) {
+        console.error("Failed to get images:", error);
+        return [];
     }
 }
 

@@ -2,10 +2,10 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useTransition, useRef } from "react";
+import { useState, useTransition, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { PlaceHolderImages, ImagePlaceholder } from "@/lib/placeholder-images";
+import { type ImagePlaceholder } from "@/lib/placeholder-images";
 import { MoreVertical, UploadCloud } from "lucide-react";
 import {
   DropdownMenu,
@@ -15,15 +15,26 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { uploadMedia } from "@/app/actions";
+import { getImages, uploadMedia } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import { Loader } from "lucide-react";
 
 export default function MediaPage() {
-  const [images, setImages] = useState<ImagePlaceholder[]>(PlaceHolderImages);
+  const [images, setImages] = useState<ImagePlaceholder[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isPending, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    async function loadImages() {
+      setIsLoading(true);
+      const fetchedImages = await getImages();
+      setImages(fetchedImages);
+      setIsLoading(false);
+    }
+    loadImages();
+  }, []);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -53,6 +64,30 @@ export default function MediaPage() {
         fileInputRef.current.value = "";
     }
   };
+
+  if (isLoading) {
+    return (
+        <div className="space-y-8">
+            <div className="flex items-center justify-between">
+                <div>
+                <h1 className="text-3xl font-bold tracking-tight">Media Library</h1>
+                <p className="text-muted-foreground">Manage your images and other media files.</p>
+                </div>
+                 <Button disabled={true}>
+                    <Loader className="mr-2 h-4 w-4 animate-spin" />
+                    Loading...
+                </Button>
+            </div>
+             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                {Array.from({ length: 12 }).map((_, i) => (
+                    <Card key={i} className="group relative overflow-hidden">
+                        <CardContent className="p-0 bg-muted animate-pulse aspect-[4/3] w-full" />
+                    </Card>
+                ))}
+            </div>
+        </div>
+    )
+  }
 
   return (
     <div className="space-y-8">
