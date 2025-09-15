@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { posts } from "@/lib/data";
-import { FileText, CheckCircle, Edit3, BarChart2, MoreVertical, ArrowUpRight, User as UserIcon } from "lucide-react";
+import { FileText, CheckCircle, Edit3, MoreVertical, ArrowUpRight, User as UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -10,15 +10,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  ChartConfig,
-} from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import Link from "next/link";
 import { users } from "@/lib/data";
+import DashboardChart from "@/components/admin/dashboard-chart";
 
 const iconMap: { [key: string]: React.ElementType } = {
   FileText,
@@ -26,14 +20,6 @@ const iconMap: { [key: string]: React.ElementType } = {
   Edit3,
   UserIcon,
 };
-
-const chartConfig = {
-  posts: {
-    label: "Posts",
-    color: "hsl(var(--primary))",
-  },
-} satisfies ChartConfig;
-
 
 export default function DashboardPage() {
   const recentPosts = [...posts].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 5);
@@ -151,21 +137,7 @@ export default function DashboardPage() {
             <CardTitle>Posts per Month</CardTitle>
           </CardHeader>
            <CardContent>
-              <ChartContainer config={chartConfig} className="h-[200px] w-full">
-                <BarChart accessibilityLayer data={chartData}>
-                  <CartesianGrid vertical={false} />
-                  <XAxis
-                    dataKey="month"
-                    tickLine={false}
-                    tickMargin={10}
-                    axisLine={false}
-                    tickFormatter={(value) => value.slice(0, 3)}
-                  />
-                  <YAxis />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="posts" fill="var(--color-posts)" radius={4} />
-                </BarChart>
-              </ChartContainer>
+              <DashboardChart chartData={chartData} />
           </CardContent>
         </Card>
       </div>
