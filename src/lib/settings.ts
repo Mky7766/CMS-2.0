@@ -31,3 +31,7 @@ export async function getSettings(): Promise<SiteSettings> {
     return defaultSettings;
   }
 }
+
+export function clearSettingsCache(): void {
+    cachedSettings = null;
+}

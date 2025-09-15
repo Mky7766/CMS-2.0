@@ -1,4 +1,3 @@
-
 "use server"
 
 import { customizeTheme } from "@/ai/flows/theme-customization";
@@ -9,7 +8,7 @@ import { User, users, setUsers, posts, setPosts, Post } from "@/lib/data";
 import { createSession, deleteSession, getSession } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 import { ImagePlaceholder } from "@/lib/placeholder-images";
-import { SiteSettings } from "@/lib/settings";
+import { SiteSettings, clearSettingsCache } from "@/lib/settings";
 
 export async function applyTheme(customThemeCss: string) {
     try {
@@ -340,7 +339,9 @@ export async function uploadMedia(fileDataUrl: string, fileName: string) {
         const settingsFilePath = path.join(process.cwd(), 'src', 'lib', 'settings.json');
         await fs.writeFile(settingsFilePath, JSON.stringify(newSettings, null, 2));
         
-        // No need to update in-memory, revalidation will handle it.
+        // Clear the in-memory cache
+        clearSettingsCache();
+        
         revalidatePath('/admin/settings');
         revalidatePath('/');
 
