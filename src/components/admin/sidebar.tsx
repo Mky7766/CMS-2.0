@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import React from "react"
 import { usePathname } from "next/navigation"
 import {
   Sidebar,
@@ -13,7 +14,7 @@ import {
 } from "@/components/ui/sidebar"
 import { Icons } from "@/components/icons"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { LayoutDashboard, FileText, Image as ImageIcon, Settings, Users, LogOut } from "lucide-react"
+import { LayoutDashboard, FileText, Image as ImageIcon, Settings, Users, LogOut, Sun, Moon } from "lucide-react"
 import { Separator } from "../ui/separator"
 import { logout } from "@/app/actions"
 import { Button } from "../ui/button"
@@ -28,6 +29,13 @@ const menuItems = [
 
 export default function AppSidebar() {
   const pathname = usePathname()
+  const [theme, setTheme] = React.useState("light");
+
+  const toggleTheme = () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    document.documentElement.classList.toggle("dark", newTheme === "dark");
+  };
 
   return (
     <Sidebar>
@@ -59,15 +67,10 @@ export default function AppSidebar() {
       <SidebarFooter>
          <SidebarMenu>
             <SidebarMenuItem>
-                <SidebarMenuButton tooltip={{ children: 'User Profile' }}>
-                    <Avatar className="h-8 w-8">
-                        <AvatarImage src="https://picsum.photos/seed/user/32/32" alt="Admin" />
-                        <AvatarFallback>A</AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col text-left">
-                        <span className="text-sm font-medium">Admin User</span>
-                        <span className="text-xs text-muted-foreground">admin@nebula.io</span>
-                    </div>
+                <SidebarMenuButton tooltip={{ children: 'Toggle Theme' }} onClick={toggleTheme}>
+                    <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                    <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                    <span>Theme</span>
                 </SidebarMenuButton>
             </SidebarMenuItem>
              <SidebarMenuItem>
