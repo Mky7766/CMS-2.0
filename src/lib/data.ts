@@ -9,6 +9,15 @@ export type Post = {
   };
 };
 
+export type User = {
+    id: string;
+    name: string;
+    email: string;
+    avatarUrl: string;
+    role: 'Admin' | 'Editor' | 'Author';
+    createdAt: string;
+}
+
 export const posts: Post[] = [
   {
     id: '1',
@@ -61,6 +70,33 @@ export const posts: Post[] = [
     },
   },
 ];
+
+export const users: User[] = [
+    {
+        id: '1',
+        name: 'Jane Doe',
+        email: 'jane.doe@example.com',
+        avatarUrl: 'https://picsum.photos/seed/a1/32/32',
+        role: 'Admin',
+        createdAt: '2024-07-01'
+    },
+    {
+        id: '2',
+        name: 'John Smith',
+        email: 'john.smith@example.com',
+        avatarUrl: 'https://picsum.photos/seed/b2/32/32',
+        role: 'Editor',
+        createdAt: '2024-07-05'
+    },
+    {
+        id: '3',
+        name: 'Alice Johnson',
+        email: 'alice.j@example.com',
+        avatarUrl: 'https://picsum.photos/seed/c3/32/32',
+        role: 'Author',
+        createdAt: '2024-07-10'
+    }
+]
 
 export const dashboardStats = [
     { title: "Total Posts", value: "28", icon: "FileText" },
