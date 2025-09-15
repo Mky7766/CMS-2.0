@@ -152,14 +152,14 @@ export default function PostForm({ post }: PostFormProps) {
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="status">Status</Label>
-              <Select defaultValue={post?.status?.toLowerCase() || "draft"} name="status">
+              <Select defaultValue={post?.status || "draft"} name="status">
                 <SelectTrigger id="status">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="draft">Draft</SelectItem>
-                  <SelectItem value="published">Published</SelectItem>
-                  <SelectItem value="scheduled">Scheduled</SelectItem>
+                  <SelectItem value="Draft">Draft</SelectItem>
+                  <SelectItem value="Published">Published</SelectItem>
+                  <SelectItem value="Scheduled">Scheduled</SelectItem>
                 </SelectContent>
               </Select>
             </div>
