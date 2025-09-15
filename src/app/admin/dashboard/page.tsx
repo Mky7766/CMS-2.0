@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { posts } from "@/lib/data";
-import { FileText, CheckCircle, Edit3, MoreVertical, ArrowUpRight, User as UserIcon } from "lucide-react";
+import { FileText, CheckCircle, Edit3, MoreVertical, ArrowUpRight, User as UserIcon, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -50,9 +50,17 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">Welcome back! Here&apos;s a summary of your content.</p>
+      <div className="flex items-center justify-between">
+        <div>
+            <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+            <p className="text-muted-foreground">Welcome back! Here&apos;s a summary of your content.</p>
+        </div>
+        <Button asChild variant="outline">
+            <Link href="/" target="_blank">
+                <ExternalLink className="mr-2 h-4 w-4" />
+                Visit Site
+            </Link>
+        </Button>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
