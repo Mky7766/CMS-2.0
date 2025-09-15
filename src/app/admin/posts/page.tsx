@@ -60,7 +60,7 @@ function PostsTable({ posts }: PostTableProps) {
                 <TableCell className="hidden md:table-cell">
                   {post.createdAt}
                 </TableCell>
-                <TableCell>
+                <TableCell className="text-right">
                     <PostActions postId={post.id} />
                 </TableCell>
               </TableRow>
