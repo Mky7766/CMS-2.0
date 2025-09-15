@@ -1,14 +1,19 @@
+
+"use client";
+
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { MoreVertical, PlusCircle, UploadCloud } from "lucide-react";
+import { MoreVertical, UploadCloud } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function MediaPage() {
   return (
@@ -18,10 +23,15 @@ export default function MediaPage() {
           <h1 className="text-3xl font-bold tracking-tight">Media Library</h1>
           <p className="text-muted-foreground">Manage your images and other media files.</p>
         </div>
-        <Button>
-          <UploadCloud className="mr-2 h-4 w-4" />
-          Upload Media
-        </Button>
+        <div>
+           <Button asChild>
+            <Label htmlFor="file-upload" className="cursor-pointer">
+              <UploadCloud className="mr-2 h-4 w-4" />
+              Upload Media
+            </Label>
+          </Button>
+          <Input id="file-upload" type="file" className="sr-only" />
+        </div>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
         {PlaceHolderImages.map((image) => (

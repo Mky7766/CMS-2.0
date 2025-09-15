@@ -1,5 +1,17 @@
 [
   {
+    "id": "samsung-phone-under-10000-jhssh",
+    "title": "Samsung Phone Under 10000",
+    "content": "Samsung Phone Under 10000:- बढ़ती हुई टेक्नोलॉजी की दुनिया में आज फोन की कितनी वैल्यू हो गई है हम सभी यह जानते हैं, आज हम आपको ऐसे ही सैमसंग का मोबाइल बताएंगे जिन्हें आप 10000 में बड़ी आसान से खरीद सकते हैं।\r\n",
+    "status": "Published",
+    "createdAt": "2025-09-15",
+    "author": {
+      "name": "mukeshyogi2802",
+      "avatarUrl": "https://picsum.photos/seed/5/32/32"
+    },
+    "tags": []
+  },
+  {
     "id": "create-a-modern-responsive-cms-admin-dashboard",
     "title": "Create a modern, responsive CMS Admin Dashboard",
     "content": "Create a modern, responsive CMS Admin Dashboard for a blogging platform that is fully compatible with static hosting like Netlify. The dashboard should look professional, clean, and user-friendly with the following pro features:\r\n\r\n🔑 Authentication & User Management\r\n\r\nSecure login/logout system.\r\n\r\nUser roles: Admin, Editor, Author, Viewer.\r\n\r\nProfile settings with avatar upload and dark/light theme toggle.\r\n\r\n📝 Content Management\r\n\r\nQuick post creation button (“New Post”).\r\n\r\nRich text + Markdown editor with image/video embed.\r\n\r\nCategories and tags management.\r\n\r\nPost status: Draft, Scheduled, Published.\r\n\r\nAuto-save drafts and post version history (rollback option).\r\n\r\n📊 Dashboard Overview (Main Screen)\r\n\r\nTotal Posts, Drafts, Published Posts count.\r\n\r\nGraph/Chart of posts published by month.\r\n\r\nLatest posts preview with edit/delete buttons.\r\n\r\nRecent comments (via API like Disqus or Firebase).\r\n\r\nNotifications (new comments, scheduled post reminder).\r\n\r\n📂 Media Library\r\n\r\nUpload images, videos, docs.\r\n\r\nDrag & drop file upload.\r\n\r\nSearch + filter media files.\r\n\r\n⚙️ SEO & Google Optimization Tools\r\n\r\nDedicated SEO panel per post with fields:\r\n\r\nMeta title & description.\r\n\r\nOpenGraph (Facebook/Twitter preview).\r\n\r\nKeywords field with density analyzer.\r\n\r\nSitemap auto-generator.\r\n\r\nGoogle Analytics integration (show traffic graph on dashboard).\r\n\r\nSearch Console integration (track clicks, impressions, top queries).\r\n\r\nSchema Markup generator (FAQ, Breadcrumbs, Article schema).\r\n\r\n🎨 Customization & Themes\r\n\r\nTheme selector for frontend blog.\r\n\r\nOption to edit blog layout, header, footer, and colors.\r\n\r\n📈 Extra Pro Features\r\n\r\nContent calendar (schedule posts visually).\r\n\r\nAI content suggestions (title ideas, SEO keywords).\r\n\r\nMulti-language content support.\r\n\r\nBackup & Restore posts.\r\n\r\nSecurity logs (failed login attempts, changes history).\r\n\r\nThe dashboard design should be clean like Google Analytics + Notion + WordPress combined. It must be responsive, mobile-friendly, with smooth navigation sidebar (Posts, Media, SEO, Settings, Users).\r\n\r\nGoal: A professional CMS Admin Dashboard at /admin/dashboard with advanced blogging, SEO, and analytics features, optimized for Google ranking.",
@@ -28,17 +40,6 @@
       "Technology",
       "CMS"
     ]
-  },
-  {
-    "id": "1",
-    "title": "The Future of Web Development with Static Site Generators",
-    "status": "Published",
-    "createdAt": "2024-07-20",
-    "author": {
-      "name": "Jane Doe",
-      "avatarUrl": "https://picsum.photos/seed/a1/32/32"
-    },
-    "content": "Static site generators are taking the web development world by storm. In this post, we'll explore why."
   },
   {
     "id": "2",
