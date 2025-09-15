@@ -76,6 +76,11 @@ export default function PostForm({ post }: PostFormProps) {
               <Input id="title" name="title" placeholder="Your amazing post title" defaultValue={post?.title} />
             </div>
             <div>
+              <Label htmlFor="permalink">Permalink</Label>
+              <Input id="permalink" name="permalink" placeholder="your-amazing-post-title" defaultValue={post?.id} />
+              <p className="text-sm text-muted-foreground">The URL-friendly version of the name.</p>
+            </div>
+            <div>
               <Label htmlFor="content">Content</Label>
               <Textarea id="content" name="content" placeholder="Start writing your content here. Markdown is supported." rows={15} defaultValue={post?.content} />
             </div>
