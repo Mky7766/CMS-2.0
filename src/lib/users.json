@@ -25,5 +25,23 @@
     "avatarUrl": "https://picsum.photos/seed/c3/32/32",
     "role": "Author",
     "createdAt": "2024-07-10"
+  },
+  {
+    "id": "4",
+    "name": "inholika",
+    "email": "inholika@gmail.com",
+    "password": "Mky7766@",
+    "avatarUrl": "https://picsum.photos/seed/4/32/32",
+    "role": "Author",
+    "createdAt": "2025-09-15"
+  },
+  {
+    "id": "5",
+    "name": "mukeshyogi2802",
+    "email": "mukeshyogi2802@gmail.com",
+    "password": "12345678",
+    "avatarUrl": "https://picsum.photos/seed/5/32/32",
+    "role": "Author",
+    "createdAt": "2025-09-15"
   }
 ]

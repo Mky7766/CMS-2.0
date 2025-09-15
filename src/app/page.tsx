@@ -25,7 +25,7 @@ export default function Home() {
           </p>
           <div className="mt-8 flex justify-center gap-4">
             <Button size="lg" asChild>
-              <Link href="/admin/dashboard">
+              <Link href="/login">
                 Go to Dashboard
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
