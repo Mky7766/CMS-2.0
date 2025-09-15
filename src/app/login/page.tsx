@@ -55,7 +55,7 @@ export default function LoginPage() {
           </div>
         </CardContent>
         <CardFooter className="justify-center text-sm">
-          <p>Don&apos;t have an account? <Link href="#" className="underline">Sign up</Link></p>
+          <p>Don&apos;t have an account? <Link href="/signup" className="underline">Sign up</Link></p>
         </CardFooter>
       </Card>
     </div>
