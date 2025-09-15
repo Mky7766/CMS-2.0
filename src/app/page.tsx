@@ -1,12 +1,15 @@
+
 import Link from "next/link";
 import { posts } from "@/lib/data";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
+import { getSettings } from "@/lib/settings";
 
-export default function Home() {
-  const publishedPosts = posts.filter(p => p.status === 'Published').sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+export default async function Home() {
+  const settings = await getSettings();
+  const publishedPosts = posts.filter(p => p.status.toLowerCase() === 'published').sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -14,7 +17,7 @@ export default function Home() {
         <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
           <Link href="/" className="flex items-center gap-2 font-headline text-xl font-bold">
             <Icons.logo className="h-6 w-6" />
-            Nebula CMS
+            {settings.siteName || "Nebula CMS"}
           </Link>
           <div className="flex flex-1 items-center justify-end space-x-4">
             <nav className="flex items-center space-x-1">
@@ -30,9 +33,9 @@ export default function Home() {
       <main className="flex-1">
         <div className="container mx-auto px-4 py-8 md:py-12">
             <div className="text-center mb-12">
-                <h1 className="text-4xl md:text-6xl font-bold tracking-tight">Nebula Blog</h1>
+                <h1 className="text-4xl md:text-6xl font-bold tracking-tight">{settings.siteName || "Nebula Blog"}</h1>
                 <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-                    Welcome to our blog. Here we share the latest stories and insights.
+                    {settings.tagline || "Welcome to our blog. Here we share the latest stories and insights."}
                 </p>
             </div>
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">

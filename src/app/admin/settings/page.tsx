@@ -1,11 +1,15 @@
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import ThemeForm from "@/components/admin/theme-form";
+import GeneralSettingsForm from "@/components/admin/general-settings-form";
+import { getSettings } from "@/lib/settings";
 
-export default function SettingsPage() {
+
+export default async function SettingsPage() {
+  const settings = await getSettings();
+
   return (
     <div className="space-y-8">
       <div>
@@ -19,22 +23,7 @@ export default function SettingsPage() {
           <TabsTrigger value="users">Users & Roles</TabsTrigger>
         </TabsList>
         <TabsContent value="general" className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>General Settings</CardTitle>
-              <CardDescription>Update your site's basic information.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="site-name">Site Name</Label>
-                <Input id="site-name" defaultValue="Nebula CMS Blog" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="tagline">Tagline</Label>
-                <Input id="tagline" defaultValue="A modern, git-based CMS" />
-              </div>
-            </CardContent>
-          </Card>
+            <GeneralSettingsForm settings={settings} />
         </TabsContent>
         <TabsContent value="appearance" className="mt-4">
             <ThemeForm />

@@ -9,6 +9,7 @@ import { User, users, setUsers, posts, setPosts, Post } from "@/lib/data";
 import { createSession, deleteSession, getSession } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 import { ImagePlaceholder } from "@/lib/placeholder-images";
+import { SiteSettings } from "@/lib/settings";
 
 export async function applyTheme(customThemeCss: string) {
     try {
@@ -316,3 +317,37 @@ export async function uploadMedia(fileDataUrl: string, fileName: string) {
       return { error: 'Failed to delete media. Please try again.' };
     }
   }
+
+  export async function updateSettings(prevState: any, formData: FormData) {
+    const session = await getSession();
+    if (!session) {
+      return { error: "Unauthorized" };
+    }
+
+    const siteName = formData.get('site-name') as string;
+    const tagline = formData.get('tagline') as string;
+
+    if (!siteName) {
+        return { error: 'Site name is required.' };
+    }
+
+    const newSettings: SiteSettings = {
+        siteName,
+        tagline,
+    };
+
+    try {
+        const settingsFilePath = path.join(process.cwd(), 'src', 'lib', 'settings.json');
+        await fs.writeFile(settingsFilePath, JSON.stringify(newSettings, null, 2));
+        
+        // No need to update in-memory, revalidation will handle it.
+        revalidatePath('/admin/settings');
+        revalidatePath('/');
+
+        return { success: 'Settings updated successfully.' };
+
+    } catch (error) {
+        console.error("Failed to update settings:", error);
+        return { error: 'Failed to update settings. Please try again.' };
+    }
+}
