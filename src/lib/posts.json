@@ -53,16 +53,5 @@
       "avatarUrl": "https://picsum.photos/seed/d4/32/32"
     },
     "content": "Image optimization is crucial for web performance. Learn the best techniques here."
-  },
-  {
-    "id": "5",
-    "title": "The Power of Markdown in Content Creation",
-    "status": "Scheduled",
-    "createdAt": "2024-07-25",
-    "author": {
-      "name": "Charlie Davis",
-      "avatarUrl": "https://picsum.photos/seed/e5/32/32"
-    },
-    "content": "Markdown is a powerful tool for writers. This guide will show you how to master it."
   }
 ]

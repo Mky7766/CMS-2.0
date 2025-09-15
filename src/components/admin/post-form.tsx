@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,27 +10,30 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar, Save, UploadCloud } from "lucide-react";
 import { Badge } from "../ui/badge";
-import { useState } from "react";
-import { savePost } from "@/app/actions";
+import { savePost, updatePost } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
+import type { Post } from "@/lib/data";
 
-
-function SubmitButton() {
+function SubmitButton({ isUpdate }: { isUpdate?: boolean }) {
   const { pending } = useFormStatus();
   return (
     <Button type="submit" disabled={pending}>
         <Save className="mr-2 h-4 w-4" /> 
-        {pending ? "Saving..." : "Save"}
+        {pending ? (isUpdate ? "Updating..." : "Saving...") : (isUpdate ? "Update" : "Save")}
     </Button>
   );
 }
 
+type PostFormProps = {
+    post?: Post;
+}
 
-export default function PostForm() {
-  const [tags, setTags] = useState(["Technology", "CMS"]);
+export default function PostForm({ post }: PostFormProps) {
+  const [tags, setTags] = useState(post?.tags || ["Technology", "CMS"]);
   const [tagInput, setTagInput] = useState("");
 
-  const [state, formAction] = useActionState(savePost, null);
+  const action = post ? updatePost : savePost;
+  const [state, formAction] = useActionState(action, null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -61,6 +64,7 @@ export default function PostForm() {
 
   return (
     <form action={formAction} className="grid gap-6 lg:grid-cols-3">
+      {post && <input type="hidden" name="postId" value={post.id} />}
       <div className="lg:col-span-2 space-y-6">
         <Card>
           <CardHeader>
@@ -69,11 +73,11 @@ export default function PostForm() {
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="title">Post Title</Label>
-              <Input id="title" name="title" placeholder="Your amazing post title" />
+              <Input id="title" name="title" placeholder="Your amazing post title" defaultValue={post?.title} />
             </div>
             <div>
               <Label htmlFor="content">Content</Label>
-              <Textarea id="content" name="content" placeholder="Start writing your content here. Markdown is supported." rows={15} />
+              <Textarea id="content" name="content" placeholder="Start writing your content here. Markdown is supported." rows={15} defaultValue={post?.content} />
             </div>
           </CardContent>
         </Card>
@@ -102,7 +106,7 @@ export default function PostForm() {
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="status">Status</Label>
-              <Select defaultValue="draft" name="status">
+              <Select defaultValue={post?.status || "draft"} name="status">
                 <SelectTrigger id="status">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
@@ -123,7 +127,7 @@ export default function PostForm() {
           </CardContent>
           <div className="p-6 pt-0 flex justify-between items-center">
             <span className="text-sm text-muted-foreground">Auto-saved</span>
-            <SubmitButton />
+            <SubmitButton isUpdate={!!post} />
           </div>
         </Card>
         <Card>

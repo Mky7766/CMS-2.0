@@ -21,6 +21,7 @@ import { MoreHorizontal } from "lucide-react"
 import { useState, useTransition } from "react"
 import { deletePost } from "@/app/actions"
 import { useToast } from "@/hooks/use-toast"
+import Link from "next/link"
 
 type PostActionsProps = {
   postId: string
@@ -53,8 +54,12 @@ export default function PostActions({ postId }: PostActionsProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem>Edit</DropdownMenuItem>
-          <DropdownMenuItem>View</DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href={`/admin/posts/${postId}/edit`}>Edit</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+             <Link href={`/blog/${postId}`} target="_blank">View</Link>
+          </DropdownMenuItem>
           <DropdownMenuItem
             className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/40"
             onSelect={() => setIsDeleteDialogOpen(true)}

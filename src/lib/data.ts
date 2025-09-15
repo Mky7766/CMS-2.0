@@ -11,6 +11,7 @@ export type Post = {
     name: string;
     avatarUrl: string;
   };
+  tags?: string[];
 };
 
 export type User = {

@@ -118,6 +118,7 @@ export async function savePost(prevState: any, formData: FormData) {
             name: user.name,
             avatarUrl: user.avatarUrl,
         },
+        tags: (formData.get('tags-hidden') as string)?.split(',') || []
     };
 
     const updatedPosts = [newPost, ...posts];
@@ -131,8 +132,61 @@ export async function savePost(prevState: any, formData: FormData) {
         return { error: 'Failed to save post. Please try again.' };
     }
 
+    revalidatePath('/admin/posts');
+    revalidatePath('/');
     redirect('/admin/posts');
 }
+
+
+export async function updatePost(prevState: any, formData: FormData) {
+    const session = await getSession();
+    if (!session || !session.userId) {
+        return { error: "You must be logged in to update a post." };
+    }
+
+    const postId = formData.get('postId') as string;
+    const title = formData.get('title') as string;
+    const content = formData.get('content') as string;
+    const status = formData.get('status') as 'Draft' | 'Published' | 'Scheduled';
+    const tags = (formData.get('tags-hidden') as string)?.split(',') || [];
+
+    if (!postId || !title || !content || !status) {
+        return { error: 'Post ID, title, content, and status are required.' };
+    }
+
+    const postIndex = posts.findIndex(p => p.id === postId);
+
+    if (postIndex === -1) {
+        return { error: 'Post not found.' };
+    }
+
+    const updatedPost: Post = {
+        ...posts[postIndex],
+        title,
+        content,
+        status,
+        tags,
+    };
+
+    const updatedPosts = [...posts];
+    updatedPosts[postIndex] = updatedPost;
+
+    try {
+        const postsFilePath = path.join(process.cwd(), 'src', 'lib', 'posts.json');
+        await fs.writeFile(postsFilePath, JSON.stringify(updatedPosts, null, 2));
+        setPosts(updatedPosts);
+    } catch (error) {
+        console.error("Failed to update post:", error);
+        return { error: 'Failed to update post. Please try again.' };
+    }
+    
+    revalidatePath('/admin/posts');
+    revalidatePath(`/admin/posts/${postId}/edit`);
+    revalidatePath(`/blog/${postId}`);
+    revalidatePath('/');
+    redirect('/admin/posts');
+}
+
 
 export async function deletePost(postId: string) {
     const session = await getSession();
@@ -154,6 +208,7 @@ export async function deletePost(postId: string) {
         setPosts(updatedPosts);
         revalidatePath('/admin/posts');
         revalidatePath('/admin/dashboard');
+        revalidatePath('/');
         return { success: 'Post deleted successfully.' };
     } catch (error) {
         console.error("Failed to delete post:", error);
