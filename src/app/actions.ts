@@ -25,7 +25,7 @@ export async function applyTheme(customThemeCss: string) {
 }
 
 
-export async function signup(formData: FormData) {
+export async function signup(prevState: any, formData: FormData) {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
@@ -62,7 +62,7 @@ export async function signup(formData: FormData) {
     redirect('/admin/dashboard');
 }
 
-export async function login(formData: FormData) {
+export async function login(prevState: any, formData: FormData) {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
