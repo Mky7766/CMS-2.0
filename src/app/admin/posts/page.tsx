@@ -14,7 +14,81 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs"
 
+type PostTableProps = {
+    posts: typeof posts;
+}
+
+function PostsTable({ posts }: PostTableProps) {
+    if (posts.length === 0) {
+        return (
+            <div className="text-center text-muted-foreground py-12">
+                No posts found.
+            </div>
+        )
+    }
+
+    return (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="hidden w-[100px] sm:table-cell">
+                <span className="sr-only">Author</span>
+              </TableHead>
+              <TableHead>Title</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="hidden md:table-cell">
+                Created at
+              </TableHead>
+              <TableHead>
+                <span className="sr-only">Actions</span>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {posts.map((post) => (
+              <TableRow key={post.id}>
+                <TableCell className="hidden sm:table-cell">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={post.author.avatarUrl} alt={post.author.name} />
+                    <AvatarFallback>{post.author.name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                </TableCell>
+                <TableCell className="font-medium">{post.title}</TableCell>
+                <TableCell>
+                  <Badge variant={post.status === 'Published' ? 'default' : post.status === 'Draft' ? 'secondary' : 'outline'}>{post.status}</Badge>
+                </TableCell>
+                <TableCell className="hidden md:table-cell">
+                  {post.createdAt}
+                </TableCell>
+                <TableCell>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button aria-haspopup="true" size="icon" variant="ghost">
+                        <MoreHorizontal className="h-4 w-4" />
+                        <span className="sr-only">Toggle menu</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem>Edit</DropdownMenuItem>
+                      <DropdownMenuItem>View</DropdownMenuItem>
+                      <DropdownMenuItem className="text-red-600">
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+    )
+}
+
 export default function PostsPage() {
+  const publishedPosts = posts.filter(p => p.status === "Published");
+  const draftPosts = posts.filter(p => p.status === "Draft");
+  const scheduledPosts = posts.filter(p => p.status === "Scheduled");
+
   return (
     <Tabs defaultValue="all">
       <div className="flex items-center">
@@ -60,65 +134,22 @@ export default function PostsPage() {
         <TabsTrigger value="draft">Draft</TabsTrigger>
         <TabsTrigger value="scheduled">Scheduled</TabsTrigger>
       </TabsList>
-      <TabsContent value="all">
-        <Card>
-          <CardContent className="pt-6">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="hidden w-[100px] sm:table-cell">
-                    <span className="sr-only">Author</span>
-                  </TableHead>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="hidden md:table-cell">
-                    Created at
-                  </TableHead>
-                  <TableHead>
-                    <span className="sr-only">Actions</span>
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {posts.map((post) => (
-                  <TableRow key={post.id}>
-                    <TableCell className="hidden sm:table-cell">
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={post.author.avatarUrl} alt={post.author.name} />
-                        <AvatarFallback>{post.author.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                    </TableCell>
-                    <TableCell className="font-medium">{post.title}</TableCell>
-                    <TableCell>
-                      <Badge variant={post.status === 'Published' ? 'default' : post.status === 'Draft' ? 'secondary' : 'outline'}>{post.status}</Badge>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">
-                      {post.createdAt}
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button aria-haspopup="true" size="icon" variant="ghost">
-                            <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Toggle menu</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>Edit</DropdownMenuItem>
-                          <DropdownMenuItem>View</DropdownMenuItem>
-                          <DropdownMenuItem className="text-red-600">
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      </TabsContent>
+      <Card className="mt-4">
+        <CardContent className="pt-6">
+            <TabsContent value="all">
+                <PostsTable posts={posts} />
+            </TabsContent>
+            <TabsContent value="published">
+                <PostsTable posts={publishedPosts} />
+            </TabsContent>
+            <TabsContent value="draft">
+                <PostsTable posts={draftPosts} />
+            </TabsContent>
+            <TabsContent value="scheduled">
+                <PostsTable posts={scheduledPosts} />
+            </TabsContent>
+        </CardContent>
+      </Card>
     </Tabs>
   );
 }
