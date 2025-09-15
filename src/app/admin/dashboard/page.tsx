@@ -2,17 +2,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { posts } from "@/lib/data";
-import { FileText, CheckCircle, Edit3, MoreVertical, ArrowUpRight, User as UserIcon, ExternalLink } from "lucide-react";
+import { FileText, CheckCircle, Edit3, ArrowUpRight, User as UserIcon, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { users } from "@/lib/data";
 import DashboardChart from "@/components/admin/dashboard-chart";
+import PostActions from "@/components/admin/post-actions";
 
 const iconMap: { [key: string]: React.ElementType } = {
   FileText,
@@ -120,18 +115,7 @@ export default function DashboardPage() {
                     </TableCell>
                     <TableCell className="hidden md:table-cell text-right">{post.createdAt}</TableCell>
                     <TableCell className="text-right">
-                       <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                                <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem>Edit</DropdownMenuItem>
-                            <DropdownMenuItem>View</DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-500">Delete</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <PostActions postId={post.id} />
                     </TableCell>
                   </TableRow>
                 ))}

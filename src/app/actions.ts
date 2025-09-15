@@ -6,6 +6,7 @@ import path from "path";
 import { redirect } from 'next/navigation';
 import { User, users, setUsers, posts, setPosts, Post } from "@/lib/data";
 import { createSession, deleteSession, getSession } from "@/lib/session";
+import { revalidatePath } from "next/cache";
 
 export async function applyTheme(customThemeCss: string) {
     try {
@@ -131,4 +132,31 @@ export async function savePost(prevState: any, formData: FormData) {
     }
 
     redirect('/admin/posts');
+}
+
+export async function deletePost(postId: string) {
+    const session = await getSession();
+    if (!session || !session.userId) {
+        // Or handle unauthorized access appropriately
+        throw new Error("Unauthorized");
+    }
+
+    const updatedPosts = posts.filter(p => p.id !== postId);
+
+    if (updatedPosts.length === posts.length) {
+        // Post not found
+        return { error: 'Post not found.' };
+    }
+
+    try {
+        const postsFilePath = path.join(process.cwd(), 'src', 'lib', 'posts.json');
+        await fs.writeFile(postsFilePath, JSON.stringify(updatedPosts, null, 2));
+        setPosts(updatedPosts);
+        revalidatePath('/admin/posts');
+        revalidatePath('/admin/dashboard');
+        return { success: 'Post deleted successfully.' };
+    } catch (error) {
+        console.error("Failed to delete post:", error);
+        return { error: 'Failed to delete post. Please try again.' };
+    }
 }

@@ -1,18 +1,18 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { posts } from "@/lib/data";
-import { MoreHorizontal, PlusCircle, File, ListFilter } from "lucide-react";
+import { PlusCircle, File, ListFilter } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@/components/ui/tabs"
+} from "@/components/ui/tabs";
+import PostActions from "@/components/admin/post-actions";
 
 type PostTableProps = {
     posts: typeof posts;
@@ -55,27 +55,13 @@ function PostsTable({ posts }: PostTableProps) {
                 </TableCell>
                 <TableCell className="font-medium">{post.title}</TableCell>
                 <TableCell>
-                  <Badge variant={post.status === 'Published' ? 'default' : post.status === 'Draft' ? 'secondary' : 'outline'}>{post.status}</Badge>
+                  <Badge variant={post.status.toLowerCase() === 'published' ? 'default' : post.status.toLowerCase() === 'draft' ? 'secondary' : 'outline'}>{post.status}</Badge>
                 </TableCell>
                 <TableCell className="hidden md:table-cell">
                   {post.createdAt}
                 </TableCell>
                 <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button aria-haspopup="true" size="icon" variant="ghost">
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Toggle menu</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Edit</DropdownMenuItem>
-                      <DropdownMenuItem>View</DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-600">
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                    <PostActions postId={post.id} />
                 </TableCell>
               </TableRow>
             ))}
@@ -85,9 +71,10 @@ function PostsTable({ posts }: PostTableProps) {
 }
 
 export default function PostsPage() {
-  const publishedPosts = posts.filter(p => p.status === "Published");
-  const draftPosts = posts.filter(p => p.status === "Draft");
-  const scheduledPosts = posts.filter(p => p.status === "Scheduled");
+  const allPosts = [...posts].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const publishedPosts = allPosts.filter(p => p.status.toLowerCase() === "published");
+  const draftPosts = allPosts.filter(p => p.status.toLowerCase() === "draft");
+  const scheduledPosts = allPosts.filter(p => p.status.toLowerCase() === "scheduled");
 
   return (
     <Tabs defaultValue="all">
@@ -97,21 +84,6 @@ export default function PostsPage() {
             <p className="text-muted-foreground">Manage your blog posts and content.</p>
         </div>
         <div className="flex items-center gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="h-8 gap-1">
-                <ListFilter className="h-3.5 w-3.5" />
-                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                  Filter
-                </span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>Published</DropdownMenuItem>
-              <DropdownMenuItem>Draft</DropdownMenuItem>
-              <DropdownMenuItem>Scheduled</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
           <Button size="sm" variant="outline" className="h-8 gap-1">
             <File className="h-3.5 w-3.5" />
             <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
@@ -137,7 +109,7 @@ export default function PostsPage() {
       <Card className="mt-4">
         <CardContent className="pt-6">
             <TabsContent value="all">
-                <PostsTable posts={posts} />
+                <PostsTable posts={allPosts} />
             </TabsContent>
             <TabsContent value="published">
                 <PostsTable posts={publishedPosts} />
