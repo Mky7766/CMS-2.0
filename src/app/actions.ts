@@ -1,3 +1,4 @@
+
 "use server"
 
 import { customizeTheme } from "@/ai/flows/theme-customization";
@@ -125,7 +126,7 @@ export async function savePost(prevState: any, formData: FormData) {
             name: user.name,
             avatarUrl: user.avatarUrl,
         },
-        tags: (formData.get('tags-hidden') as string)?.split(',') || []
+        tags: (formData.get('tags-hidden') as string)?.split(',').filter(Boolean) || []
     };
 
     const updatedPosts = [newPost, ...posts];
@@ -156,7 +157,7 @@ export async function updatePost(prevState: any, formData: FormData) {
     const title = formData.get('title') as string;
     const content = formData.get('content') as string;
     const status = formData.get('status') as 'Draft' | 'Published' | 'Scheduled';
-    const tags = (formData.get('tags-hidden') as string)?.split(',') || [];
+    const tags = (formData.get('tags-hidden') as string)?.split(',').filter(Boolean) || [];
 
     if (!postId || !title || !content || !status || !permalink) {
         return { error: 'Post ID, permalink, title, content, and status are required.' };
@@ -176,7 +177,7 @@ export async function updatePost(prevState: any, formData: FormData) {
 
     const updatedPost: Post = {
         ...posts[postIndex],
-        id: permalink,
+        id: permalink, // The permalink is the new ID
         title,
         content,
         status,
@@ -196,8 +197,10 @@ export async function updatePost(prevState: any, formData: FormData) {
     }
     
     revalidatePath('/admin/posts');
-    revalidatePath(`/admin/posts/${permalink}/edit`);
-    revalidatePath(`/blog/${permalink}`);
+    revalidatePath(`/admin/posts/${postId}/edit`); // old path
+    revalidatePath(`/admin/posts/${permalink}/edit`); // new path
+    revalidatePath(`/blog/${postId}`); // old path
+    revalidatePath(`/blog/${permalink}`); // new path
     revalidatePath('/');
     redirect('/admin/posts');
 }

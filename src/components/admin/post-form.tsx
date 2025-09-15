@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
@@ -19,7 +20,7 @@ function SubmitButton({ isUpdate }: { isUpdate?: boolean }) {
   return (
     <Button type="submit" disabled={pending}>
         <Save className="mr-2 h-4 w-4" /> 
-        {pending ? (isUpdate ? "Updating..." : "Saving...") : (isUpdate ? "Update" : "Save")}
+        {pending ? (isUpdate ? "Updating..." : "Saving...") : (isUpdate ? "Update Post" : "Save Post")}
     </Button>
   );
 }
@@ -33,19 +34,21 @@ function slugify(text: string) {
         .toString()
         .toLowerCase()
         .trim()
-        .replace(/\s+/g, '-')
-        .replace(/[^\w-]+/g, '')
-        .replace(/--+/g, '-');
+        .replace(/\s+/g, '-') // Replace spaces with -
+        .replace(/[^\w-]+/g, '') // Remove all non-word chars
+        .replace(/--+/g, '-'); // Replace multiple - with single -
 }
 
 export default function PostForm({ post }: PostFormProps) {
   const [title, setTitle] = useState(post?.title || "");
-  const [permalink, setPermalink] = useState(post?.id ? (post.id.startsWith("new-post-") ? slugify(post.title) : post.id) : "");
-  const [tags, setTags] = useState(post?.tags || ["Technology", "CMS"]);
+  const [permalink, setPermalink] = useState(post?.id || "");
+  const [tags, setTags] = useState(post?.tags || []);
   const [tagInput, setTagInput] = useState("");
 
+  // Determine the action and prepare the initial state
   const action = post ? updatePost : savePost;
   const [state, formAction] = useActionState(action, null);
+
   const { toast } = useToast();
 
   useEffect(() => {
@@ -61,15 +64,19 @@ export default function PostForm({ post }: PostFormProps) {
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
     setTitle(newTitle);
-    setPermalink(slugify(newTitle));
+    // Only auto-update permalink for new posts or if it was already a slugified version of the old title
+    if (!post || (post && post.id === slugify(post.title))) {
+        setPermalink(slugify(newTitle));
+    }
   };
 
 
   const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && tagInput.trim() !== "") {
       e.preventDefault();
-      if (!tags.includes(tagInput.trim())) {
-        setTags([...tags, tagInput.trim()]);
+      const newTag = tagInput.trim();
+      if (!tags.includes(newTag)) {
+        setTags([...tags, newTag]);
       }
       setTagInput("");
     }
@@ -82,11 +89,9 @@ export default function PostForm({ post }: PostFormProps) {
 
   return (
     <form action={formAction} className="grid gap-6 lg:grid-cols-3">
-      {post ? (
-          <input type="hidden" name="postId" value={post.id} />
-      ) : (
-          <input type="hidden" name="postId" value={`new-post-${Date.now()}`} />
-      )}
+      {/* Hidden input to pass the original post ID for updates */}
+      {post && <input type="hidden" name="postId" value={post.id} />}
+      
       <div className="lg:col-span-2 space-y-6">
         <Card>
           <CardHeader>
@@ -100,7 +105,8 @@ export default function PostForm({ post }: PostFormProps) {
                 name="title" 
                 placeholder="Your amazing post title" 
                 value={title}
-                onChange={handleTitleChange} 
+                onChange={handleTitleChange}
+                required
               />
             </div>
             <div>
@@ -110,13 +116,14 @@ export default function PostForm({ post }: PostFormProps) {
                 name="permalink" 
                 placeholder="your-amazing-post-title" 
                 value={permalink}
-                onChange={(e) => setPermalink(e.target.value)}
+                onChange={(e) => setPermalink(slugify(e.target.value))}
+                required
               />
               <p className="text-sm text-muted-foreground">The URL-friendly version of the name.</p>
             </div>
             <div>
               <Label htmlFor="content">Content</Label>
-              <Textarea id="content" name="content" placeholder="Start writing your content here. Markdown is supported." rows={15} defaultValue={post?.content} />
+              <Textarea id="content" name="content" placeholder="Start writing your content here. Markdown is supported." rows={15} defaultValue={post?.content} required />
             </div>
           </CardContent>
         </Card>
@@ -145,7 +152,7 @@ export default function PostForm({ post }: PostFormProps) {
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="status">Status</Label>
-              <Select defaultValue={post?.status || "draft"} name="status">
+              <Select defaultValue={post?.status?.toLowerCase() || "draft"} name="status">
                 <SelectTrigger id="status">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
@@ -158,14 +165,14 @@ export default function PostForm({ post }: PostFormProps) {
             </div>
             <div>
                 <Label>Schedule Publish</Label>
-                 <Button variant="outline" className="w-full justify-start text-left font-normal">
+                 <Button variant="outline" className="w-full justify-start text-left font-normal" disabled>
                     <Calendar className="mr-2 h-4 w-4" />
                     Pick a date
                 </Button>
             </div>
           </CardContent>
           <div className="p-6 pt-0 flex justify-between items-center">
-            <span className="text-sm text-muted-foreground">Auto-saved</span>
+             <Button variant="outline" type="button" onClick={() => window.history.back()}>Cancel</Button>
             <SubmitButton isUpdate={!!post} />
           </div>
         </Card>
@@ -179,7 +186,7 @@ export default function PostForm({ post }: PostFormProps) {
                 <Input 
                     id="tags" 
                     name="tags"
-                    placeholder="Add tags..." 
+                    placeholder="Add tags and press Enter" 
                     value={tagInput}
                     onChange={(e) => setTagInput(e.target.value)}
                     onKeyDown={handleTagInputKeyDown}
@@ -189,7 +196,7 @@ export default function PostForm({ post }: PostFormProps) {
                     {tags.map(tag => (
                         <Badge key={tag} variant="secondary" className="flex items-center gap-1">
                             {tag}
-                            <button type="button" onClick={() => removeTag(tag)} className="text-muted-foreground hover:text-foreground">
+                            <button type="button" onClick={() => removeTag(tag)} className="ml-1 text-muted-foreground hover:text-foreground">
                                 <span className="sr-only">Remove {tag}</span>
                                 &times;
                             </button>
