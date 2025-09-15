@@ -1,19 +1,66 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { posts, dashboardStats } from "@/lib/data";
-import { FileText, CheckCircle, Edit3, BarChart2, MoreVertical, ArrowUpRight } from "lucide-react";
+import { posts } from "@/lib/data";
+import { FileText, CheckCircle, Edit3, BarChart2, MoreVertical, ArrowUpRight, User as UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartConfig,
+} from "@/components/ui/chart";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
+import Link from "next/link";
+import { users } from "@/lib/data";
 
 const iconMap: { [key: string]: React.ElementType } = {
   FileText,
   CheckCircle,
   Edit3,
-  BarChart2,
+  UserIcon,
 };
 
+const chartConfig = {
+  posts: {
+    label: "Posts",
+    color: "hsl(var(--primary))",
+  },
+} satisfies ChartConfig;
+
+
 export default function DashboardPage() {
-  const recentPosts = posts.slice(0, 5);
+  const recentPosts = [...posts].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 5);
+
+  const totalPosts = posts.length;
+  const publishedPosts = posts.filter(p => p.status === 'Published').length;
+  const draftPosts = posts.filter(p => p.status === 'Draft').length;
+  const totalUsers = users.length;
+
+  const dashboardStats = [
+    { title: "Total Posts", value: totalPosts, icon: "FileText" },
+    { title: "Published Posts", value: publishedPosts, icon: "CheckCircle" },
+    { title: "Draft Posts", value: draftPosts, icon: "Edit3" },
+    { title: "Total Users", value: totalUsers, icon: "UserIcon" },
+  ];
+
+  const postsByMonth = posts.reduce((acc, post) => {
+    const month = new Date(post.createdAt).toLocaleString('default', { month: 'short' });
+    acc[month] = (acc[month] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const chartData = Object.keys(postsByMonth).map(month => ({
+    month,
+    posts: postsByMonth[month],
+  })).reverse();
+
 
   return (
     <div className="space-y-8">
@@ -33,7 +80,7 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stat.value}</div>
-                <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+                <p className="text-xs text-muted-foreground">+2 from last month</p>
               </CardContent>
             </Card>
           );
@@ -42,8 +89,16 @@ export default function DashboardPage() {
 
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-7">
         <Card className="lg:col-span-4">
-          <CardHeader>
-            <CardTitle>Recent Posts</CardTitle>
+          <CardHeader className="flex flex-row items-center">
+            <div className="grid gap-2">
+                <CardTitle>Recent Posts</CardTitle>
+            </div>
+            <Button asChild size="sm" className="ml-auto gap-1">
+              <Link href="/admin/posts">
+                View All
+                <ArrowUpRight className="h-4 w-4" />
+              </Link>
+            </Button>
           </CardHeader>
           <CardContent>
             <Table>
@@ -51,7 +106,7 @@ export default function DashboardPage() {
                 <TableRow>
                   <TableHead>Title</TableHead>
                   <TableHead className="hidden sm:table-cell">Status</TableHead>
-                  <TableHead className="hidden md:table-cell">Date</TableHead>
+                  <TableHead className="hidden md:table-cell text-right">Date</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -65,15 +120,24 @@ export default function DashboardPage() {
                       </div>
                     </TableCell>
                     <TableCell className="hidden sm:table-cell">
-                      <Badge variant={post.status === 'Published' ? 'default' : 'secondary'} className={`${post.status === 'Published' ? 'bg-primary/20 text-primary-foreground' : ''}`}>
+                      <Badge variant={post.status === 'Published' ? 'default' : post.status === "Draft" ? "secondary" : "outline"}>
                         {post.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="hidden md:table-cell">{post.createdAt}</TableCell>
+                    <TableCell className="hidden md:table-cell text-right">{post.createdAt}</TableCell>
                     <TableCell className="text-right">
-                       <Button variant="ghost" size="icon">
-                            <MoreVertical className="h-4 w-4" />
-                       </Button>
+                       <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                                <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem>Edit</DropdownMenuItem>
+                            <DropdownMenuItem>View</DropdownMenuItem>
+                            <DropdownMenuItem className="text-red-500">Delete</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -84,48 +148,24 @@ export default function DashboardPage() {
 
         <Card className="lg:col-span-3">
           <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
+            <CardTitle>Posts per Month</CardTitle>
           </CardHeader>
-           <CardContent className="grid gap-8">
-            <div className="flex items-center gap-4">
-              <div className="rounded-full bg-primary/10 p-2">
-                <FileText className="h-4 w-4 text-primary" />
-              </div>
-              <div className="grid gap-1">
-                <p className="text-sm font-medium leading-none">
-                  New post published: "The Future of Web Dev"
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  by Jane Doe - 2 hours ago
-                </p>
-              </div>
-            </div>
-             <div className="flex items-center gap-4">
-              <div className="rounded-full bg-accent/10 p-2">
-                <Edit3 className="h-4 w-4 text-accent-foreground" />
-              </div>
-              <div className="grid gap-1">
-                <p className="text-sm font-medium leading-none">
-                  Post updated: "Getting Started with Nebula"
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  by Alice Johnson - 5 hours ago
-                </p>
-              </div>
-            </div>
-             <div className="flex items-center gap-4">
-              <div className="rounded-full bg-primary/10 p-2">
-                <FileText className="h-4 w-4 text-primary" />
-              </div>
-              <div className="grid gap-1">
-                <p className="text-sm font-medium leading-none">
-                  New post scheduled: "The Power of Markdown"
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  by Charlie Davis - 1 day ago
-                </p>
-              </div>
-            </div>
+           <CardContent>
+              <ChartContainer config={chartConfig} className="h-[200px] w-full">
+                <BarChart accessibilityLayer data={chartData}>
+                  <CartesianGrid vertical={false} />
+                  <XAxis
+                    dataKey="month"
+                    tickLine={false}
+                    tickMargin={10}
+                    axisLine={false}
+                    tickFormatter={(value) => value.slice(0, 3)}
+                  />
+                  <YAxis />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar dataKey="posts" fill="var(--color-posts)" radius={4} />
+                </BarChart>
+              </ChartContainer>
           </CardContent>
         </Card>
       </div>
