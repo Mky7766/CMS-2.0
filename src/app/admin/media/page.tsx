@@ -2,9 +2,10 @@
 "use client";
 
 import Image from "next/image";
+import { useState, useTransition, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { PlaceHolderImages, ImagePlaceholder } from "@/lib/placeholder-images";
 import { MoreVertical, UploadCloud } from "lucide-react";
 import {
   DropdownMenu,
@@ -14,8 +15,45 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { uploadMedia } from "@/app/actions";
+import { useToast } from "@/hooks/use-toast";
+import { Loader } from "lucide-react";
 
 export default function MediaPage() {
+  const [images, setImages] = useState<ImagePlaceholder[]>(PlaceHolderImages);
+  const [isPending, startTransition] = useTransition();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      startTransition(async () => {
+        const result = await uploadMedia(dataUrl, file.name);
+        if (result.success && result.newImage) {
+           setImages(prevImages => [result.newImage!, ...prevImages]);
+           toast({ title: "Success", description: "Image uploaded successfully." });
+        } else {
+           toast({ title: "Error", description: result.error, variant: "destructive" });
+        }
+      });
+    };
+    reader.onerror = (error) => {
+        console.error("Error reading file:", error);
+        toast({ title: "Error", description: "Failed to read file.", variant: "destructive" });
+    };
+
+    // Reset file input to allow uploading the same file again
+    if(fileInputRef.current) {
+        fileInputRef.current.value = "";
+    }
+  };
+
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
@@ -24,17 +62,25 @@ export default function MediaPage() {
           <p className="text-muted-foreground">Manage your images and other media files.</p>
         </div>
         <div>
-           <Button asChild>
+           <Button asChild disabled={isPending}>
             <Label htmlFor="file-upload" className="cursor-pointer">
-              <UploadCloud className="mr-2 h-4 w-4" />
-              Upload Media
+              {isPending ? <Loader className="mr-2 h-4 w-4 animate-spin" /> : <UploadCloud className="mr-2 h-4 w-4" />}
+              {isPending ? "Uploading..." : "Upload Media"}
             </Label>
           </Button>
-          <Input id="file-upload" type="file" className="sr-only" />
+          <Input 
+            id="file-upload" 
+            type="file" 
+            className="sr-only" 
+            onChange={handleFileChange}
+            accept="image/*"
+            ref={fileInputRef}
+            disabled={isPending}
+          />
         </div>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-        {PlaceHolderImages.map((image) => (
+        {images.map((image) => (
           <Card key={image.id} className="group relative overflow-hidden">
             <CardContent className="p-0">
               <Image
@@ -44,6 +90,7 @@ export default function MediaPage() {
                 height={300}
                 className="aspect-[4/3] w-full object-cover transition-transform group-hover:scale-105"
                 data-ai-hint={image.imageHint}
+                unoptimized={image.imageUrl.startsWith('data:')} // unoptimize data urls
               />
             </CardContent>
              <div className="absolute top-2 right-2">

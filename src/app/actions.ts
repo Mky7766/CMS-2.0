@@ -8,6 +8,7 @@ import { redirect } from 'next/navigation';
 import { User, users, setUsers, posts, setPosts, Post } from "@/lib/data";
 import { createSession, deleteSession, getSession } from "@/lib/session";
 import { revalidatePath } from "next/cache";
+import { PlaceHolderImages, ImagePlaceholder } from "@/lib/placeholder-images";
 
 export async function applyTheme(customThemeCss: string) {
     try {
@@ -233,3 +234,41 @@ export async function deletePost(postId: string) {
         return { error: 'Failed to delete post. Please try again.' };
     }
 }
+
+export async function uploadMedia(fileDataUrl: string, fileName: string) {
+    const session = await getSession();
+    if (!session) {
+      return { error: "Unauthorized" };
+    }
+  
+    try {
+      const imagesFilePath = path.join(process.cwd(), 'src', 'lib', 'placeholder-images.json');
+      const currentImagesData = await fs.readFile(imagesFilePath, 'utf-8');
+      const currentImagesJson = JSON.parse(currentImagesData);
+  
+      const newImage: ImagePlaceholder = {
+        id: `media-${Date.now()}`,
+        description: fileName,
+        // In a real app, you would upload to a CDN and store the URL.
+        // For this demo, we'll store the data URL directly.
+        // This is NOT recommended for production due to performance implications.
+        imageUrl: fileDataUrl, 
+        imageHint: "custom upload",
+      };
+      
+      const updatedImages = [newImage, ...currentImagesJson.placeholderImages];
+      currentImagesJson.placeholderImages = updatedImages;
+  
+      await fs.writeFile(imagesFilePath, JSON.stringify(currentImagesJson, null, 2));
+      
+      // We don't need to update the in-memory `PlaceHolderImages` because 
+      // the page will be revalidated and will re-read the JSON file.
+      
+      revalidatePath('/admin/media');
+      return { success: true, newImage };
+  
+    } catch (error) {
+      console.error("Failed to upload media:", error);
+      return { error: 'Failed to upload media. Please try again.' };
+    }
+  }
