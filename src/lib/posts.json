@@ -1,0 +1,57 @@
+[
+  {
+    "id": "1",
+    "title": "The Future of Web Development with Static Site Generators",
+    "status": "Published",
+    "createdAt": "2024-07-20",
+    "author": {
+      "name": "Jane Doe",
+      "avatarUrl": "https://picsum.photos/seed/a1/32/32"
+    },
+    "content": "Static site generators are taking the web development world by storm. In this post, we'll explore why."
+  },
+  {
+    "id": "2",
+    "title": "A Deep Dive into Headless CMS Architectures",
+    "status": "Published",
+    "createdAt": "2024-07-18",
+    "author": {
+      "name": "John Smith",
+      "avatarUrl": "https://picsum.photos/seed/b2/32/32"
+    },
+    "content": "Headless CMS offers a new level of flexibility. Let's look at the pros and cons."
+  },
+  {
+    "id": "3",
+    "title": "Getting Started with Nebula CMS: A Beginner's Guide",
+    "status": "Draft",
+    "createdAt": "2024-07-21",
+    "author": {
+      "name": "Alice Johnson",
+      "avatarUrl": "https://picsum.photos/seed/c3/32/32"
+    },
+    "content": "Your first steps into the world of Nebula CMS. It's easier than you think!"
+  },
+  {
+    "id": "4",
+    "title": "Optimizing Images for the Web",
+    "status": "Published",
+    "createdAt": "2024-07-15",
+    "author": {
+      "name": "Bob Brown",
+      "avatarUrl": "https://picsum.photos/seed/d4/32/32"
+    },
+    "content": "Image optimization is crucial for web performance. Learn the best techniques here."
+  },
+  {
+    "id": "5",
+    "title": "The Power of Markdown in Content Creation",
+    "status": "Scheduled",
+    "createdAt": "2024-07-25",
+    "author": {
+      "name": "Charlie Davis",
+      "avatarUrl": "https://picsum.photos/seed/e5/32/32"
+    },
+    "content": "Markdown is a powerful tool for writers. This guide will show you how to master it."
+  }
+]

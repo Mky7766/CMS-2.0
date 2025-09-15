@@ -4,7 +4,7 @@ import { customizeTheme } from "@/ai/flows/theme-customization";
 import fs from "fs/promises";
 import path from "path";
 import { redirect } from 'next/navigation';
-import { User, users, setUsers, posts, Post } from "@/lib/data";
+import { User, users, setUsers, posts, setPosts, Post } from "@/lib/data";
 import { createSession, deleteSession, getSession } from "@/lib/session";
 
 export async function applyTheme(customThemeCss: string) {
@@ -110,6 +110,7 @@ export async function savePost(prevState: any, formData: FormData) {
     const newPost: Post = {
         id: (posts.length + 1).toString(),
         title,
+        content,
         status,
         createdAt: new Date().toISOString().split('T')[0],
         author: {
@@ -118,9 +119,16 @@ export async function savePost(prevState: any, formData: FormData) {
         },
     };
 
-    console.log("New Post Data:", newPost);
-    // Here you would typically save the new post to your data store (e.g., a file or database)
-    // For now, we just log it.
+    const updatedPosts = [newPost, ...posts];
+
+    try {
+        const postsFilePath = path.join(process.cwd(), 'src', 'lib', 'posts.json');
+        await fs.writeFile(postsFilePath, JSON.stringify(updatedPosts, null, 2));
+        setPosts(updatedPosts);
+    } catch (error) {
+        console.error("Failed to save post:", error);
+        return { error: 'Failed to save post. Please try again.' };
+    }
 
     redirect('/admin/posts');
 }
