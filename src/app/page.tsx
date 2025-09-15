@@ -11,9 +11,6 @@ export default function Home() {
           <Icons.logo className="h-6 w-6" />
           Nebula CMS
         </Link>
-        <Button asChild>
-          <Link href="/login">Sign In</Link>
-        </Button>
       </header>
       <main className="flex-1 flex flex-col items-center justify-center text-center p-4">
         <div className="max-w-3xl">
