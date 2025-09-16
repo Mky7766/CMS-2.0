@@ -1,11 +1,35 @@
 
+"use client";
+
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Trash2 } from "lucide-react";
+
+type MenuItem = {
+  id: number;
+  label: string;
+  url: string;
+};
 
 export default function NewMenuPage() {
+  const [menuName, setMenuName] = useState("");
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+
+  const addMenuItem = () => {
+    setMenuItems([...menuItems, { id: Date.now(), label: "", url: "" }]);
+  };
+
+  const removeMenuItem = (id: number) => {
+    setMenuItems(menuItems.filter(item => item.id !== id));
+  };
+
+  const handleItemChange = (id: number, field: "label" | "url", value: string) => {
+    setMenuItems(menuItems.map(item => item.id === id ? { ...item, [field]: value } : item));
+  };
+
   return (
     <div className="space-y-8">
         <div>
@@ -20,7 +44,13 @@ export default function NewMenuPage() {
                     </CardHeader>
                     <CardContent>
                         <Label htmlFor="menu-name">Name</Label>
-                        <Input id="menu-name" name="menu-name" placeholder="e.g., Main Navigation" />
+                        <Input 
+                          id="menu-name" 
+                          name="menu-name" 
+                          placeholder="e.g., Main Navigation"
+                          value={menuName}
+                          onChange={(e) => setMenuName(e.target.value)}
+                        />
                     </CardContent>
                 </Card>
                 <Card className="mt-8">
@@ -28,15 +58,43 @@ export default function NewMenuPage() {
                         <CardTitle>Menu Structure</CardTitle>
                         <CardDescription>Add and arrange menu items.</CardDescription>
                     </CardHeader>
-                    <CardContent>
-                        {/* Placeholder for menu item editor */}
-                        <div className="text-center py-12 border-2 border-dashed rounded-lg">
-                            <p className="text-muted-foreground">Menu item editor coming soon.</p>
-                            <Button variant="outline" className="mt-4">
-                                <PlusCircle className="mr-2 h-4 w-4" />
-                                Add Menu Item
-                            </Button>
-                        </div>
+                    <CardContent className="space-y-4">
+                        {menuItems.length > 0 ? (
+                            menuItems.map((item, index) => (
+                                <div key={item.id} className="flex items-end gap-4 p-4 border rounded-lg">
+                                    <div className="grid gap-2 flex-1">
+                                        <Label htmlFor={`item-label-${index}`}>Label</Label>
+                                        <Input 
+                                            id={`item-label-${index}`} 
+                                            placeholder="e.g., Home"
+                                            value={item.label}
+                                            onChange={(e) => handleItemChange(item.id, 'label', e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="grid gap-2 flex-1">
+                                        <Label htmlFor={`item-url-${index}`}>URL</Label>
+                                        <Input 
+                                            id={`item-url-${index}`} 
+                                            placeholder="e.g., /"
+                                            value={item.url}
+                                            onChange={(e) => handleItemChange(item.id, 'url', e.target.value)}
+                                        />
+                                    </div>
+                                    <Button variant="ghost" size="icon" onClick={() => removeMenuItem(item.id)}>
+                                        <Trash2 className="h-4 w-4 text-red-500" />
+                                        <span className="sr-only">Remove Item</span>
+                                    </Button>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="text-center py-12 border-2 border-dashed rounded-lg">
+                                <p className="text-muted-foreground">No menu items yet. Add one to get started.</p>
+                            </div>
+                        )}
+                        <Button variant="outline" className="mt-4" onClick={addMenuItem}>
+                            <PlusCircle className="mr-2 h-4 w-4" />
+                            Add Menu Item
+                        </Button>
                     </CardContent>
                 </Card>
             </div>
