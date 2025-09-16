@@ -1,4 +1,5 @@
 
+
 "use server"
 
 import { customizeTheme } from "@/ai/flows/theme-customization";
@@ -333,6 +334,7 @@ export async function uploadMedia(fileDataUrl: string, fileName: string) {
 
     const siteName = formData.get('site-name') as string;
     const tagline = formData.get('tagline') as string;
+    const logo = formData.get('logo') as string;
 
     if (!siteName) {
         return { error: 'Site name is required.' };
@@ -342,6 +344,7 @@ export async function uploadMedia(fileDataUrl: string, fileName: string) {
         ...currentSettings,
         siteName,
         tagline,
+        logo,
     };
 
     try {

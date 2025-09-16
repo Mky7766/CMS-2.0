@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, Save, UploadCloud, X, Loader } from "lucide-react";
+import { Calendar, Save, UploadCloud, X, Loader, Bold, Italic, Link as LinkIcon } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { savePost, updatePost, uploadMedia } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
@@ -43,11 +43,14 @@ function slugify(text: string) {
 export default function PostForm({ post }: PostFormProps) {
   const [title, setTitle] = useState(post?.title || "");
   const [permalink, setPermalink] = useState(post?.id || "");
+  const [content, setContent] = useState(post?.content || "");
   const [tags, setTags] = useState(post?.tags || []);
   const [tagInput, setTagInput] = useState("");
   const [featuredImageUrl, setFeaturedImageUrl] = useState(post?.featuredImage?.url || "");
   const [isUploading, startUploading] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const contentRef = useRef<HTMLTextAreaElement>(null);
+
 
   // Determine the action and prepare the initial state
   const action = post ? updatePost : savePost;
@@ -123,12 +126,48 @@ export default function PostForm({ post }: PostFormProps) {
       setFeaturedImageUrl("");
   }
 
+  const applyFormat = (format: 'bold' | 'italic' | 'link') => {
+    const textarea = contentRef.current;
+    if (!textarea) return;
+    
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = content.substring(start, end);
+
+    let newText = '';
+    
+    switch(format) {
+        case 'bold':
+            newText = `**${selectedText}**`;
+            break;
+        case 'italic':
+            newText = `*${selectedText}*`;
+            break;
+        case 'link':
+            newText = `[${selectedText}](url)`;
+            break;
+    }
+
+    setContent(content.substring(0, start) + newText + content.substring(end));
+    
+    // Focus and adjust cursor position after state update
+    setTimeout(() => {
+        textarea.focus();
+        if (format === 'link') {
+            textarea.setSelectionRange(start + newText.length - 4, start + newText.length - 1);
+        } else {
+            textarea.setSelectionRange(start + newText.length, start + newText.length);
+        }
+    }, 0);
+};
+
 
   return (
     <form action={formAction} className="grid gap-6 lg:grid-cols-3">
       {/* Hidden input to pass the original post ID for updates */}
       {post && <input type="hidden" name="postId" value={post.id} />}
       <input type="hidden" name="featured-image-url" value={featuredImageUrl} />
+       <input type="hidden" name="content" value={content} />
       
       <div className="lg:col-span-2 space-y-6">
         <Card>
@@ -161,7 +200,30 @@ export default function PostForm({ post }: PostFormProps) {
             </div>
             <div>
               <Label htmlFor="content">Content</Label>
-              <Textarea id="content" name="content" placeholder="Start writing your content here. Markdown is supported." rows={15} defaultValue={post?.content} required />
+              <div className="rounded-md border border-input">
+                <div className="p-2 border-b">
+                     <Button type="button" variant="ghost" size="icon" onClick={() => applyFormat('bold')} title="Bold">
+                        <Bold className="h-4 w-4" />
+                    </Button>
+                     <Button type="button" variant="ghost" size="icon" onClick={() => applyFormat('italic')} title="Italic">
+                        <Italic className="h-4 w-4" />
+                    </Button>
+                     <Button type="button" variant="ghost" size="icon" onClick={() => applyFormat('link')} title="Link">
+                        <LinkIcon className="h-4 w-4" />
+                    </Button>
+                </div>
+                <Textarea 
+                    id="content" 
+                    name="content-display"
+                    placeholder="Start writing your content here. Markdown is supported." 
+                    rows={15} 
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                    ref={contentRef}
+                    required 
+                />
+              </div>
             </div>
           </CardContent>
         </Card>
