@@ -112,7 +112,7 @@ export default function AppHeader() {
             <DropdownMenuLabel>{user ? user.name : "My Account"}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-                <Link href="/admin/users">Profile</Link>
+                <Link href="/admin/profile">Profile</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
                 <Link href="/admin/settings">Settings</Link>

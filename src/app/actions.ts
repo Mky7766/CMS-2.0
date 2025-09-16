@@ -1,3 +1,4 @@
+
 "use server"
 
 import { customizeTheme } from "@/ai/flows/theme-customization";
@@ -351,4 +352,52 @@ export async function uploadMedia(fileDataUrl: string, fileName: string) {
         console.error("Failed to update settings:", error);
         return { error: 'Failed to update settings. Please try again.' };
     }
+}
+
+export async function updateUser(prevState: any, formData: FormData) {
+    const session = await getSession();
+    if (!session || !session.userId) {
+        return { error: "You must be logged in to update your profile." };
+    }
+
+    const name = formData.get('name') as string;
+    const password = formData.get('password') as string;
+    const confirmPassword = formData.get('confirmPassword') as string;
+
+    if (!name) {
+        return { error: 'Name is required.' };
+    }
+
+    if (password && password !== confirmPassword) {
+        return { error: 'Passwords do not match.' };
+    }
+    
+    const userIndex = users.findIndex(u => u.id === session.userId);
+
+    if (userIndex === -1) {
+        return { error: 'User not found.' };
+    }
+
+    const updatedUser: User = { ...users[userIndex], name };
+
+    if (password) {
+        updatedUser.password = password; // Again, hash this in a real app
+    }
+    
+    const updatedUsers = [...users];
+    updatedUsers[userIndex] = updatedUser;
+
+    try {
+        const usersFilePath = path.join(process.cwd(), 'src', 'lib', 'users.json');
+        await fs.writeFile(usersFilePath, JSON.stringify(updatedUsers, null, 2));
+        setUsers(updatedUsers);
+    } catch (error) {
+        console.error("Failed to update user:", error);
+        return { error: 'Failed to update profile. Please try again.' };
+    }
+
+    revalidatePath('/admin/profile');
+    revalidatePath('/admin/layout'); // To refresh header
+
+    return { success: 'Profile updated successfully.' };
 }
