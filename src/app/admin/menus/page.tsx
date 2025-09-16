@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlusCircle } from "lucide-react";
+import Link from "next/link";
 
 export default function MenusPage() {
   return (
@@ -13,9 +14,11 @@ export default function MenusPage() {
             Manage the navigation menus for your site's header and footer.
           </p>
         </div>
-        <Button>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Create New Menu
+        <Button asChild>
+          <Link href="/admin/menus/new">
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Create New Menu
+          </Link>
         </Button>
       </div>
 
@@ -29,7 +32,9 @@ export default function MenusPage() {
         <CardContent>
           <div className="text-center py-12 text-muted-foreground">
             <p>You haven't created any menus yet.</p>
-            <Button variant="link" className="mt-2">Create your first menu</Button>
+            <Button variant="link" className="mt-2" asChild>
+              <Link href="/admin/menus/new">Create your first menu</Link>
+            </Button>
           </div>
         </CardContent>
       </Card>
