@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, Save, UploadCloud, X, Loader, Bold, Italic, Link as LinkIcon } from "lucide-react";
+import { Calendar, Save, UploadCloud, X, Loader, Bold, Italic, Link as LinkIcon, Code } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { savePost, updatePost, uploadMedia } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
@@ -126,7 +126,7 @@ export default function PostForm({ post }: PostFormProps) {
       setFeaturedImageUrl("");
   }
 
-  const applyFormat = (format: 'bold' | 'italic' | 'link') => {
+  const applyFormat = (format: 'bold' | 'italic' | 'link' | 'code') => {
     const textarea = contentRef.current;
     if (!textarea) return;
     
@@ -145,6 +145,9 @@ export default function PostForm({ post }: PostFormProps) {
             break;
         case 'link':
             newText = `[${selectedText}](url)`;
+            break;
+        case 'code':
+            newText = "```html\n" + selectedText + "\n```";
             break;
     }
 
@@ -210,6 +213,9 @@ export default function PostForm({ post }: PostFormProps) {
                     </Button>
                      <Button type="button" variant="ghost" size="icon" onMouseDown={(e) => e.preventDefault()} onClick={() => applyFormat('link')} title="Link">
                         <LinkIcon className="h-4 w-4" />
+                    </Button>
+                     <Button type="button" variant="ghost" size="icon" onMouseDown={(e) => e.preventDefault()} onClick={() => applyFormat('code')} title="Code">
+                        <Code className="h-4 w-4" />
                     </Button>
                 </div>
                 <Textarea 
@@ -358,3 +364,5 @@ export default function PostForm({ post }: PostFormProps) {
     </form>
   );
 }
+
+    

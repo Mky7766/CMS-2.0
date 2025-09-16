@@ -1,3 +1,4 @@
+
 import { posts } from "@/lib/data";
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -6,6 +7,7 @@ import { Icons } from "@/components/icons";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { getSettings } from "@/lib/settings";
+import HtmlRenderer from "@/components/html-renderer";
 
 export default async function PostPage({ params }: { params: { postId: string } }) {
   const post = posts.find(p => p.id === params.postId);
@@ -64,7 +66,7 @@ export default async function PostPage({ params }: { params: { postId: string } 
                  <time dateTime={post.createdAt}>{new Date(post.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
               </div>
             </header>
-            <div dangerouslySetInnerHTML={{ __html: post.content.replace(/\n/g, '<br />') }} />
+            <HtmlRenderer htmlContent={post.content} />
           </article>
         </div>
       </main>
@@ -74,3 +76,5 @@ export default async function PostPage({ params }: { params: { postId: string } 
     </div>
   );
 }
+
+    
