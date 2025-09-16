@@ -6,6 +6,32 @@
       {
         "label": "Bajtimes",
         "url": "https://www.bajtimes.com"
+      },
+      {
+        "label": "news",
+        "url": ""
+      },
+      {
+        "label": "Phone",
+        "url": ""
+      }
+    ]
+  },
+  {
+    "id": "1758021746600",
+    "name": "footer  menu",
+    "items": [
+      {
+        "label": "home ",
+        "url": ""
+      },
+      {
+        "label": "blog",
+        "url": ""
+      },
+      {
+        "label": "about us",
+        "url": ""
       }
     ]
   }

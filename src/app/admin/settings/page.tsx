@@ -6,6 +6,9 @@ import { getSettings } from "@/lib/settings";
 import { Menu } from "@/lib/data";
 import fs from 'fs/promises';
 import path from 'path';
+import ThemeForm from "@/components/admin/theme-form";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 
 async function getMenus(): Promise<Menu[]> {
