@@ -13,16 +13,52 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Search, Bell, Moon, Sun } from "lucide-react"
-import React from "react"
+import { Search, Bell, Moon, Sun, User } from "lucide-react"
+import React, { useEffect, useState } from "react"
 import { logout } from "@/app/actions"
+import Link from "next/link"
+
+// This is a simplified client-side session fetcher.
+// In a real app, you'd likely use a context provider or a library like next-auth.
+async function getClientSession() {
+  try {
+    const res = await fetch('/api/session');
+    if (res.ok) {
+      const { user } = await res.json();
+      return { user };
+    }
+    return { user: null };
+  } catch (error) {
+    console.error("Failed to fetch session:", error);
+    return { user: null };
+  }
+}
+
 
 export default function AppHeader() {
-  const [theme, setTheme] = React.useState("light");
+  const [theme, setTheme] = useState("light");
+  const [user, setUser] = useState<{name: string, email: string, avatarUrl: string} | null>(null);
+
+  useEffect(() => {
+    // Set theme from local storage or system preference
+    const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    setTheme(savedTheme);
+    document.documentElement.classList.toggle("dark", savedTheme === "dark");
+
+    // Fetch user session
+    async function fetchUser() {
+        const session = await getClientSession();
+        if(session.user) {
+            setUser(session.user);
+        }
+    }
+    fetchUser();
+  }, []);
 
   const toggleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
     document.documentElement.classList.toggle("dark", newTheme === "dark");
   };
 
@@ -58,17 +94,29 @@ export default function AppHeader() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
               <Avatar className="h-8 w-8">
-                <AvatarImage src="https://picsum.photos/seed/user/32/32" alt="Admin" />
-                <AvatarFallback>A</AvatarFallback>
+                 {user ? (
+                    <>
+                        <AvatarImage src={user.avatarUrl} alt={user.name} />
+                        <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                    </>
+                 ) : (
+                    <AvatarFallback>
+                        <User className="h-5 w-5" />
+                    </AvatarFallback>
+                 )}
               </Avatar>
               <span className="sr-only">Toggle user menu</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>{user ? user.name : "My Account"}</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+                <Link href="/admin/users">Profile</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+                <Link href="/admin/settings">Settings</Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
              <form action={logout}>
                 <DropdownMenuItem asChild>
