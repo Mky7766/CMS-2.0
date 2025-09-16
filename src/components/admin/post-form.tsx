@@ -202,13 +202,13 @@ export default function PostForm({ post }: PostFormProps) {
               <Label htmlFor="content">Content</Label>
               <div className="rounded-md border border-input">
                 <div className="p-2 border-b">
-                     <Button type="button" variant="ghost" size="icon" onClick={() => applyFormat('bold')} title="Bold">
+                     <Button type="button" variant="ghost" size="icon" onMouseDown={(e) => e.preventDefault()} onClick={() => applyFormat('bold')} title="Bold">
                         <Bold className="h-4 w-4" />
                     </Button>
-                     <Button type="button" variant="ghost" size="icon" onClick={() => applyFormat('italic')} title="Italic">
+                     <Button type="button" variant="ghost" size="icon" onMouseDown={(e) => e.preventDefault()} onClick={() => applyFormat('italic')} title="Italic">
                         <Italic className="h-4 w-4" />
                     </Button>
-                     <Button type="button" variant="ghost" size="icon" onClick={() => applyFormat('link')} title="Link">
+                     <Button type="button" variant="ghost" size="icon" onMouseDown={(e) => e.preventDefault()} onClick={() => applyFormat('link')} title="Link">
                         <LinkIcon className="h-4 w-4" />
                     </Button>
                 </div>
@@ -358,5 +358,3 @@ export default function PostForm({ post }: PostFormProps) {
     </form>
   );
 }
-
-    
