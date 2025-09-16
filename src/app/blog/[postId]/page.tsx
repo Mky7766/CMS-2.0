@@ -4,9 +4,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Icons } from "@/components/icons";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { getSettings } from "@/lib/settings";
 
-export default function PostPage({ params }: { params: { postId: string } }) {
+export default async function PostPage({ params }: { params: { postId: string } }) {
   const post = posts.find(p => p.id === params.postId);
+  const settings = await getSettings();
 
   if (!post) {
     notFound();
@@ -18,7 +20,7 @@ export default function PostPage({ params }: { params: { postId: string } }) {
             <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
             <Link href="/" className="flex items-center gap-2 font-headline text-xl font-bold">
                 <Icons.logo className="h-6 w-6" />
-                Nebula CMS
+                {settings.siteName || "Nebula CMS"}
             </Link>
             <div className="flex flex-1 items-center justify-end space-x-4">
                 <nav className="flex items-center space-x-1">
