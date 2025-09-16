@@ -6,7 +6,7 @@ import { customizeTheme } from "@/ai/flows/theme-customization";
 import fs from "fs/promises";
 import path from "path";
 import { redirect } from 'next/navigation';
-import { User, users, setUsers, posts, setPosts, Post } from "@/lib/data";
+import { User, users, setUsers, posts, setPosts, Post, Menu } from "@/lib/data";
 import { createSession, deleteSession, getSession } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 import { ImagePlaceholder } from "@/lib/placeholder-images";
@@ -196,7 +196,7 @@ export async function updatePost(prevState: any, formData: FormData) {
     updatedPosts[postIndex] = updatedPost;
 
     try {
-        const postsFilePath = path.join(process.cwd(), 'src', 'lib', 'posts.json');
+        const postsFilePath = path.join(process.cwd(), 'src/lib/posts.json');
         await fs.writeFile(postsFilePath, JSON.stringify(updatedPosts, null, 2));
         setPosts(updatedPosts);
     } catch (error) {
@@ -229,7 +229,7 @@ export async function deletePost(postId: string) {
     }
 
     try {
-        const postsFilePath = path.join(process.cwd(), 'src', 'lib', 'posts.json');
+        const postsFilePath = path.join(process.cwd(), 'src/lib/posts.json');
         await fs.writeFile(postsFilePath, JSON.stringify(updatedPosts, null, 2));
         setPosts(updatedPosts);
         revalidatePath('/admin/posts');
@@ -628,6 +628,54 @@ export async function deleteUser(userId: string) {
 
     revalidatePath('/admin/users');
     return { success: "User deleted successfully." };
+}
+
+export async function saveMenu(prevState: any, formData: FormData) {
+    const session = await getSession();
+    if (!session) {
+        return { error: "Unauthorized" };
+    }
+
+    const name = formData.get('menu-name') as string;
+    const labels = formData.getAll('item-labels') as string[];
+    const urls = formData.getAll('item-urls') as string[];
+
+    if (!name) {
+        return { error: 'Menu name is required.' };
+    }
+    
+    const menuItems = labels.map((label, index) => ({
+        label,
+        url: urls[index]
+    }));
+
+    const newMenu: Menu = {
+        id: `${Date.now()}`,
+        name,
+        items: menuItems
+    };
+    
+    const menusFilePath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
+
+    try {
+        let menus: Menu[] = [];
+        try {
+            const menusFileContent = await fs.readFile(menusFilePath, 'utf-8');
+            menus = JSON.parse(menusFileContent);
+        } catch (readError) {
+            // File might not exist yet, which is fine
+        }
+        
+        menus.push(newMenu);
+        await fs.writeFile(menusFilePath, JSON.stringify(menus, null, 2));
+
+    } catch (error) {
+        console.error("Failed to save menu:", error);
+        return { error: 'Failed to save menu. Please try again.' };
+    }
+
+    revalidatePath('/admin/menus');
+    redirect('/admin/menus');
 }
 
     

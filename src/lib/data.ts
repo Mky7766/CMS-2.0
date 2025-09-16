@@ -29,6 +29,17 @@ export type User = {
     createdAt: string;
 }
 
+export type MenuItem = {
+    label: string;
+    url: string;
+};
+
+export type Menu = {
+    id: string;
+    name: string;
+    items: MenuItem[];
+};
+
 let posts: Post[] = postsData;
 
 let users: User[] = usersData;
