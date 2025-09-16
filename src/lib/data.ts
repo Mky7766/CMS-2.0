@@ -13,6 +13,10 @@ export type Post = {
   };
   authorId: string;
   tags?: string[];
+  featuredImage?: {
+    url: string;
+    alt: string;
+  };
 };
 
 export type User = {

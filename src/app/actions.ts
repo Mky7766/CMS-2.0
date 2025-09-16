@@ -107,6 +107,7 @@ export async function savePost(prevState: any, formData: FormData) {
     const title = formData.get('title') as string;
     const content = formData.get('content') as string;
     const status = formData.get('status') as 'Draft' | 'Published' | 'Scheduled';
+    const featuredImageUrl = formData.get('featured-image-url') as string;
 
     if (!title || !content || !status || !permalink) {
         return { error: 'Title, content, status and permalink are required.' };
@@ -129,7 +130,8 @@ export async function savePost(prevState: any, formData: FormData) {
             avatarUrl: user.avatarUrl,
         },
         authorId: user.id,
-        tags: (formData.get('tags-hidden') as string)?.split(',').filter(Boolean) || []
+        tags: (formData.get('tags-hidden') as string)?.split(',').filter(Boolean) || [],
+        featuredImage: featuredImageUrl ? { url: featuredImageUrl, alt: title } : undefined
     };
 
     const updatedPosts = [newPost, ...posts];
@@ -161,6 +163,7 @@ export async function updatePost(prevState: any, formData: FormData) {
     const content = formData.get('content') as string;
     const status = formData.get('status') as 'Draft' | 'Published' | 'Scheduled';
     const tags = (formData.get('tags-hidden') as string)?.split(',').filter(Boolean) || [];
+    const featuredImageUrl = formData.get('featured-image-url') as string;
 
     if (!postId || !title || !content || !status || !permalink) {
         return { error: 'Post ID, permalink, title, content, and status are required.' };
@@ -185,6 +188,7 @@ export async function updatePost(prevState: any, formData: FormData) {
         content,
         status,
         tags,
+        featuredImage: featuredImageUrl ? { url: featuredImageUrl, alt: title } : posts[postIndex].featuredImage
     };
 
     const updatedPosts = [...posts];
@@ -348,7 +352,7 @@ export async function uploadMedia(fileDataUrl: string, fileName: string) {
 
         revalidatePath('/admin/settings');
         revalidatePath('/');
-        revalidatePath('/blog', 'layout');
+        revalidatePath('/[postId]', 'page');
         revalidatePath('/admin', 'layout');
 
 

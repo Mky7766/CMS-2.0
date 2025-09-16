@@ -1,17 +1,18 @@
 
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useState, useTransition, useRef } from "react";
 import { useFormStatus } from "react-dom";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, Save, UploadCloud } from "lucide-react";
+import { Calendar, Save, UploadCloud, X, Loader } from "lucide-react";
 import { Badge } from "../ui/badge";
-import { savePost, updatePost } from "@/app/actions";
+import { savePost, updatePost, uploadMedia } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import type { Post } from "@/lib/data";
 
@@ -44,6 +45,9 @@ export default function PostForm({ post }: PostFormProps) {
   const [permalink, setPermalink] = useState(post?.id || "");
   const [tags, setTags] = useState(post?.tags || []);
   const [tagInput, setTagInput] = useState("");
+  const [featuredImageUrl, setFeaturedImageUrl] = useState(post?.featuredImage?.url || "");
+  const [isUploading, startUploading] = useTransition();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Determine the action and prepare the initial state
   const action = post ? updatePost : savePost;
@@ -85,12 +89,46 @@ export default function PostForm({ post }: PostFormProps) {
   const removeTag = (tagToRemove: string) => {
     setTags(tags.filter(tag => tag !== tagToRemove));
   };
+  
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      startUploading(async () => {
+        const result = await uploadMedia(dataUrl, file.name);
+        if (result.success && result.newImage) {
+           setFeaturedImageUrl(result.newImage.imageUrl);
+           toast({ title: "Success", description: "Image uploaded and set as featured." });
+        } else {
+           toast({ title: "Error", description: result.error, variant: "destructive" });
+        }
+      });
+    };
+    reader.onerror = (error) => {
+        console.error("Error reading file:", error);
+        toast({ title: "Error", description: "Failed to read file.", variant: "destructive" });
+    };
+
+    // Reset file input
+    if(fileInputRef.current) {
+        fileInputRef.current.value = "";
+    }
+  };
+
+  const removeFeaturedImage = () => {
+      setFeaturedImageUrl("");
+  }
 
 
   return (
     <form action={formAction} className="grid gap-6 lg:grid-cols-3">
       {/* Hidden input to pass the original post ID for updates */}
       {post && <input type="hidden" name="postId" value={post.id} />}
+      <input type="hidden" name="featured-image-url" value={featuredImageUrl} />
       
       <div className="lg:col-span-2 space-y-6">
         <Card>
@@ -205,20 +243,52 @@ export default function PostForm({ post }: PostFormProps) {
                 </div>
             </div>
             <div>
-              <Label htmlFor="featured-image">Featured Image</Label>
-              <div className="mt-1 flex justify-center rounded-md border-2 border-dashed border-border px-6 pt-5 pb-6">
-                <div className="space-y-1 text-center">
-                  <UploadCloud className="mx-auto h-12 w-12 text-gray-400" />
-                  <div className="flex text-sm text-muted-foreground">
-                    <Label htmlFor="file-upload" className="relative cursor-pointer rounded-md bg-background font-medium text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 hover:text-primary">
-                      <span>Upload a file</span>
-                      <Input id="file-upload" name="file-upload" type="file" className="sr-only" />
-                    </Label>
-                    <p className="pl-1">or drag and drop</p>
-                  </div>
-                  <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
-                </div>
-              </div>
+              <Label>Featured Image</Label>
+                {featuredImageUrl ? (
+                    <div className="mt-2 relative">
+                        <Image
+                            src={featuredImageUrl}
+                            alt="Featured image preview"
+                            width={300}
+                            height={200}
+                            className="w-full h-auto rounded-md object-cover"
+                            unoptimized={featuredImageUrl.startsWith('data:')}
+                        />
+                        <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon"
+                            className="absolute top-2 right-2 h-7 w-7"
+                            onClick={removeFeaturedImage}
+                        >
+                            <X className="h-4 w-4" />
+                            <span className="sr-only">Remove image</span>
+                        </Button>
+                    </div>
+                ) : (
+                    <div className="mt-1 flex justify-center rounded-md border-2 border-dashed border-border px-6 pt-5 pb-6">
+                        <div className="space-y-1 text-center">
+                        {isUploading ? <Loader className="mx-auto h-12 w-12 text-gray-400 animate-spin" /> : <UploadCloud className="mx-auto h-12 w-12 text-gray-400" />}
+                        <div className="flex text-sm text-muted-foreground">
+                            <Label htmlFor="file-upload" className="relative cursor-pointer rounded-md bg-background font-medium text-primary focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 hover:text-primary">
+                            <span>{isUploading ? "Uploading..." : "Upload a file"}</span>
+                            <Input 
+                                id="file-upload" 
+                                name="file-upload" 
+                                type="file" 
+                                className="sr-only"
+                                onChange={handleFileChange}
+                                accept="image/*"
+                                ref={fileInputRef}
+                                disabled={isUploading}
+                            />
+                            </Label>
+                            <p className="pl-1">or drag and drop</p>
+                        </div>
+                        <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                        </div>
+                    </div>
+                )}
             </div>
           </CardContent>
         </Card>

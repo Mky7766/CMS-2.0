@@ -1,5 +1,6 @@
 import { posts } from "@/lib/data";
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Icons } from "@/components/icons";
 import Link from "next/link";
@@ -33,8 +34,21 @@ export default async function PostPage({ params }: { params: { postId: string } 
             </div>
             </div>
       </header>
-      <main className="flex-1 py-12 md:py-16 lg:py-20">
-        <div className="container mx-auto px-4">
+      <main className="flex-1">
+        <div className="container mx-auto px-4 py-8 md:py-12">
+           {post.featuredImage && (
+             <div className="mb-8 aspect-video overflow-hidden rounded-lg">
+                <Image
+                    src={post.featuredImage.url}
+                    alt={post.featuredImage.alt}
+                    width={1200}
+                    height={675}
+                    className="w-full h-full object-cover"
+                    priority
+                    unoptimized={post.featuredImage.url.startsWith('data:')}
+                />
+             </div>
+           )}
           <article className="prose prose-lg mx-auto max-w-4xl dark:prose-invert">
             <header className="mb-8">
               <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">{post.title}</h1>
