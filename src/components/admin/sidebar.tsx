@@ -1,4 +1,5 @@
 
+
 "use client"
 
 import Link from "next/link"
@@ -29,7 +30,7 @@ const menuItems = [
   { href: "/admin/users", label: "Users", icon: Users },
 ]
 
-export default function AppSidebar() {
+export default function AppSidebar({ siteName }: { siteName: string }) {
   const pathname = usePathname()
   
   return (
@@ -37,7 +38,7 @@ export default function AppSidebar() {
       <SidebarHeader>
         <Link href="/admin/dashboard" className="flex items-center gap-2">
           <Icons.logo className="w-7 h-7 text-primary" />
-          <h1 className="text-xl font-semibold text-sidebar-foreground">Nebula CMS</h1>
+          <h1 className="text-xl font-semibold text-sidebar-foreground">{siteName}</h1>
         </Link>
       </SidebarHeader>
       <SidebarContent className="flex-1">

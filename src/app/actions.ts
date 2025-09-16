@@ -9,7 +9,7 @@ import { User, users, setUsers, posts, setPosts, Post } from "@/lib/data";
 import { createSession, deleteSession, getSession } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 import { ImagePlaceholder } from "@/lib/placeholder-images";
-import { SiteSettings, clearSettingsCache } from "@/lib/settings";
+import { SiteSettings, getSettings } from "@/lib/settings";
 
 export async function applyTheme(customThemeCss: string) {
     try {
@@ -325,6 +325,8 @@ export async function uploadMedia(fileDataUrl: string, fileName: string) {
       return { error: "Unauthorized" };
     }
 
+    const currentSettings = await getSettings();
+
     const siteName = formData.get('site-name') as string;
     const tagline = formData.get('tagline') as string;
 
@@ -333,6 +335,7 @@ export async function uploadMedia(fileDataUrl: string, fileName: string) {
     }
 
     const newSettings: SiteSettings = {
+        ...currentSettings,
         siteName,
         tagline,
     };
@@ -341,11 +344,10 @@ export async function uploadMedia(fileDataUrl: string, fileName: string) {
         const settingsFilePath = path.join(process.cwd(), 'src', 'lib', 'settings.json');
         await fs.writeFile(settingsFilePath, JSON.stringify(newSettings, null, 2));
         
-        // Clear the in-memory cache
-        clearSettingsCache();
-        
         revalidatePath('/admin/settings');
         revalidatePath('/');
+        revalidatePath('/admin');
+
 
         return { success: 'Settings updated successfully.' };
 
