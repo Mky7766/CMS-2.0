@@ -59,6 +59,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
           <option value="h1">Heading 1</option>
           <option value="h2">Heading 2</option>
           <option value="h3">Heading 3</option>
+          <option value="h4">Heading 4</option>
+          <option value="h5">Heading 5</option>
+          <option value="h6">Heading 6</option>
           <option value="blockquote">Quote</option>
         </select>
         <button type="button" onMouseDown={onButtonMouseDown} data-command="bold" title="Bold" className="font-bold p-2 w-8 hover:bg-accent hover:text-accent-foreground rounded-md">B</button>
