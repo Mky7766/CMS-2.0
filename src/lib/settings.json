@@ -1,8 +1,8 @@
 {
-  "siteName": "Nebula CMS",
-  "tagline": "A modern, git-based CMS aaj",
+  "siteName": "Vinee CMS",
+  "tagline": "A modern, git-based CMS ",
   "logo": "https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600",
   "headerMenuId": "1758020871095",
   "footerMenuId": "1758021746600",
-  "footerText": "Built with ❤️ by the open-source community."
+  "footerText": "<p>\r\n  © <span id=\"footer-year\"></span>\r\n  <a href=\"https://your-site.example\" style=\"text-decoration:none; color:inherit;\">\r\n    Vinee CMS\r\n  </a>. All rights reserved.\r\n</p>\r\n\r\n<script>\r\n  document.getElementById('footer-year').textContent = new Date().getFullYear();\r\n</script>\r\n"
 }
