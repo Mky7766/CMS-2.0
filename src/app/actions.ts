@@ -377,8 +377,11 @@ export async function updateUser(prevState: any, formData: FormData) {
     if (userIndex === -1) {
         return { error: 'User not found.' };
     }
+    
+    const originalUser = users[userIndex];
+    const originalName = originalUser.name;
 
-    const updatedUser: User = { ...users[userIndex], name };
+    const updatedUser: User = { ...originalUser, name };
 
     if (password) {
         updatedUser.password = password; // Again, hash this in a real app
@@ -387,17 +390,39 @@ export async function updateUser(prevState: any, formData: FormData) {
     const updatedUsers = [...users];
     updatedUsers[userIndex] = updatedUser;
 
+    // Now, update the author name in all posts by this user
+    const updatedPosts = posts.map(post => {
+        if (post.author.name === originalName) {
+            // This is a simplification. In a real app, you'd use author ID.
+            // Assuming author name is unique for this to work correctly.
+            return {
+                ...post,
+                author: {
+                    ...post.author,
+                    name: name
+                }
+            };
+        }
+        return post;
+    });
+
     try {
         const usersFilePath = path.join(process.cwd(), 'src', 'lib', 'users.json');
         await fs.writeFile(usersFilePath, JSON.stringify(updatedUsers, null, 2));
         setUsers(updatedUsers);
+
+        const postsFilePath = path.join(process.cwd(), 'src', 'lib', 'posts.json');
+        await fs.writeFile(postsFilePath, JSON.stringify(updatedPosts, null, 2));
+        setPosts(updatedPosts);
+
     } catch (error) {
-        console.error("Failed to update user:", error);
+        console.error("Failed to update data:", error);
         return { error: 'Failed to update profile. Please try again.' };
     }
 
     revalidatePath('/admin/profile');
     revalidatePath('/admin/layout'); // To refresh header
+    revalidatePath('/'); // To refresh blog posts with new author name
 
     return { success: 'Profile updated successfully.' };
 }
