@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import ThemeForm from "@/components/admin/theme-form";
 import GeneralSettingsForm from "@/components/admin/general-settings-form";
 import { getSettings } from "@/lib/settings";
+import Link from "next/link";
 
 
 export default async function SettingsPage() {
@@ -20,6 +21,7 @@ export default async function SettingsPage() {
         <TabsList>
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="appearance">Appearance</TabsTrigger>
+           <TabsTrigger value="menus">Menus</TabsTrigger>
           <TabsTrigger value="users">Users & Roles</TabsTrigger>
         </TabsList>
         <TabsContent value="general" className="mt-4">
@@ -27,6 +29,20 @@ export default async function SettingsPage() {
         </TabsContent>
         <TabsContent value="appearance" className="mt-4">
             <ThemeForm />
+        </TabsContent>
+        <TabsContent value="menus" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Menu Management</CardTitle>
+              <CardDescription>Manage the navigation menus for your site.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>You can create and edit menus in the main Menus section.</p>
+              <Button className="mt-4" asChild>
+                <Link href="/admin/menus">Go to Menu Editor</Link>
+              </Button>
+            </CardContent>
+          </Card>
         </TabsContent>
         <TabsContent value="users" className="mt-4">
           <Card>
