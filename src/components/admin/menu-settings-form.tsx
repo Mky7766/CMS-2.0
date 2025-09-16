@@ -74,12 +74,15 @@ export default function MenuSettingsForm({ settings, menus }: MenuSettingsFormPr
                  <div className="space-y-2">
                     <Label>Footer Menu</Label>
                     <p className="text-sm text-muted-foreground">The navigation for your site's footer.</p>
-                    <Select name="footer-menu-id" defaultValue={settings.footerMenuId} disabled>
+                    <Select name="footer-menu-id" defaultValue={settings.footerMenuId}>
                         <SelectTrigger>
                             <SelectValue placeholder="Select a menu" />
                         </SelectTrigger>
                         <SelectContent>
                              <SelectItem value="none">None</SelectItem>
+                             {menus.map((menu) => (
+                                <SelectItem key={menu.id} value={menu.id}>{menu.name}</SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
                 </div>

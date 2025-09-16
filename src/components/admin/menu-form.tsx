@@ -173,8 +173,8 @@ export default function MenuForm({ menu, settings }: MenuFormProps) {
                                         <Label htmlFor="loc-header">Header Menu</Label>
                                     </div>
                                     <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value="footer" id="loc-footer" disabled />
-                                        <Label htmlFor="loc-footer">Footer Menu (coming soon)</Label>
+                                        <RadioGroupItem value="footer" id="loc-footer" />
+                                        <Label htmlFor="loc-footer">Footer Menu</Label>
                                     </div>
                                 </RadioGroup>
                                 <p className="text-sm text-muted-foreground">

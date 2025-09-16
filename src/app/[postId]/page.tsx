@@ -27,6 +27,8 @@ export default async function PostPage({ params }: { params: { postId: string } 
   const settings = await getSettings();
   const menus = await getMenus();
   const headerMenu = menus.find(m => m.id === settings.headerMenuId);
+  const footerMenu = menus.find(m => m.id === settings.footerMenuId);
+
 
   if (!post) {
     notFound();
@@ -91,11 +93,22 @@ export default async function PostPage({ params }: { params: { postId: string } 
           </article>
         </div>
       </main>
-      <footer className="p-4 text-center text-sm text-muted-foreground border-t">
-        Built with &#x2764;&#xFE0F; by the open-source community.
+      <footer className="border-t bg-muted/20 py-8">
+        <div className="container">
+           {footerMenu && footerMenu.items.length > 0 && (
+            <nav className="flex justify-center gap-4 mb-4">
+              {footerMenu.items.map((item, index) => (
+                <Link key={index} href={item.url} className="text-sm text-muted-foreground hover:text-foreground">
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          )}
+          <p className="text-center text-sm text-muted-foreground">
+            Built with &#x2764;&#xFE0F; by the open-source community.
+          </p>
+        </div>
       </footer>
     </div>
   );
 }
-
-    

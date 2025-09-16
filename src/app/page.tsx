@@ -26,6 +26,8 @@ export default async function Home() {
   const publishedPosts = posts.filter(p => p.status.toLowerCase() === 'published').sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   const menus = await getMenus();
   const headerMenu = menus.find(m => m.id === settings.headerMenuId);
+  const footerMenu = menus.find(m => m.id === settings.footerMenuId);
+
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -98,8 +100,21 @@ export default async function Home() {
             </div>
         </div>
       </main>
-      <footer className="p-4 text-center text-sm text-muted-foreground border-t">
-        Built with &#x2764;&#xFE0F; by the open-source community.
+      <footer className="border-t bg-muted/20 py-8">
+        <div className="container">
+          {footerMenu && footerMenu.items.length > 0 && (
+            <nav className="flex justify-center gap-4 mb-4">
+              {footerMenu.items.map((item, index) => (
+                <Link key={index} href={item.url} className="text-sm text-muted-foreground hover:text-foreground">
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          )}
+          <p className="text-center text-sm text-muted-foreground">
+            Built with &#x2764;&#xFE0F; by the open-source community.
+          </p>
+        </div>
       </footer>
     </div>
   );
