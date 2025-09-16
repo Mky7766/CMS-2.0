@@ -35,3 +35,5 @@ export async function getSettings(): Promise<SiteSettings> {
 export function clearSettingsCache(): void {
     cachedSettings = null;
 }
+
+    

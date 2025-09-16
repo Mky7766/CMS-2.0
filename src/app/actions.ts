@@ -474,3 +474,5 @@ export async function updateUserAvatar(userId: string, avatarDataUrl: string) {
     
     return { success: 'Profile picture updated successfully.', newAvatarUrl: avatarDataUrl };
 }
+
+    
