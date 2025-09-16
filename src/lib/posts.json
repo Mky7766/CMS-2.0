@@ -9,6 +9,7 @@
       "name": "mukeshyogi2802",
       "avatarUrl": "https://picsum.photos/seed/5/32/32"
     },
+    "authorId": "5",
     "tags": []
   },
   {
@@ -21,6 +22,7 @@
       "name": "mukeshyogi2802",
       "avatarUrl": "https://picsum.photos/seed/5/32/32"
     },
+    "authorId": "5",
     "tags": [
       "Technology",
       "CMS"
@@ -35,6 +37,7 @@
       "name": "John Smith",
       "avatarUrl": "https://picsum.photos/seed/b2/32/32"
     },
+    "authorId": "2",
     "content": "Headless CMS offers a new level of flexibility. Let's look at the pros and cons."
   },
   {
@@ -46,6 +49,7 @@
       "name": "Alice Johnson",
       "avatarUrl": "https://picsum.photos/seed/c3/32/32"
     },
+    "authorId": "3",
     "content": "Your first steps into the world of Nebula CMS. It's easier than you think!"
   },
   {
@@ -57,6 +61,7 @@
       "name": "Bob Brown",
       "avatarUrl": "https://picsum.photos/seed/d4/32/32"
     },
+    "authorId": "4",
     "content": "Image optimization is crucial for web performance. Learn the best techniques here."
   }
 ]

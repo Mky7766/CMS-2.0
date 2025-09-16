@@ -128,6 +128,7 @@ export async function savePost(prevState: any, formData: FormData) {
             name: user.name,
             avatarUrl: user.avatarUrl,
         },
+        authorId: user.id,
         tags: (formData.get('tags-hidden') as string)?.split(',').filter(Boolean) || []
     };
 
@@ -379,7 +380,6 @@ export async function updateUser(prevState: any, formData: FormData) {
     }
     
     const originalUser = users[userIndex];
-    const originalName = originalUser.name;
 
     const updatedUser: User = { ...originalUser, name };
 
@@ -392,9 +392,7 @@ export async function updateUser(prevState: any, formData: FormData) {
 
     // Now, update the author name in all posts by this user
     const updatedPosts = posts.map(post => {
-        if (post.author.name === originalName) {
-            // This is a simplification. In a real app, you'd use author ID.
-            // Assuming author name is unique for this to work correctly.
+        if (post.authorId === session.userId) {
             return {
                 ...post,
                 author: {
