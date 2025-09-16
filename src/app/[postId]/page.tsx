@@ -1,5 +1,5 @@
 
-import { posts } from "@/lib/data";
+import { posts, Menu } from "@/lib/data";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -8,10 +8,25 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { getSettings } from "@/lib/settings";
 import HtmlRenderer from "@/components/html-renderer";
+import fs from 'fs/promises';
+import path from 'path';
+
+async function getMenus(): Promise<Menu[]> {
+    const filePath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
+    try {
+        const data = await fs.readFile(filePath, 'utf-8');
+        return JSON.parse(data) as Menu[];
+    } catch (error) {
+        return [];
+    }
+}
+
 
 export default async function PostPage({ params }: { params: { postId: string } }) {
   const post = posts.find(p => p.id === params.postId);
   const settings = await getSettings();
+  const menus = await getMenus();
+  const headerMenu = menus.find(m => m.id === settings.headerMenuId);
 
   if (!post) {
     notFound();
@@ -27,11 +42,17 @@ export default async function PostPage({ params }: { params: { postId: string } 
             </Link>
             <div className="flex flex-1 items-center justify-end space-x-4">
                 <nav className="flex items-center space-x-1">
-                <Button asChild>
-                    <Link href="/admin">
-                    Dashboard
-                    </Link>
-                </Button>
+                  {headerMenu ? (
+                    headerMenu.items.map((item, index) => (
+                      <Button key={index} variant="ghost" asChild>
+                        <Link href={item.url}>{item.label}</Link>
+                      </Button>
+                    ))
+                  ) : (
+                    <Button asChild>
+                      <Link href="/admin">Dashboard</Link>
+                    </Button>
+                  )}
                 </nav>
             </div>
             </div>

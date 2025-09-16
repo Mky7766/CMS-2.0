@@ -335,17 +335,16 @@ export async function uploadMedia(fileDataUrl: string, fileName: string) {
     const siteName = formData.get('site-name') as string;
     const tagline = formData.get('tagline') as string;
     const logo = formData.get('logo') as string;
-
-    if (!siteName) {
-        return { error: 'Site name is required.' };
-    }
+    const headerMenuId = formData.get('header-menu-id') as string;
 
     const newSettings: SiteSettings = {
         ...currentSettings,
-        siteName,
-        tagline,
-        logo,
     };
+
+    if (siteName) newSettings.siteName = siteName;
+    if (tagline) newSettings.tagline = tagline;
+    if (logo) newSettings.logo = logo;
+    if (headerMenuId) newSettings.headerMenuId = headerMenuId;
 
     try {
         const settingsFilePath = path.join(process.cwd(), 'src', 'lib', 'settings.json');
@@ -681,3 +680,4 @@ export async function saveMenu(prevState: any, formData: FormData) {
     
 
     
+

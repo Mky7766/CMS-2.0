@@ -7,6 +7,8 @@ export type SiteSettings = {
   siteName: string;
   tagline: string;
   logo: string;
+  headerMenuId?: string;
+  footerMenuId?: string;
 };
 
 // In-memory cache for settings

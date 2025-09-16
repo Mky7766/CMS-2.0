@@ -1,15 +1,26 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import ThemeForm from "@/components/admin/theme-form";
 import GeneralSettingsForm from "@/components/admin/general-settings-form";
+import MenuSettingsForm from "@/components/admin/menu-settings-form";
 import { getSettings } from "@/lib/settings";
-import Link from "next/link";
+import { Menu } from "@/lib/data";
+import fs from 'fs/promises';
+import path from 'path';
 
+
+async function getMenus(): Promise<Menu[]> {
+    const filePath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
+    try {
+        const data = await fs.readFile(filePath, 'utf-8');
+        return JSON.parse(data) as Menu[];
+    } catch (error) {
+        return [];
+    }
+}
 
 export default async function SettingsPage() {
   const settings = await getSettings();
+  const menus = await getMenus();
 
   return (
     <div className="space-y-8">
@@ -31,18 +42,7 @@ export default async function SettingsPage() {
             <ThemeForm />
         </TabsContent>
         <TabsContent value="menus" className="mt-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Menu Management</CardTitle>
-              <CardDescription>Manage the navigation menus for your site.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p>You can create and edit menus in the main Menus section.</p>
-              <Button className="mt-4" asChild>
-                <Link href="/admin/menus">Go to Menu Editor</Link>
-              </Button>
-            </CardContent>
-          </Card>
+          <MenuSettingsForm settings={settings} menus={menus} />
         </TabsContent>
         <TabsContent value="users" className="mt-4">
           <Card>

@@ -1,16 +1,31 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { posts } from "@/lib/data";
+import { posts, Menu } from "@/lib/data";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
 import { getSettings } from "@/lib/settings";
+import fs from 'fs/promises';
+import path from 'path';
+
+async function getMenus(): Promise<Menu[]> {
+    const filePath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
+    try {
+        const data = await fs.readFile(filePath, 'utf-8');
+        return JSON.parse(data) as Menu[];
+    } catch (error) {
+        return [];
+    }
+}
+
 
 export default async function Home() {
   const settings = await getSettings();
   const publishedPosts = posts.filter(p => p.status.toLowerCase() === 'published').sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const menus = await getMenus();
+  const headerMenu = menus.find(m => m.id === settings.headerMenuId);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -22,11 +37,17 @@ export default async function Home() {
           </Link>
           <div className="flex flex-1 items-center justify-end space-x-4">
             <nav className="flex items-center space-x-1">
-               <Button asChild>
-                <Link href="/admin">
-                  Dashboard
-                </Link>
-              </Button>
+               {headerMenu ? (
+                  headerMenu.items.map((item, index) => (
+                    <Button key={index} variant="ghost" asChild>
+                      <Link href={item.url}>{item.label}</Link>
+                    </Button>
+                  ))
+                ) : (
+                  <Button asChild>
+                    <Link href="/admin">Dashboard</Link>
+                  </Button>
+                )}
             </nav>
           </div>
         </div>
