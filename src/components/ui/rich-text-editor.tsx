@@ -14,11 +14,11 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
   // we only set the initial value.
   useEffect(() => {
     const editor = editorRef.current;
-    if (editor && !editor.innerHTML) { // Set content only if it's empty
+    if (editor && value !== editor.innerHTML) { 
         editor.innerHTML = value;
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [value]);
 
   const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
     onChange(e.currentTarget.innerHTML);
@@ -51,10 +51,11 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
   
   const handleFormatChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     e.preventDefault();
-    document.execCommand('formatBlock', false, e.target.value);
-    editorRef.current?.focus();
-    if(editorRef.current) {
-        onChange(editorRef.current.innerHTML);
+    const value = e.target.value;
+    if (editorRef.current) {
+        editorRef.current.focus();
+        document.execCommand('formatBlock', false, value);
+        onChange(editorRef.current.innerHTML); // Update state after command
     }
   };
 
