@@ -104,9 +104,9 @@ export default async function PostPage({ params }: { params: { postId: string } 
               ))}
             </nav>
           )}
-          <p className="text-center text-sm text-muted-foreground">
-            Built with &#x2764;&#xFE0F; by the open-source community.
-          </p>
+          <div className="text-center text-sm text-muted-foreground">
+            <HtmlRenderer htmlContent={settings.footerText || ''} />
+          </div>
         </div>
       </footer>
     </div>

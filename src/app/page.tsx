@@ -9,6 +9,7 @@ import { Icons } from "@/components/icons";
 import { getSettings } from "@/lib/settings";
 import fs from 'fs/promises';
 import path from 'path';
+import HtmlRenderer from "@/components/html-renderer";
 
 async function getMenus(): Promise<Menu[]> {
     const filePath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
@@ -111,9 +112,9 @@ export default async function Home() {
               ))}
             </nav>
           )}
-          <p className="text-center text-sm text-muted-foreground">
-            Built with &#x2764;&#xFE0F; by the open-source community.
-          </p>
+          <div className="text-center text-sm text-muted-foreground">
+             <HtmlRenderer htmlContent={settings.footerText || ''} />
+          </div>
         </div>
       </footer>
     </div>

@@ -690,5 +690,3 @@ export async function getMenus(): Promise<Menu[]> {
         return [];
     }
 }
-
-    

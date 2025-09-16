@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { updateSettings } from "@/app/actions";
 import { SiteSettings } from "@/lib/settings";
+import { Textarea } from "../ui/textarea";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -59,6 +60,16 @@ export default function GeneralSettingsForm({ settings }: GeneralSettingsFormPro
             <div className="space-y-2">
                 <Label htmlFor="tagline">Tagline</Label>
                 <Input id="tagline" name="tagline" defaultValue={settings.tagline} />
+            </div>
+             <div className="space-y-2">
+                <Label htmlFor="footer-text">Footer Text</Label>
+                <Textarea 
+                    id="footer-text" 
+                    name="footer-text" 
+                    defaultValue={settings.footerText} 
+                    rows={4}
+                    placeholder="Enter footer content. You can use HTML."
+                />
             </div>
             </CardContent>
             <CardFooter>
