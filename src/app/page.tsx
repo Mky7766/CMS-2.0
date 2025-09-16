@@ -43,7 +43,7 @@ export default async function Home() {
                 <Card key={post.id}>
                     <CardHeader>
                         <CardTitle className="text-2xl hover:text-primary transition-colors">
-                            <Link href={`/blog/${post.id}`}>{post.title}</Link>
+                            <Link href={`/${post.id}`}>{post.title}</Link>
                         </CardTitle>
                         <CardDescription>
                             <time dateTime={post.createdAt}>{new Date(post.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</time>

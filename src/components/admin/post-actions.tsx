@@ -58,7 +58,7 @@ export default function PostActions({ postId }: PostActionsProps) {
             <Link href={`/admin/posts/${postId}/edit`}>Edit</Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-             <Link href={`/blog/${postId}`} target="_blank">View</Link>
+             <Link href={`/${postId}`} target="_blank">View</Link>
           </DropdownMenuItem>
           <DropdownMenuItem
             className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/40"

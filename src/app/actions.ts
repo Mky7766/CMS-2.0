@@ -202,8 +202,8 @@ export async function updatePost(prevState: any, formData: FormData) {
     revalidatePath('/admin/posts');
     revalidatePath(`/admin/posts/${postId}/edit`); // old path
     revalidatePath(`/admin/posts/${permalink}/edit`); // new path
-    revalidatePath(`/blog/${postId}`); // old path
-    revalidatePath(`/blog/${permalink}`); // new path
+    revalidatePath(`/${postId}`); // old path
+    revalidatePath(`/${permalink}`); // new path
     revalidatePath('/');
     redirect('/admin/posts');
 }
