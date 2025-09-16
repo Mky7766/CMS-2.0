@@ -9,7 +9,7 @@ import { User, users, setUsers, posts, setPosts, Post } from "@/lib/data";
 import { createSession, deleteSession, getSession } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 import { ImagePlaceholder } from "@/lib/placeholder-images";
-import { SiteSettings, getSettings } from "@/lib/settings";
+import { SiteSettings, getSettings, clearSettingsCache } from "@/lib/settings";
 
 export async function applyTheme(customThemeCss: string) {
     try {
@@ -344,9 +344,12 @@ export async function uploadMedia(fileDataUrl: string, fileName: string) {
         const settingsFilePath = path.join(process.cwd(), 'src', 'lib', 'settings.json');
         await fs.writeFile(settingsFilePath, JSON.stringify(newSettings, null, 2));
         
+        clearSettingsCache(); // Clear the in-memory cache
+
         revalidatePath('/admin/settings');
         revalidatePath('/');
-        revalidatePath('/admin');
+        revalidatePath('/blog', 'layout');
+        revalidatePath('/admin', 'layout');
 
 
         return { success: 'Settings updated successfully.' };
@@ -475,6 +478,149 @@ export async function updateUserAvatar(userId: string, avatarDataUrl: string) {
     revalidatePath('/');
     
     return { success: 'Profile picture updated successfully.', newAvatarUrl: avatarDataUrl };
+}
+
+
+// --- User Management Actions ---
+
+export async function getUsersClient(): Promise<User[]> {
+    return users;
+}
+
+export async function getUserById(userId: string): Promise<User | undefined> {
+    return users.find(u => u.id === userId);
+}
+
+
+export async function createUser(prevState: any, formData: FormData) {
+    const session = await getSession();
+    if (!session) {
+        return { error: "Unauthorized" };
+    }
+
+    const name = formData.get('name') as string;
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    const role = formData.get('role') as 'Admin' | 'Editor' | 'Author';
+
+    if (!name || !email || !password || !role) {
+        return { error: 'All fields are required.' };
+    }
+    
+    const existingUser = users.find(u => u.email === email);
+    if (existingUser) {
+        return { error: 'A user with this email already exists.' };
+    }
+
+    const newUser: User = {
+        id: `${Date.now()}`,
+        name,
+        email,
+        password,
+        role,
+        avatarUrl: `https://picsum.photos/seed/${Date.now()}/32/32`,
+        createdAt: new Date().toISOString().split('T')[0],
+    };
+
+    const updatedUsers = [...users, newUser];
+
+    try {
+        const usersFilePath = path.join(process.cwd(), 'src', 'lib', 'users.json');
+        await fs.writeFile(usersFilePath, JSON.stringify(updatedUsers, null, 2));
+        setUsers(updatedUsers);
+    } catch (error) {
+        console.error("Failed to create user:", error);
+        return { error: 'Failed to create user. Please try again.' };
+    }
+    
+    revalidatePath('/admin/users');
+    redirect('/admin/users');
+}
+
+export async function adminUpdateUser(prevState: any, formData: FormData) {
+    const session = await getSession();
+    if (!session) {
+        return { error: "Unauthorized" };
+    }
+
+    const userId = formData.get('userId') as string;
+    const name = formData.get('name') as string;
+    const role = formData.get('role') as 'Admin' | 'Editor' | 'Author';
+
+    if (!userId || !name || !role) {
+        return { error: 'User ID, name and role are required.' };
+    }
+
+    const userIndex = users.findIndex(u => u.id === userId);
+    if (userIndex === -1) {
+        return { error: 'User not found.' };
+    }
+    
+    const updatedUsers = [...users];
+    updatedUsers[userIndex] = { ...updatedUsers[userIndex], name, role };
+    
+    // Also update author name in posts
+    const updatedPosts = posts.map(post => {
+        if (post.authorId === userId) {
+            return { ...post, author: { ...post.author, name: name } };
+        }
+        return post;
+    });
+
+
+    try {
+        const usersFilePath = path.join(process.cwd(), 'src', 'lib', 'users.json');
+        await fs.writeFile(usersFilePath, JSON.stringify(updatedUsers, null, 2));
+        setUsers(updatedUsers);
+
+        const postsFilePath = path.join(process.cwd(), 'src', 'lib', 'posts.json');
+        await fs.writeFile(postsFilePath, JSON.stringify(updatedPosts, null, 2));
+        setPosts(updatedPosts);
+    } catch (error) {
+        console.error("Failed to update user:", error);
+        return { error: 'Failed to update user. Please try again.' };
+    }
+    
+    revalidatePath('/admin/users');
+    revalidatePath(`/admin/users/${userId}/edit`);
+    redirect('/admin/users');
+}
+
+
+export async function deleteUser(userId: string) {
+    const session = await getSession();
+    if (!session) {
+      return { error: "Unauthorized" };
+    }
+
+    // Prevent deleting the last user
+    if (users.length <= 1) {
+        return { error: "Cannot delete the last user." };
+    }
+    // Prevent deleting oneself
+    if (session.userId === userId) {
+        return { error: "You cannot delete your own account." };
+    }
+
+    const updatedUsers = users.filter(u => u.id !== userId);
+    // Also delete all posts by this user
+    const updatedPosts = posts.filter(p => p.authorId !== userId);
+
+    try {
+        const usersFilePath = path.join(process.cwd(), 'src', 'lib', 'users.json');
+        await fs.writeFile(usersFilePath, JSON.stringify(updatedUsers, null, 2));
+        setUsers(updatedUsers);
+
+        const postsFilePath = path.join(process.cwd(), 'src', 'lib', 'posts.json');
+        await fs.writeFile(postsFilePath, JSON.stringify(updatedPosts, null, 2));
+        setPosts(updatedPosts);
+    } catch (error) {
+        console.error("Failed to delete user:", error);
+        return { error: 'Failed to delete user. Please try again.' };
+    }
+
+    revalidatePath('/admin/users');
+    return { success: "User deleted successfully." };
 }
 
     
