@@ -5,25 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Menu } from "@/lib/data";
-import fs from 'fs/promises';
-import path from 'path';
 import { PlusCircle } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import MenuActions from "@/components/admin/menu-actions";
-
-
-// We have to make this a client-side fetch because Server Components
-// can't easily be updated after a server action.
-async function getMenusClient(): Promise<Menu[]> {
-    const filePath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
-    try {
-        const data = await fs.readFile(filePath, 'utf-8');
-        return JSON.parse(data) as Menu[];
-    } catch (error) {
-        return [];
-    }
-}
+import { getMenus } from "@/app/actions";
 
 
 export default function MenusPage() {
@@ -34,7 +20,7 @@ export default function MenusPage() {
   useEffect(() => {
     async function loadMenus() {
       setIsLoading(true);
-      const menusData = await getMenusClient();
+      const menusData = await getMenus();
       setMenus(menusData);
       setIsLoading(false);
     }
@@ -110,4 +96,3 @@ export default function MenusPage() {
     </div>
   );
 }
-

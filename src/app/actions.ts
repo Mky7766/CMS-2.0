@@ -636,7 +636,7 @@ export async function deleteUser(userId: string) {
 
 // --- Menu Management Actions ---
 
-async function getMenusFromFile(): Promise<Menu[]> {
+export async function getMenus(): Promise<Menu[]> {
     const filePath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
     try {
         const data = await fs.readFile(filePath, 'utf-8');
@@ -676,7 +676,7 @@ export async function saveMenu(prevState: any, formData: FormData) {
     const menusFilePath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
 
     try {
-        const menus = await getMenusFromFile();
+        const menus = await getMenus();
         menus.push(newMenu);
         await fs.writeFile(menusFilePath, JSON.stringify(menus, null, 2));
         
@@ -729,7 +729,7 @@ export async function updateMenu(prevState: any, formData: FormData) {
     const menusFilePath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
 
     try {
-        const menus = await getMenusFromFile();
+        const menus = await getMenus();
         const menuIndex = menus.findIndex(m => m.id === menuId);
 
         if (menuIndex === -1) {
@@ -783,7 +783,7 @@ export async function deleteMenu(menuId: string) {
     }
   
     try {
-      const menus = await getMenusFromFile();
+      const menus = await getMenus();
       const updatedMenus = menus.filter(m => m.id !== menuId);
   
       if (updatedMenus.length === menus.length) {
@@ -828,3 +828,6 @@ export async function deleteMenu(menuId: string) {
 
 
 
+
+
+    
