@@ -10,6 +10,8 @@ import { Label } from "@/components/ui/label";
 import { PlusCircle, Trash2 } from "lucide-react";
 import { saveMenu } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
 
 type MenuItem = {
   id: number;
@@ -134,9 +136,26 @@ export default function NewMenuPage() {
                             <CardTitle>Publish</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-sm text-muted-foreground">
-                                Once you save the menu, you can assign it to a location in your theme settings.
-                            </p>
+                             <div className="space-y-4">
+                                <Label>Display Location</Label>
+                                <RadioGroup defaultValue="none" name="menu-location">
+                                    <div className="flex items-center space-x-2">
+                                        <RadioGroupItem value="none" id="loc-none" />
+                                        <Label htmlFor="loc-none">None</Label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <RadioGroupItem value="header" id="loc-header" />
+                                        <Label htmlFor="loc-header">Header Menu</Label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <RadioGroupItem value="footer" id="loc-footer" disabled />
+                                        <Label htmlFor="loc-footer">Footer Menu (coming soon)</Label>
+                                    </div>
+                                </RadioGroup>
+                                <p className="text-sm text-muted-foreground">
+                                    Assign this menu to a location in your theme.
+                                </p>
+                             </div>
                         </CardContent>
                         <CardFooter>
                             <SubmitButton />

@@ -638,6 +638,7 @@ export async function saveMenu(prevState: any, formData: FormData) {
     const name = formData.get('menu-name') as string;
     const labels = formData.getAll('item-labels') as string[];
     const urls = formData.getAll('item-urls') as string[];
+    const location = formData.get('menu-location') as string;
 
     if (!name) {
         return { error: 'Menu name is required.' };
@@ -647,9 +648,10 @@ export async function saveMenu(prevState: any, formData: FormData) {
         label,
         url: urls[index]
     }));
-
+    
+    const newMenuId = `${Date.now()}`;
     const newMenu: Menu = {
-        id: `${Date.now()}`,
+        id: newMenuId,
         name,
         items: menuItems
     };
@@ -667,6 +669,21 @@ export async function saveMenu(prevState: any, formData: FormData) {
         
         menus.push(newMenu);
         await fs.writeFile(menusFilePath, JSON.stringify(menus, null, 2));
+        
+        // If a location was selected, update settings.json
+        if (location && location !== 'none') {
+            const settings = await getSettings();
+            if (location === 'header') {
+                settings.headerMenuId = newMenuId;
+            } else if (location === 'footer') {
+                settings.footerMenuId = newMenuId;
+            }
+            const settingsFilePath = path.join(process.cwd(), 'src', 'lib', 'settings.json');
+            await fs.writeFile(settingsFilePath, JSON.stringify(settings, null, 2));
+            clearSettingsCache();
+            revalidatePath('/admin/settings');
+            revalidatePath('/');
+        }
 
     } catch (error) {
         console.error("Failed to save menu:", error);
@@ -680,4 +697,5 @@ export async function saveMenu(prevState: any, formData: FormData) {
     
 
     
+
 
