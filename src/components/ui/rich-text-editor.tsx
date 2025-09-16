@@ -50,9 +50,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
   };
   
   const handleFormatChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    e.preventDefault();
     const value = e.target.value;
     if (editorRef.current) {
+        e.preventDefault();
         editorRef.current.focus();
         document.execCommand('formatBlock', false, value);
         onChange(editorRef.current.innerHTML); // Update state after command
