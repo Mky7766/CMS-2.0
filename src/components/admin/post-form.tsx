@@ -9,8 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { Calendar, Save, UploadCloud, X, Loader, Bold, Italic, Link as LinkIcon, Code } from "lucide-react";
+import RichTextEditor from "@/components/ui/rich-text-editor";
+import { Calendar, Save, UploadCloud, X, Loader } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { savePost, updatePost, uploadMedia } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
@@ -49,8 +49,7 @@ export default function PostForm({ post }: PostFormProps) {
   const [featuredImageUrl, setFeaturedImageUrl] = useState(post?.featuredImage?.url || "");
   const [isUploading, startUploading] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const contentRef = useRef<HTMLTextAreaElement>(null);
-
+  
 
   // Determine the action and prepare the initial state
   const action = post ? updatePost : savePost;
@@ -126,45 +125,6 @@ export default function PostForm({ post }: PostFormProps) {
       setFeaturedImageUrl("");
   }
 
-  const applyFormat = (format: 'bold' | 'italic' | 'link' | 'code') => {
-    const textarea = contentRef.current;
-    if (!textarea) return;
-    
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = content.substring(start, end);
-
-    let newText = '';
-    
-    switch(format) {
-        case 'bold':
-            newText = `**${selectedText}**`;
-            break;
-        case 'italic':
-            newText = `*${selectedText}*`;
-            break;
-        case 'link':
-            newText = `[${selectedText}](url)`;
-            break;
-        case 'code':
-            newText = "```html\n" + selectedText + "\n```";
-            break;
-    }
-
-    setContent(content.substring(0, start) + newText + content.substring(end));
-    
-    // Focus and adjust cursor position after state update
-    setTimeout(() => {
-        textarea.focus();
-        if (format === 'link') {
-            textarea.setSelectionRange(start + newText.length - 4, start + newText.length - 1);
-        } else {
-            textarea.setSelectionRange(start + newText.length, start + newText.length);
-        }
-    }, 0);
-};
-
-
   return (
     <form action={formAction} className="grid gap-6 lg:grid-cols-3">
       {/* Hidden input to pass the original post ID for updates */}
@@ -203,33 +163,7 @@ export default function PostForm({ post }: PostFormProps) {
             </div>
             <div>
               <Label htmlFor="content">Content</Label>
-              <div className="rounded-md border border-input">
-                <div className="p-2 border-b">
-                     <Button type="button" variant="ghost" size="icon" onMouseDown={(e) => e.preventDefault()} onClick={() => applyFormat('bold')} title="Bold">
-                        <Bold className="h-4 w-4" />
-                    </Button>
-                     <Button type="button" variant="ghost" size="icon" onMouseDown={(e) => e.preventDefault()} onClick={() => applyFormat('italic')} title="Italic">
-                        <Italic className="h-4 w-4" />
-                    </Button>
-                     <Button type="button" variant="ghost" size="icon" onMouseDown={(e) => e.preventDefault()} onClick={() => applyFormat('link')} title="Link">
-                        <LinkIcon className="h-4 w-4" />
-                    </Button>
-                     <Button type="button" variant="ghost" size="icon" onMouseDown={(e) => e.preventDefault()} onClick={() => applyFormat('code')} title="Code">
-                        <Code className="h-4 w-4" />
-                    </Button>
-                </div>
-                <Textarea 
-                    id="content-display" 
-                    name="content-display"
-                    placeholder="Start writing your content here. Markdown is supported." 
-                    rows={15} 
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-                    ref={contentRef}
-                    required 
-                />
-              </div>
+              <RichTextEditor value={content} onChange={setContent} />
             </div>
           </CardContent>
         </Card>
@@ -245,7 +179,13 @@ export default function PostForm({ post }: PostFormProps) {
             </div>
             <div>
               <Label htmlFor="seo-description">Meta Description</Label>
-              <Textarea id="seo-description" name="seo-description" placeholder="A brief summary for search results" rows={3} />
+               <textarea
+                id="seo-description"
+                name="seo-description"
+                rows={3}
+                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                placeholder="A brief summary for search results"
+              ></textarea>
             </div>
           </CardContent>
         </Card>
@@ -258,7 +198,7 @@ export default function PostForm({ post }: PostFormProps) {
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="status">Status</Label>
-              <Select defaultValue={post?.status || "draft"} name="status">
+              <Select defaultValue={post?.status || "Draft"} name="status">
                 <SelectTrigger id="status">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
