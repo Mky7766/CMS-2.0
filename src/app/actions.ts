@@ -336,6 +336,8 @@ export async function uploadMedia(fileDataUrl: string, fileName: string) {
     const tagline = formData.get('tagline') as string;
     const logo = formData.get('logo') as string;
     const headerMenuId = formData.get('header-menu-id') as string;
+    const footerMenuId = formData.get('footer-menu-id') as string;
+
 
     const newSettings: SiteSettings = {
         ...currentSettings,
@@ -344,7 +346,9 @@ export async function uploadMedia(fileDataUrl: string, fileName: string) {
     if (siteName) newSettings.siteName = siteName;
     if (tagline) newSettings.tagline = tagline;
     if (logo) newSettings.logo = logo;
-    if (headerMenuId) newSettings.headerMenuId = headerMenuId;
+    if (headerMenuId !== undefined) newSettings.headerMenuId = headerMenuId;
+    if (footerMenuId !== undefined) newSettings.footerMenuId = footerMenuId;
+
 
     try {
         const settingsFilePath = path.join(process.cwd(), 'src', 'lib', 'settings.json');
@@ -629,6 +633,19 @@ export async function deleteUser(userId: string) {
     return { success: "User deleted successfully." };
 }
 
+
+// --- Menu Management Actions ---
+
+async function getMenusFromFile(): Promise<Menu[]> {
+    const filePath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
+    try {
+        const data = await fs.readFile(filePath, 'utf-8');
+        return JSON.parse(data) as Menu[];
+    } catch (error) {
+        return [];
+    }
+}
+
 export async function saveMenu(prevState: any, formData: FormData) {
     const session = await getSession();
     if (!session) {
@@ -659,14 +676,7 @@ export async function saveMenu(prevState: any, formData: FormData) {
     const menusFilePath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
 
     try {
-        let menus: Menu[] = [];
-        try {
-            const menusFileContent = await fs.readFile(menusFilePath, 'utf-8');
-            menus = JSON.parse(menusFileContent);
-        } catch (readError) {
-            // File might not exist yet, which is fine
-        }
-        
+        const menus = await getMenusFromFile();
         menus.push(newMenu);
         await fs.writeFile(menusFilePath, JSON.stringify(menus, null, 2));
         
@@ -681,21 +691,140 @@ export async function saveMenu(prevState: any, formData: FormData) {
             const settingsFilePath = path.join(process.cwd(), 'src', 'lib', 'settings.json');
             await fs.writeFile(settingsFilePath, JSON.stringify(settings, null, 2));
             clearSettingsCache();
-            revalidatePath('/admin/settings');
-            revalidatePath('/');
         }
-
     } catch (error) {
         console.error("Failed to save menu:", error);
         return { error: 'Failed to save menu. Please try again.' };
     }
 
     revalidatePath('/admin/menus');
+    revalidatePath('/admin/settings');
+    revalidatePath('/');
     redirect('/admin/menus');
 }
 
+
+export async function updateMenu(prevState: any, formData: FormData) {
+    const session = await getSession();
+    if (!session) {
+        return { error: "Unauthorized" };
+    }
+    
+    const menuId = formData.get('menu-id') as string;
+    const name = formData.get('menu-name') as string;
+    const labels = formData.getAll('item-labels') as string[];
+    const urls = formData.getAll('item-urls') as string[];
+    const location = formData.get('menu-location') as string;
+
+    if (!menuId || !name) {
+        return { error: 'Menu ID and name are required.' };
+    }
+
+    const menuItems = labels.map((label, index) => ({
+        label,
+        url: urls[index]
+    }));
+
+    const updatedMenu: Menu = { id: menuId, name, items: menuItems };
+    const menusFilePath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
+
+    try {
+        const menus = await getMenusFromFile();
+        const menuIndex = menus.findIndex(m => m.id === menuId);
+
+        if (menuIndex === -1) {
+            return { error: "Menu not found." };
+        }
+        menus[menuIndex] = updatedMenu;
+
+        await fs.writeFile(menusFilePath, JSON.stringify(menus, null, 2));
+        
+        // If a location was selected, update settings.json
+        const settings = await getSettings();
+        let settingsChanged = false;
+        if (location === 'header' && settings.headerMenuId !== menuId) {
+            settings.headerMenuId = menuId;
+            settingsChanged = true;
+        } else if (settings.headerMenuId === menuId && location !== 'header') {
+            settings.headerMenuId = undefined;
+            settingsChanged = true;
+        }
+        
+        if (location === 'footer' && settings.footerMenuId !== menuId) {
+            settings.footerMenuId = menuId;
+            settingsChanged = true;
+        } else if (settings.footerMenuId === menuId && location !== 'footer') {
+            settings.footerMenuId = undefined;
+            settingsChanged = true;
+        }
+        
+        if (settingsChanged) {
+            const settingsFilePath = path.join(process.cwd(), 'src', 'lib', 'settings.json');
+            await fs.writeFile(settingsFilePath, JSON.stringify(settings, null, 2));
+            clearSettingsCache();
+        }
+
+    } catch (error) {
+        console.error("Failed to update menu:", error);
+        return { error: 'Failed to update menu. Please try again.' };
+    }
+    
+    revalidatePath('/admin/menus');
+    revalidatePath('/admin/settings');
+    revalidatePath('/');
+    redirect('/admin/menus');
+}
+
+
+export async function deleteMenu(menuId: string) {
+    const session = await getSession();
+    if (!session) {
+      return { error: "Unauthorized" };
+    }
+  
+    try {
+      const menus = await getMenusFromFile();
+      const updatedMenus = menus.filter(m => m.id !== menuId);
+  
+      if (updatedMenus.length === menus.length) {
+        return { error: 'Menu not found.' };
+      }
+      
+      const menusFilePath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
+      await fs.writeFile(menusFilePath, JSON.stringify(updatedMenus, null, 2));
+      
+      // Check if this menu was assigned and unassign it
+      const settings = await getSettings();
+      let settingsChanged = false;
+      if (settings.headerMenuId === menuId) {
+        settings.headerMenuId = undefined;
+        settingsChanged = true;
+      }
+      if (settings.footerMenuId === menuId) {
+        settings.footerMenuId = undefined;
+        settingsChanged = true;
+      }
+      
+      if(settingsChanged) {
+        const settingsFilePath = path.join(process.cwd(), 'src', 'lib', 'settings.json');
+        await fs.writeFile(settingsFilePath, JSON.stringify(settings, null, 2));
+        clearSettingsCache();
+        revalidatePath('/admin/settings');
+        revalidatePath('/');
+      }
+
+      revalidatePath('/admin/menus');
+      return { success: 'Menu deleted successfully.' };
+  
+    } catch (error) {
+      console.error("Failed to delete menu:", error);
+      return { error: 'Failed to delete menu. Please try again.' };
+    }
+}
+    
     
 
     
+
 
 

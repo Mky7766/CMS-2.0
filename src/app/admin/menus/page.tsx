@@ -1,28 +1,53 @@
 
+"use client"
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Menu } from "@/lib/data";
 import fs from 'fs/promises';
 import path from 'path';
-import { MoreHorizontal, PlusCircle } from "lucide-react";
+import { PlusCircle } from "lucide-react";
 import Link from "next/link";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useState, useEffect } from "react";
+import MenuActions from "@/components/admin/menu-actions";
 
-async function getMenus(): Promise<Menu[]> {
+
+// We have to make this a client-side fetch because Server Components
+// can't easily be updated after a server action.
+async function getMenusClient(): Promise<Menu[]> {
     const filePath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
     try {
         const data = await fs.readFile(filePath, 'utf-8');
         return JSON.parse(data) as Menu[];
     } catch (error) {
-        // If file doesn't exist, return empty array
         return [];
     }
 }
 
 
-export default async function MenusPage() {
-  const menus = await getMenus();
+export default function MenusPage() {
+  const [menus, setMenus] = useState<Menu[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Initial load
+  useEffect(() => {
+    async function loadMenus() {
+      setIsLoading(true);
+      const menusData = await getMenusClient();
+      setMenus(menusData);
+      setIsLoading(false);
+    }
+    loadMenus();
+  }, [])
+  
+  const handleMenuDeleted = (menuId: string) => {
+    setMenus(prevMenus => prevMenus.filter(m => m.id !== menuId));
+  }
+
+  if (isLoading) {
+    return <div>Loading menus...</div>
+  }
 
   return (
     <div className="space-y-8">
@@ -66,18 +91,7 @@ export default async function MenusPage() {
                             <TableCell className="font-medium">{menu.name}</TableCell>
                             <TableCell>{menu.items.length}</TableCell>
                             <TableCell className="text-right">
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button aria-haspopup="true" size="icon" variant="ghost">
-                                            <MoreHorizontal className="h-4 w-4" />
-                                            <span className="sr-only">Toggle menu</span>
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                                        <DropdownMenuItem className="text-red-500">Delete</DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                <MenuActions menuId={menu.id} onMenuDeleted={handleMenuDeleted} />
                             </TableCell>
                         </TableRow>
                     ))}
@@ -96,3 +110,4 @@ export default async function MenusPage() {
     </div>
   );
 }
+

@@ -8,5 +8,15 @@
         "url": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/5"
       }
     ]
+  },
+  {
+    "id": "1758020871095",
+    "name": "Home",
+    "items": [
+      {
+        "label": "Bajtimes",
+        "url": "https://www.bajtimes.com"
+      }
+    ]
   }
 ]
