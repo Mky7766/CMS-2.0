@@ -64,7 +64,7 @@ export default async function PostPage({ params }: { params: { postId: string } 
                  <time dateTime={post.createdAt}>{new Date(post.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
               </div>
             </header>
-            <div className="whitespace-pre-wrap">{post.content}</div>
+            <div dangerouslySetInnerHTML={{ __html: post.content.replace(/\n/g, '<br />') }} />
           </article>
         </div>
       </main>
