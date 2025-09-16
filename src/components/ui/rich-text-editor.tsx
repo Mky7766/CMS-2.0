@@ -10,51 +10,61 @@ type RichTextEditorProps = {
 const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   
+  // To prevent re-rendering from clearing the editor state,
+  // we only set the initial value.
   useEffect(() => {
     const editor = editorRef.current;
-    if (editor && value !== editor.innerHTML) {
+    if (editor && !editor.innerHTML) { // Set content only if it's empty
         editor.innerHTML = value;
     }
-  }, [value]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
     onChange(e.currentTarget.innerHTML);
   };
+  
+  const onButtonMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault(); // Prevent editor from losing focus
+    const command = e.currentTarget.dataset.command;
+    const arg = e.currentTarget.dataset.arg;
+    if (command) {
+      document.execCommand(command, false, arg);
+      editorRef.current?.focus();
+      if(editorRef.current) {
+          onChange(editorRef.current.innerHTML);
+      }
+    }
+  };
 
-  const handleCommand = (command: string, arg?: string) => {
-    document.execCommand(command, false, arg);
+  const handleLink = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const url = prompt('Enter URL:');
+    if (url) {
+      document.execCommand('createLink', false, url);
+    }
+     editorRef.current?.focus();
+     if(editorRef.current) {
+          onChange(editorRef.current.innerHTML);
+      }
+  };
+  
+  const handleFormatChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    e.preventDefault();
+    document.execCommand('formatBlock', false, e.target.value);
     editorRef.current?.focus();
     if(editorRef.current) {
         onChange(editorRef.current.innerHTML);
     }
   };
-  
-  const handleLink = () => {
-    const url = prompt('Enter URL:');
-    if (url) {
-      handleCommand('createLink', url);
-    }
-  };
 
-  const onButtonMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    const command = e.currentTarget.dataset.command;
-    const arg = e.currentTarget.dataset.arg;
-    if(command) {
-        handleCommand(command, arg);
-    }
-  };
-  
-   const onSelectMouseDown = (e: React.MouseEvent<HTMLSelectElement>) => {
-    e.preventDefault();
-  }
 
   return (
     <div className="rounded-md border border-input bg-background ring-offset-background focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
       <div className="p-1 border-b flex flex-wrap items-center gap-1 text-sm bg-muted/50 rounded-t-md">
         <button type="button" onMouseDown={onButtonMouseDown} data-command="undo" title="Undo" className="p-2 hover:bg-accent hover:text-accent-foreground rounded-md">↩️</button>
         <button type="button" onMouseDown={onButtonMouseDown} data-command="redo" title="Redo" className="p-2 hover:bg-accent hover:text-accent-foreground rounded-md">↪️</button>
-        <select onChange={e => handleCommand('formatBlock', e.target.value)} defaultValue="p" className="p-2 bg-transparent hover:bg-accent hover:text-accent-foreground rounded-md" onMouseDown={onSelectMouseDown}>
+        <select onChange={handleFormatChange} defaultValue="p" className="p-2 bg-transparent hover:bg-accent hover:text-accent-foreground rounded-md text-sm" onMouseDown={e => e.preventDefault()}>
           <option value="p">Paragraph</option>
           <option value="h1">Heading 1</option>
           <option value="h2">Heading 2</option>
@@ -68,7 +78,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange }) => {
         <button type="button" onMouseDown={onButtonMouseDown} data-command="italic" title="Italic" className="italic p-2 w-8 hover:bg-accent hover:text-accent-foreground rounded-md">I</button>
         <button type="button" onMouseDown={onButtonMouseDown} data-command="underline" title="Underline" className="underline p-2 w-8 hover:bg-accent hover:text-accent-foreground rounded-md">U</button>
         <button type="button" onMouseDown={onButtonMouseDown} data-command="strikeThrough" title="Strikethrough" className="line-through p-2 w-8 hover:bg-accent hover:text-accent-foreground rounded-md">S</button>
-        <button type="button" onMouseDown={() => handleLink()} title="Link" className="p-2 hover:bg-accent hover:text-accent-foreground rounded-md">🔗</button>
+        <button type="button" onMouseDown={handleLink} title="Link" className="p-2 hover:bg-accent hover:text-accent-foreground rounded-md">🔗</button>
         <button type="button" onMouseDown={onButtonMouseDown} data-command="unlink" title="Unlink" className="p-2 hover:bg-accent hover:text-accent-foreground rounded-md">💔</button>
         <button type="button" onMouseDown={onButtonMouseDown} data-command="justifyLeft" title="Align Left" className="p-2 hover:bg-accent hover:text-accent-foreground rounded-md">
             <svg className="w-4 h-4" viewBox="0 0 24 24"><path fill="currentColor" d="M3 21v-2h18v2H3Zm0-4v-2h12v2H3Zm0-4v-2h18v2H3Zm0-4V7h12v2H3Zm0-4V3h18v2H3Z"/></svg>
