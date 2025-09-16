@@ -213,7 +213,7 @@ export default function PostForm({ post }: PostFormProps) {
                     </Button>
                 </div>
                 <Textarea 
-                    id="content" 
+                    id="content-display" 
                     name="content-display"
                     placeholder="Start writing your content here. Markdown is supported." 
                     rows={15} 
@@ -358,3 +358,5 @@ export default function PostForm({ post }: PostFormProps) {
     </form>
   );
 }
+
+    
