@@ -72,7 +72,7 @@ export default function AppHeader() {
             <DropdownMenuSeparator />
              <form action={logout}>
                 <DropdownMenuItem asChild>
-                    <button type="submit" className="w-full">Logout</button>
+                    <button type="submit" className="w-full text-left">Logout</button>
                 </DropdownMenuItem>
              </form>
           </DropdownMenuContent>
