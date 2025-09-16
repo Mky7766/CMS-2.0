@@ -12,6 +12,7 @@ type HtmlRendererProps = {
 
 const HtmlRenderer: React.FC<HtmlRendererProps> = ({ htmlContent }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const scriptsExecuted = useRef(new Set<string>());
 
   // This effect will run after the component mounts and after every update.
   useEffect(() => {
@@ -19,9 +20,23 @@ const HtmlRenderer: React.FC<HtmlRendererProps> = ({ htmlContent }) => {
     if (!container) return;
 
     // Find and execute script tags within the rendered HTML
-    const scripts = container.getElementsByTagName('script');
-    for (let i = 0; i < scripts.length; i++) {
-      const script = scripts[i];
+    const scripts = Array.from(container.getElementsByTagName('script'));
+    for (const script of scripts) {
+        const src = script.getAttribute('src');
+        const scriptId = src || script.innerHTML;
+
+        // Prevent re-execution of the same script
+        if (scriptsExecuted.current.has(scriptId)) {
+            continue;
+        }
+
+        // Special check for Google Maps API to prevent re-initialization error
+        if (src && src.includes('maps.googleapis.com') && (window as any).google?.maps) {
+            console.log("Google Maps API already loaded, skipping script injection.");
+            scriptsExecuted.current.add(scriptId);
+            continue;
+        }
+
       const newScript = document.createElement('script');
       
       // Copy attributes
@@ -36,6 +51,7 @@ const HtmlRenderer: React.FC<HtmlRendererProps> = ({ htmlContent }) => {
       
       // Replace the old script tag with the new one to trigger execution
       script.parentNode?.replaceChild(newScript, script);
+      scriptsExecuted.current.add(scriptId);
     }
   }, [htmlContent]); // Re-run the effect if the htmlContent changes
 
@@ -44,7 +60,7 @@ const HtmlRenderer: React.FC<HtmlRendererProps> = ({ htmlContent }) => {
     // The captured group `code` is the raw HTML, CSS, JS content.
     // We just return it as is, to be injected into the div.
     return code;
-  }).replace(/\n/g, '<br />'); // Also replace newlines with <br> for non-HTML content.
+  }).replace(/(?<!```)\n/g, '<br />'); // Replace newlines with <br> only outside of code blocks.
 
 
   return (
