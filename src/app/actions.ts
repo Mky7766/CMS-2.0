@@ -414,7 +414,7 @@ export async function updateUser(prevState: any, formData: FormData) {
         setPosts(updatedPosts);
 
     } catch (error) {
-        console.error("Failed to update data:", error);
+        console.error("Failed to data:", error);
         return { error: 'Failed to update profile. Please try again.' };
     }
 
@@ -423,4 +423,54 @@ export async function updateUser(prevState: any, formData: FormData) {
     revalidatePath('/'); // To refresh blog posts with new author name
 
     return { success: 'Profile updated successfully.' };
+}
+
+export async function updateUserAvatar(userId: string, avatarDataUrl: string) {
+    const session = await getSession();
+    if (!session || session.userId !== userId) {
+        return { error: "Unauthorized" };
+    }
+
+    const userIndex = users.findIndex(u => u.id === userId);
+    if (userIndex === -1) {
+        return { error: 'User not found.' };
+    }
+
+    // Update user's avatar
+    const updatedUsers = [...users];
+    updatedUsers[userIndex].avatarUrl = avatarDataUrl;
+
+    // Update author avatar in all posts by this user
+    const updatedPosts = posts.map(post => {
+        if (post.authorId === userId) {
+            return {
+                ...post,
+                author: {
+                    ...post.author,
+                    avatarUrl: avatarDataUrl
+                }
+            };
+        }
+        return post;
+    });
+
+    try {
+        const usersFilePath = path.join(process.cwd(), 'src', 'lib', 'users.json');
+        await fs.writeFile(usersFilePath, JSON.stringify(updatedUsers, null, 2));
+        setUsers(updatedUsers);
+
+        const postsFilePath = path.join(process.cwd(), 'src', 'lib', 'posts.json');
+        await fs.writeFile(postsFilePath, JSON.stringify(updatedPosts, null, 2));
+        setPosts(updatedPosts);
+
+    } catch (error) {
+        console.error("Failed to update avatar:", error);
+        return { error: 'Failed to update profile picture. Please try again.' };
+    }
+
+    revalidatePath('/admin/profile');
+    revalidatePath('/admin/layout');
+    revalidatePath('/');
+    
+    return { success: 'Profile picture updated successfully.', newAvatarUrl: avatarDataUrl };
 }
