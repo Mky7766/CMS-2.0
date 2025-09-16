@@ -29,18 +29,6 @@
     ]
   },
   {
-    "id": "2",
-    "title": "A Deep Dive into Headless CMS Architectures",
-    "status": "Published",
-    "createdAt": "2024-07-18",
-    "author": {
-      "name": "John Smith",
-      "avatarUrl": "https://picsum.photos/seed/b2/32/32"
-    },
-    "authorId": "2",
-    "content": "Headless CMS offers a new level of flexibility. Let's look at the pros and cons."
-  },
-  {
     "id": "3",
     "title": "Getting Started with Nebula CMS: A Beginner's Guide",
     "status": "Draft",
@@ -51,17 +39,5 @@
     },
     "authorId": "3",
     "content": "Your first steps into the world of Nebula CMS. It's easier than you think!"
-  },
-  {
-    "id": "4",
-    "title": "Optimizing Images for the Web",
-    "status": "Published",
-    "createdAt": "2024-07-15",
-    "author": {
-      "name": "Bob Brown",
-      "avatarUrl": "https://picsum.photos/seed/d4/32/32"
-    },
-    "authorId": "4",
-    "content": "Image optimization is crucial for web performance. Learn the best techniques here."
   }
 ]
