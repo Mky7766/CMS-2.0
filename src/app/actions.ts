@@ -1,5 +1,4 @@
 
-
 "use server"
 
 import { customizeTheme } from "@/ai/flows/theme-customization";
@@ -77,14 +76,14 @@ export async function login(prevState: any, formData: FormData) {
         return { error: 'Email and password are required.' };
     }
 
-    const user = users.find(u => u.email === email && u.password === password);
+    const user = users.find(user => user.email === email);
 
-    if (user) {
-        await createSession(user.id);
-        redirect('/admin/dashboard');
-    } else {
+    if (!user || user.password !== password) {
         return { error: 'Invalid email or password.' };
     }
+
+    await createSession(user.id);
+    redirect('/admin/dashboard');
 }
 
 export async function logout() {
@@ -92,33 +91,30 @@ export async function logout() {
     redirect('/login');
 }
 
-
 export async function savePost(prevState: any, formData: FormData) {
-    const session = await getSession();
-    if (!session || !session.userId) {
-        return { error: "You must be logged in to create a post." };
-    }
-    
-    const user = users.find(u => u.id === session.userId);
-    if (!user) {
-        return { error: "User not found." };
-    }
-
-    const permalink = formData.get('permalink') as string;
+    // This is a simplified example. In a real app, you'd do more validation.
     const title = formData.get('title') as string;
     const content = formData.get('content') as string;
-    const status = formData.get('status') as 'Draft' | 'Published' | 'Scheduled';
+    const permalink = formData.get('permalink') as string;
+    const status = formData.get('status') as 'Published' | 'Draft' | 'Scheduled';
     const featuredImageUrl = formData.get('featured-image-url') as string;
+    const tags = (formData.get('tags-hidden') as string).split(',').filter(t => t.trim() !== '');
 
-    if (!title || !content || !status || !permalink) {
-        return { error: 'Title, content, status and permalink are required.' };
+    const session = await getSession();
+    if (!session?.userId) {
+        return { error: "You must be logged in to create a post." };
+    }
+
+    const author = users.find(u => u.id === session.userId);
+    if (!author) {
+        return { error: "Author not found." };
+    }
+
+    // Check for duplicate permalink/ID
+    if (posts.some(p => p.id === permalink)) {
+        return { error: `A post with the permalink "${permalink}" already exists.` };
     }
     
-    const existingPost = posts.find(p => p.id === permalink);
-    if (existingPost) {
-        return { error: 'A post with this permalink already exists.' };
-    }
-
 
     const newPost: Post = {
         id: permalink,
@@ -127,15 +123,21 @@ export async function savePost(prevState: any, formData: FormData) {
         status,
         createdAt: new Date().toISOString().split('T')[0],
         author: {
-            name: user.name,
-            avatarUrl: user.avatarUrl,
+            name: author.name,
+            avatarUrl: author.avatarUrl,
         },
-        authorId: user.id,
-        tags: (formData.get('tags-hidden') as string)?.split(',').filter(Boolean) || [],
-        featuredImage: featuredImageUrl ? { url: featuredImageUrl, alt: title } : undefined
+        authorId: author.id,
+        tags,
     };
+    
+    if (featuredImageUrl) {
+        newPost.featuredImage = {
+            url: featuredImageUrl,
+            alt: title,
+        }
+    }
 
-    const updatedPosts = [newPost, ...posts];
+    const updatedPosts = [...posts, newPost];
 
     try {
         const postsFilePath = path.join(process.cwd(), 'src', 'lib', 'posts.json');
@@ -143,236 +145,279 @@ export async function savePost(prevState: any, formData: FormData) {
         setPosts(updatedPosts);
     } catch (error) {
         console.error("Failed to save post:", error);
-        return { error: 'Failed to save post. Please try again.' };
+        return { error: "Could not save the post. Please try again." };
     }
-
-    revalidatePath('/admin/posts');
+    
     revalidatePath('/');
+    revalidatePath(`/${permalink}`);
     redirect('/admin/posts');
 }
 
 
 export async function updatePost(prevState: any, formData: FormData) {
+    const postId = formData.get('postId') as string;
+    const title = formData.get('title') as string;
+    const content = formData.get('content') as string;
+    const permalink = formData.get('permalink') as string;
+    const status = formData.get('status') as 'Published' | 'Draft' | 'Scheduled';
+    const featuredImageUrl = formData.get('featured-image-url') as string;
+    const tags = (formData.get('tags-hidden') as string).split(',').filter(t => t.trim() !== '');
+
     const session = await getSession();
-    if (!session || !session.userId) {
+    if (!session?.userId) {
         return { error: "You must be logged in to update a post." };
     }
 
-    const postId = formData.get('postId') as string;
-    const permalink = formData.get('permalink') as string;
-    const title = formData.get('title') as string;
-    const content = formData.get('content') as string;
-    const status = formData.get('status') as 'Draft' | 'Published' | 'Scheduled';
-    const tags = (formData.get('tags-hidden') as string)?.split(',').filter(Boolean) || [];
-    const featuredImageUrl = formData.get('featured-image-url') as string;
-
-    if (!postId || !title || !content || !status || !permalink) {
-        return { error: 'Post ID, permalink, title, content, and status are required.' };
-    }
-
     const postIndex = posts.findIndex(p => p.id === postId);
-
     if (postIndex === -1) {
-        return { error: 'Post not found.' };
+        return { error: "Post not found." };
     }
-    
-    // Check if another post already has the new permalink
+
+    // Check if the new permalink conflicts with another post
     if (permalink !== postId && posts.some(p => p.id === permalink)) {
-        return { error: 'Another post with this permalink already exists.' };
+        return { error: `A post with the permalink "${permalink}" already exists.` };
     }
 
-
-    const updatedPost: Post = {
-        ...posts[postIndex],
-        id: permalink, // The permalink is the new ID
-        title,
-        content,
-        status,
-        tags,
-        featuredImage: featuredImageUrl ? { url: featuredImageUrl, alt: title } : posts[postIndex].featuredImage
-    };
+    const updatedPost = { ...posts[postIndex] };
+    updatedPost.id = permalink;
+    updatedPost.title = title;
+    updatedPost.content = content;
+    updatedPost.status = status;
+    updatedPost.tags = tags;
+    
+    if (featuredImageUrl) {
+        updatedPost.featuredImage = {
+            url: featuredImageUrl,
+            alt: title,
+        }
+    } else {
+        delete updatedPost.featuredImage;
+    }
 
     const updatedPosts = [...posts];
     updatedPosts[postIndex] = updatedPost;
 
     try {
-        const postsFilePath = path.join(process.cwd(), 'src/lib/posts.json');
+        const postsFilePath = path.join(process.cwd(), 'src', 'lib', 'posts.json');
         await fs.writeFile(postsFilePath, JSON.stringify(updatedPosts, null, 2));
         setPosts(updatedPosts);
     } catch (error) {
         console.error("Failed to update post:", error);
-        return { error: 'Failed to update post. Please try again.' };
+        return { error: "Could not update the post. Please try again." };
     }
-    
-    revalidatePath('/admin/posts');
-    revalidatePath(`/admin/posts/${postId}/edit`); // old path
-    revalidatePath(`/admin/posts/${permalink}/edit`); // new path
-    revalidatePath(`/${postId}`); // old path
-    revalidatePath(`/${permalink}`); // new path
+
     revalidatePath('/');
+    revalidatePath(`/${postId}`);
+    revalidatePath(`/${permalink}`);
     redirect('/admin/posts');
 }
 
-
 export async function deletePost(postId: string) {
     const session = await getSession();
-    if (!session || !session.userId) {
-        // Or handle unauthorized access appropriately
-        throw new Error("Unauthorized");
+    if (!session?.userId) {
+        // In a real app, you'd also check for roles/permissions
+        return { error: "You are not authorized to delete this post." };
     }
 
     const updatedPosts = posts.filter(p => p.id !== postId);
 
-    if (updatedPosts.length === posts.length) {
-        // Post not found
-        return { error: 'Post not found.' };
-    }
-
     try {
-        const postsFilePath = path.join(process.cwd(), 'src/lib/posts.json');
+        const postsFilePath = path.join(process.cwd(), 'src', 'lib', 'posts.json');
         await fs.writeFile(postsFilePath, JSON.stringify(updatedPosts, null, 2));
         setPosts(updatedPosts);
-        revalidatePath('/admin/posts');
-        revalidatePath('/admin/dashboard');
-        revalidatePath('/');
-        return { success: 'Post deleted successfully.' };
     } catch (error) {
         console.error("Failed to delete post:", error);
-        return { error: 'Failed to delete post. Please try again.' };
+        return { error: "Could not delete the post. Please try again." };
+    }
+    
+    revalidatePath('/');
+    revalidatePath(`/admin/posts`);
+    revalidatePath(`/${postId}`);
+    return { success: "Post deleted successfully." };
+}
+
+export async function uploadMedia(dataUrl: string, fileName: string) {
+    const session = await getSession();
+    if (!session?.userId) {
+        return { error: "You must be logged in to upload media." };
+    }
+
+    const placeholderDataPath = path.join(process.cwd(), 'src', 'lib', 'placeholder-images.json');
+
+    try {
+        const file = await fs.readFile(placeholderDataPath, 'utf-8');
+        const data = JSON.parse(file);
+        
+        const newImage: ImagePlaceholder = {
+            id: `media-${Date.now()}`,
+            description: fileName,
+            imageUrl: dataUrl,
+            imageHint: 'custom upload'
+        };
+
+        data.placeholderImages.unshift(newImage); // Add to the beginning
+
+        await fs.writeFile(placeholderDataPath, JSON.stringify(data, null, 2));
+        
+        return { success: "Image uploaded successfully.", newImage };
+    } catch (error) {
+        console.error("Error uploading media:", error);
+        return { error: "Failed to upload image." };
     }
 }
 
-export async function getImages(): Promise<ImagePlaceholder[]> {
+export async function deleteMedia(imageId: string) {
+    const session = await getSession();
+    if (!session?.userId) {
+        return { error: "You must be logged in to delete media." };
+    }
+
+    const placeholderDataPath = path.join(process.cwd(), 'src', 'lib', 'placeholder-images.json');
     try {
-        const imagesFilePath = path.join(process.cwd(), 'src', 'lib', 'placeholder-images.json');
-        const currentImagesData = await fs.readFile(imagesFilePath, 'utf-8');
-        const currentImagesJson = JSON.parse(currentImagesData);
-        return currentImagesJson.placeholderImages as ImagePlaceholder[];
+        const file = await fs.readFile(placeholderDataPath, 'utf-8');
+        const data = JSON.parse(file);
+        
+        const initialLength = data.placeholderImages.length;
+        data.placeholderImages = data.placeholderImages.filter((img: ImagePlaceholder) => img.id !== imageId);
+
+        if (data.placeholderImages.length === initialLength) {
+            return { error: "Image not found." };
+        }
+
+        await fs.writeFile(placeholderDataPath, JSON.stringify(data, null, 2));
+
+        return { success: "Image deleted successfully." };
     } catch (error) {
-        console.error("Failed to get images:", error);
+        console.error("Error deleting media:", error);
+        return { error: "Failed to delete image." };
+    }
+}
+
+
+export async function getImages(): Promise<ImagePlaceholder[]> {
+    const placeholderDataPath = path.join(process.cwd(), 'src', 'lib', 'placeholder-images.json');
+    try {
+        const file = await fs.readFile(placeholderDataPath, 'utf-8');
+        const data = JSON.parse(file);
+        return data.placeholderImages as ImagePlaceholder[];
+    } catch (error) {
+        console.error("Error fetching images:", error);
         return [];
     }
 }
 
-export async function uploadMedia(fileDataUrl: string, fileName: string) {
+export async function updateSettings(prevState: any, formData: FormData) {
     const session = await getSession();
-    if (!session) {
-      return { error: "Unauthorized" };
+    if (!session?.userId) {
+        return { error: "You are not authorized to perform this action." };
     }
-  
+    // TODO: In a real app, check if the user has the 'Admin' role.
+
+    const settingsPath = path.join(process.cwd(), 'src', 'lib', 'settings.json');
     try {
-      const imagesFilePath = path.join(process.cwd(), 'src', 'lib', 'placeholder-images.json');
-      const currentImagesData = await fs.readFile(imagesFilePath, 'utf-8');
-      const currentImagesJson = JSON.parse(currentImagesData);
-  
-      const newImage: ImagePlaceholder = {
-        id: `media-${Date.now()}`,
-        description: fileName,
-        // In a real app, you would upload to a CDN and store the URL.
-        // For this demo, we'll store the data URL directly.
-        // This is NOT recommended for production due to performance implications.
-        imageUrl: fileDataUrl, 
-        imageHint: "custom upload",
-      };
-      
-      const updatedImages = [newImage, ...currentImagesJson.placeholderImages];
-      currentImagesJson.placeholderImages = updatedImages;
-  
-      await fs.writeFile(imagesFilePath, JSON.stringify(currentImagesJson, null, 2));
-      
-      // We don't need to update the in-memory `PlaceHolderImages` because 
-      // the page will be revalidated and will re-read the JSON file.
-      
-      revalidatePath('/admin/media');
-      return { success: true, newImage };
-  
-    } catch (error) {
-      console.error("Failed to upload media:", error);
-      return { error: 'Failed to upload media. Please try again.' };
-    }
-  }
+        const currentSettings = await getSettings();
 
+        // This approach allows us to update settings from different forms
+        // without wiping out other settings.
+        const updatedSettings = {
+            ...currentSettings,
+            siteName: formData.has('site-name') ? formData.get('site-name') as string : currentSettings.siteName,
+            tagline: formData.has('tagline') ? formData.get('tagline') as string : currentSettings.tagline,
+            headerMenuId: formData.has('header-menu-id') ? formData.get('header-menu-id') as string : currentSettings.headerMenuId,
+            footerMenuId: formData.has('footer-menu-id') ? formData.get('footer-menu-id') as string : currentSettings.footerMenuId,
+            footerText: formData.has('footer-text') ? formData.get('footer-text') as string : currentSettings.footerText,
+        };
 
-  export async function deleteMedia(imageId: string) {
-    const session = await getSession();
-    if (!session) {
-      return { error: "Unauthorized" };
-    }
-  
-    try {
-      const imagesFilePath = path.join(process.cwd(), 'src', 'lib', 'placeholder-images.json');
-      const currentImagesData = await fs.readFile(imagesFilePath, 'utf-8');
-      const currentImagesJson = JSON.parse(currentImagesData);
-  
-      const initialLength = currentImagesJson.placeholderImages.length;
-      const updatedImages = currentImagesJson.placeholderImages.filter((img: ImagePlaceholder) => img.id !== imageId);
-      
-      if (updatedImages.length === initialLength) {
-        return { error: 'Image not found.' };
-      }
-      
-      currentImagesJson.placeholderImages = updatedImages;
-  
-      await fs.writeFile(imagesFilePath, JSON.stringify(currentImagesJson, null, 2));
-      
-      revalidatePath('/admin/media');
-      return { success: true };
-  
-    } catch (error) {
-      console.error("Failed to delete media:", error);
-      return { error: 'Failed to delete media. Please try again.' };
-    }
-  }
-
-  export async function updateSettings(prevState: any, formData: FormData) {
-    const session = await getSession();
-    if (!session) {
-      return { error: "Unauthorized" };
-    }
-
-    const currentSettings = await getSettings();
-
-    const siteName = formData.get('site-name') as string;
-    const tagline = formData.get('tagline') as string;
-    const logo = formData.get('logo') as string;
-    const headerMenuId = formData.get('header-menu-id') as string;
-    const footerMenuId = formData.get('footer-menu-id') as string;
-
-
-    const newSettings: SiteSettings = {
-        ...currentSettings,
-    };
-
-    if (siteName) newSettings.siteName = siteName;
-    if (tagline) newSettings.tagline = tagline;
-    if (logo) newSettings.logo = logo;
-    if (headerMenuId !== undefined) newSettings.headerMenuId = headerMenuId;
-    if (footerMenuId !== undefined) newSettings.footerMenuId = footerMenuId;
-
-
-    try {
-        const settingsFilePath = path.join(process.cwd(), 'src', 'lib', 'settings.json');
-        await fs.writeFile(settingsFilePath, JSON.stringify(newSettings, null, 2));
+        await fs.writeFile(settingsPath, JSON.stringify(updatedSettings, null, 2));
         
-        clearSettingsCache(); // Clear the in-memory cache
+        clearSettingsCache();
+        revalidatePath('/', 'layout');
 
-        revalidatePath('/admin/settings');
-        revalidatePath('/');
-        revalidatePath('/[postId]', 'page');
-        revalidatePath('/admin', 'layout');
-
-
-        return { success: 'Settings updated successfully.' };
+        return { success: "Settings updated successfully." };
 
     } catch (error) {
-        console.error("Failed to update settings:", error);
-        return { error: 'Failed to update settings. Please try again.' };
+        console.error("Error updating settings:", error);
+        return { error: "Failed to update settings." };
     }
 }
 
+
+export async function createUser(prevState: any, formData: FormData) {
+    const session = await getSession();
+    if (!session?.userId) {
+        return { error: "You are not authorized to perform this action." };
+    }
+
+    const email = formData.get('email') as string;
+    const name = formData.get('name') as string;
+    const password = formData.get('password') as string;
+    const role = formData.get('role') as User['role'];
+
+    if (!email || !name || !password || !role) {
+        return { error: 'All fields are required.' };
+    }
+
+    if (users.find(u => u.email === email)) {
+        return { error: 'A user with this email already exists.' };
+    }
+
+    const newUser: User = {
+        id: `user-${Date.now()}`,
+        name,
+        email,
+        password, // Don't forget to hash passwords in a real app!
+        role,
+        avatarUrl: `https://picsum.photos/seed/user-${Date.now()}/32/32`,
+        createdAt: new Date().toISOString().split('T')[0],
+    };
+
+    const updatedUsers = [...users, newUser];
+    try {
+        const usersFilePath = path.join(process.cwd(), 'src', 'lib', 'users.json');
+        await fs.writeFile(usersFilePath, JSON.stringify(updatedUsers, null, 2));
+        setUsers(updatedUsers);
+    } catch (error) {
+        console.error("Failed to create user:", error);
+        return { error: 'Failed to save user.' };
+    }
+
+    revalidatePath('/admin/users');
+    redirect('/admin/users');
+}
+
+
+export async function adminUpdateUser(prevState: any, formData: FormData) {
+    const session = await getSession();
+    if (!session?.userId) { return { error: "Unauthorized." }; }
+
+    const userId = formData.get('userId') as string;
+    const name = formData.get('name') as string;
+    const role = formData.get('role') as User['role'];
+
+    const userIndex = users.findIndex(u => u.id === userId);
+    if (userIndex === -1) {
+        return { error: "User not found." };
+    }
+
+    const updatedUsers = [...users];
+    updatedUsers[userIndex] = { ...updatedUsers[userIndex], name, role };
+    
+    try {
+        const usersFilePath = path.join(process.cwd(), 'src', 'lib', 'users.json');
+        await fs.writeFile(usersFilePath, JSON.stringify(updatedUsers, null, 2));
+        setUsers(updatedUsers);
+    } catch (error) {
+        return { error: "Failed to update user." };
+    }
+
+    revalidatePath('/admin/users');
+    redirect('/admin/users');
+}
+
+
 export async function updateUser(prevState: any, formData: FormData) {
     const session = await getSession();
-    if (!session || !session.userId) {
+    if (!session?.userId) {
         return { error: "You must be logged in to update your profile." };
     }
 
@@ -380,454 +425,270 @@ export async function updateUser(prevState: any, formData: FormData) {
     const password = formData.get('password') as string;
     const confirmPassword = formData.get('confirmPassword') as string;
 
-    if (!name) {
-        return { error: 'Name is required.' };
-    }
-
-    if (password && password !== confirmPassword) {
-        return { error: 'Passwords do not match.' };
-    }
-    
     const userIndex = users.findIndex(u => u.id === session.userId);
-
     if (userIndex === -1) {
-        return { error: 'User not found.' };
+        return { error: "User not found." };
     }
-    
-    const originalUser = users[userIndex];
 
-    const updatedUser: User = { ...originalUser, name };
+    const updatedUsers = [...users];
+    const userToUpdate = { ...updatedUsers[userIndex] };
+    
+    userToUpdate.name = name;
 
     if (password) {
-        updatedUser.password = password; // Again, hash this in a real app
+        if (password !== confirmPassword) {
+            return { error: "Passwords do not match." };
+        }
+        userToUpdate.password = password; // Hash in a real app
     }
     
-    const updatedUsers = [...users];
-    updatedUsers[userIndex] = updatedUser;
-
-    // Now, update the author name in all posts by this user
-    const updatedPosts = posts.map(post => {
-        if (post.authorId === session.userId) {
-            return {
-                ...post,
-                author: {
-                    ...post.author,
-                    name: name
-                }
-            };
-        }
-        return post;
-    });
+    updatedUsers[userIndex] = userToUpdate;
 
     try {
         const usersFilePath = path.join(process.cwd(), 'src', 'lib', 'users.json');
         await fs.writeFile(usersFilePath, JSON.stringify(updatedUsers, null, 2));
         setUsers(updatedUsers);
-
-        const postsFilePath = path.join(process.cwd(), 'src', 'lib', 'posts.json');
-        await fs.writeFile(postsFilePath, JSON.stringify(updatedPosts, null, 2));
-        setPosts(updatedPosts);
-
     } catch (error) {
-        console.error("Failed to data:", error);
-        return { error: 'Failed to update profile. Please try again.' };
+        return { error: "Failed to update profile." };
     }
 
     revalidatePath('/admin/profile');
-    revalidatePath('/admin/layout'); // To refresh header
-    revalidatePath('/'); // To refresh blog posts with new author name
-
-    return { success: 'Profile updated successfully.' };
+    return { success: "Profile updated successfully." };
 }
 
-export async function updateUserAvatar(userId: string, avatarDataUrl: string) {
+
+export async function updateUserAvatar(userId: string, dataUrl: string) {
     const session = await getSession();
-    if (!session || session.userId !== userId) {
-        return { error: "Unauthorized" };
+    if (!session?.userId || session.userId !== userId) {
+        return { error: "Unauthorized." };
     }
 
     const userIndex = users.findIndex(u => u.id === userId);
     if (userIndex === -1) {
-        return { error: 'User not found.' };
+        return { error: "User not found." };
     }
 
-    // Update user's avatar
     const updatedUsers = [...users];
-    updatedUsers[userIndex].avatarUrl = avatarDataUrl;
-
-    // Update author avatar in all posts by this user
-    const updatedPosts = posts.map(post => {
-        if (post.authorId === userId) {
-            return {
-                ...post,
-                author: {
-                    ...post.author,
-                    avatarUrl: avatarDataUrl
-                }
-            };
-        }
-        return post;
-    });
+    updatedUsers[userIndex].avatarUrl = dataUrl;
 
     try {
         const usersFilePath = path.join(process.cwd(), 'src', 'lib', 'users.json');
         await fs.writeFile(usersFilePath, JSON.stringify(updatedUsers, null, 2));
         setUsers(updatedUsers);
-
-        const postsFilePath = path.join(process.cwd(), 'src', 'lib', 'posts.json');
-        await fs.writeFile(postsFilePath, JSON.stringify(updatedPosts, null, 2));
-        setPosts(updatedPosts);
-
     } catch (error) {
-        console.error("Failed to update avatar:", error);
-        return { error: 'Failed to update profile picture. Please try again.' };
+        return { error: "Failed to update avatar." };
     }
 
     revalidatePath('/admin/profile');
-    revalidatePath('/admin/layout');
-    revalidatePath('/');
-    
-    return { success: 'Profile picture updated successfully.', newAvatarUrl: avatarDataUrl };
+    revalidatePath('/admin');
+    return { success: "Avatar updated.", newAvatarUrl: dataUrl };
 }
-
-
-// --- User Management Actions ---
-
-export async function getUsersClient(): Promise<User[]> {
-    return users;
-}
-
-export async function getUserById(userId: string): Promise<User | undefined> {
-    return users.find(u => u.id === userId);
-}
-
-
-export async function createUser(prevState: any, formData: FormData) {
-    const session = await getSession();
-    if (!session) {
-        return { error: "Unauthorized" };
-    }
-
-    const name = formData.get('name') as string;
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-    const role = formData.get('role') as 'Admin' | 'Editor' | 'Author';
-
-    if (!name || !email || !password || !role) {
-        return { error: 'All fields are required.' };
-    }
-    
-    const existingUser = users.find(u => u.email === email);
-    if (existingUser) {
-        return { error: 'A user with this email already exists.' };
-    }
-
-    const newUser: User = {
-        id: `${Date.now()}`,
-        name,
-        email,
-        password,
-        role,
-        avatarUrl: `https://picsum.photos/seed/${Date.now()}/32/32`,
-        createdAt: new Date().toISOString().split('T')[0],
-    };
-
-    const updatedUsers = [...users, newUser];
-
-    try {
-        const usersFilePath = path.join(process.cwd(), 'src', 'lib', 'users.json');
-        await fs.writeFile(usersFilePath, JSON.stringify(updatedUsers, null, 2));
-        setUsers(updatedUsers);
-    } catch (error) {
-        console.error("Failed to create user:", error);
-        return { error: 'Failed to create user. Please try again.' };
-    }
-    
-    revalidatePath('/admin/users');
-    redirect('/admin/users');
-}
-
-export async function adminUpdateUser(prevState: any, formData: FormData) {
-    const session = await getSession();
-    if (!session) {
-        return { error: "Unauthorized" };
-    }
-
-    const userId = formData.get('userId') as string;
-    const name = formData.get('name') as string;
-    const role = formData.get('role') as 'Admin' | 'Editor' | 'Author';
-
-    if (!userId || !name || !role) {
-        return { error: 'User ID, name and role are required.' };
-    }
-
-    const userIndex = users.findIndex(u => u.id === userId);
-    if (userIndex === -1) {
-        return { error: 'User not found.' };
-    }
-    
-    const updatedUsers = [...users];
-    updatedUsers[userIndex] = { ...updatedUsers[userIndex], name, role };
-    
-    // Also update author name in posts
-    const updatedPosts = posts.map(post => {
-        if (post.authorId === userId) {
-            return { ...post, author: { ...post.author, name: name } };
-        }
-        return post;
-    });
-
-
-    try {
-        const usersFilePath = path.join(process.cwd(), 'src', 'lib', 'users.json');
-        await fs.writeFile(usersFilePath, JSON.stringify(updatedUsers, null, 2));
-        setUsers(updatedUsers);
-
-        const postsFilePath = path.join(process.cwd(), 'src', 'lib', 'posts.json');
-        await fs.writeFile(postsFilePath, JSON.stringify(updatedPosts, null, 2));
-        setPosts(updatedPosts);
-    } catch (error) {
-        console.error("Failed to update user:", error);
-        return { error: 'Failed to update user. Please try again.' };
-    }
-    
-    revalidatePath('/admin/users');
-    revalidatePath(`/admin/users/${userId}/edit`);
-    redirect('/admin/users');
-}
-
 
 export async function deleteUser(userId: string) {
     const session = await getSession();
-    if (!session) {
-      return { error: "Unauthorized" };
-    }
-
-    // Prevent deleting the last user
-    if (users.length <= 1) {
-        return { error: "Cannot delete the last user." };
-    }
-    // Prevent deleting oneself
+    if (!session?.userId) { return { error: "Unauthorized." }; }
+    
+    // Prevent user from deleting themselves
     if (session.userId === userId) {
         return { error: "You cannot delete your own account." };
     }
 
     const updatedUsers = users.filter(u => u.id !== userId);
-    // Also delete all posts by this user
+    // Also delete user's posts
     const updatedPosts = posts.filter(p => p.authorId !== userId);
 
     try {
         const usersFilePath = path.join(process.cwd(), 'src', 'lib', 'users.json');
         await fs.writeFile(usersFilePath, JSON.stringify(updatedUsers, null, 2));
         setUsers(updatedUsers);
-
+        
         const postsFilePath = path.join(process.cwd(), 'src', 'lib', 'posts.json');
         await fs.writeFile(postsFilePath, JSON.stringify(updatedPosts, null, 2));
         setPosts(updatedPosts);
     } catch (error) {
-        console.error("Failed to delete user:", error);
-        return { error: 'Failed to delete user. Please try again.' };
+        return { error: "Failed to delete user and their posts." };
     }
 
     revalidatePath('/admin/users');
+    revalidatePath('/');
     return { success: "User deleted successfully." };
 }
 
-
-// --- Menu Management Actions ---
-
-export async function getMenus(): Promise<Menu[]> {
-    const filePath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
-    try {
-        const data = await fs.readFile(filePath, 'utf-8');
-        return JSON.parse(data) as Menu[];
-    } catch (error) {
-        return [];
-    }
+export async function getUserById(userId: string) {
+    return users.find(u => u.id === userId) || null;
 }
+
+export async function getUsersClient() {
+    // This is a client-safe version that doesn't expose passwords
+    return users.map(({ password, ...user }) => user);
+}
+
 
 export async function saveMenu(prevState: any, formData: FormData) {
     const session = await getSession();
-    if (!session) {
-        return { error: "Unauthorized" };
-    }
+    if (!session?.userId) { return { error: "Unauthorized." }; }
 
-    const name = formData.get('menu-name') as string;
+    const menuName = formData.get('menu-name') as string;
     const labels = formData.getAll('item-labels') as string[];
     const urls = formData.getAll('item-urls') as string[];
     const location = formData.get('menu-location') as string;
 
-    if (!name) {
-        return { error: 'Menu name is required.' };
+    if (!menuName) {
+        return { error: "Menu name is required." };
     }
-    
-    const menuItems = labels.map((label, index) => ({
-        label,
-        url: urls[index]
-    }));
-    
-    const newMenuId = `${Date.now()}`;
-    const newMenu: Menu = {
-        id: newMenuId,
-        name,
-        items: menuItems
-    };
-    
-    const menusFilePath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
 
+    const newMenu: Menu = {
+        id: `${Date.now()}`,
+        name: menuName,
+        items: labels.map((label, index) => ({ label, url: urls[index] })),
+    };
+
+    const menusPath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
+    
     try {
-        const menus = await getMenus();
-        menus.push(newMenu);
-        await fs.writeFile(menusFilePath, JSON.stringify(menus, null, 2));
-        
-        // If a location was selected, update settings.json
-        if (location && location !== 'none') {
-            const settings = await getSettings();
-            if (location === 'header') {
-                settings.headerMenuId = newMenuId;
-            } else if (location === 'footer') {
-                settings.footerMenuId = newMenuId;
-            }
-            const settingsFilePath = path.join(process.cwd(), 'src', 'lib', 'settings.json');
-            await fs.writeFile(settingsFilePath, JSON.stringify(settings, null, 2));
-            clearSettingsCache();
+        let allMenus: Menu[] = [];
+        try {
+            const file = await fs.readFile(menusPath, 'utf-8');
+            allMenus = JSON.parse(file);
+        } catch (readError) {
+            // File doesn't exist, start with an empty array
         }
+
+        allMenus.push(newMenu);
+        await fs.writeFile(menusPath, JSON.stringify(allMenus, null, 2));
+
+        // If a location was selected, update settings.json
+        if (location === 'header' || location === 'footer') {
+            const settingsPath = path.join(process.cwd(), 'src', 'lib', 'settings.json');
+            const settingsFile = await fs.readFile(settingsPath, 'utf-8');
+            const settings = JSON.parse(settingsFile);
+            
+            if (location === 'header') {
+                settings.headerMenuId = newMenu.id;
+            } else if (location === 'footer') {
+                settings.footerMenuId = newMenu.id;
+            }
+
+            await fs.writeFile(settingsPath, JSON.stringify(settings, null, 2));
+            clearSettingsCache();
+            revalidatePath('/', 'layout');
+        }
+
     } catch (error) {
-        console.error("Failed to save menu:", error);
-        return { error: 'Failed to save menu. Please try again.' };
+        console.error("Error saving menu:", error);
+        return { error: "Failed to save menu." };
     }
 
     revalidatePath('/admin/menus');
-    revalidatePath('/admin/settings');
-    revalidatePath('/');
     redirect('/admin/menus');
 }
 
 
 export async function updateMenu(prevState: any, formData: FormData) {
     const session = await getSession();
-    if (!session) {
-        return { error: "Unauthorized" };
-    }
-    
+    if (!session?.userId) { return { error: "Unauthorized." }; }
+
     const menuId = formData.get('menu-id') as string;
-    const name = formData.get('menu-name') as string;
+    const menuName = formData.get('menu-name') as string;
     const labels = formData.getAll('item-labels') as string[];
     const urls = formData.getAll('item-urls') as string[];
     const location = formData.get('menu-location') as string;
 
-    if (!menuId || !name) {
-        return { error: 'Menu ID and name are required.' };
-    }
-
-    const menuItems = labels.map((label, index) => ({
-        label,
-        url: urls[index]
-    }));
-
-    const updatedMenu: Menu = { id: menuId, name, items: menuItems };
-    const menusFilePath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
+    const menusPath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
 
     try {
-        const menus = await getMenus();
-        const menuIndex = menus.findIndex(m => m.id === menuId);
-
+        const file = await fs.readFile(menusPath, 'utf-8');
+        const allMenus: Menu[] = JSON.parse(file);
+        
+        const menuIndex = allMenus.findIndex(m => m.id === menuId);
         if (menuIndex === -1) {
             return { error: "Menu not found." };
         }
-        menus[menuIndex] = updatedMenu;
 
-        await fs.writeFile(menusFilePath, JSON.stringify(menus, null, 2));
+        allMenus[menuIndex] = {
+            id: menuId,
+            name: menuName,
+            items: labels.map((label, index) => ({ label, url: urls[index] })),
+        };
+
+        await fs.writeFile(menusPath, JSON.stringify(allMenus, null, 2));
+
+        const settingsPath = path.join(process.cwd(), 'src', 'lib', 'settings.json');
+        const settingsFile = await fs.readFile(settingsPath, 'utf-8');
+        const settings = JSON.parse(settingsFile);
+
+        // Clear old assignment if it exists
+        if (settings.headerMenuId === menuId) delete settings.headerMenuId;
+        if (settings.footerMenuId === menuId) delete settings.footerMenuId;
         
-        // If a location was selected, update settings.json
-        const settings = await getSettings();
-        let settingsChanged = false;
-        if (location === 'header' && settings.headerMenuId !== menuId) {
-            settings.headerMenuId = menuId;
-            settingsChanged = true;
-        } else if (settings.headerMenuId === menuId && location !== 'header') {
-            settings.headerMenuId = undefined;
-            settingsChanged = true;
-        }
-        
-        if (location === 'footer' && settings.footerMenuId !== menuId) {
-            settings.footerMenuId = menuId;
-            settingsChanged = true;
-        } else if (settings.footerMenuId === menuId && location !== 'footer') {
-            settings.footerMenuId = undefined;
-            settingsChanged = true;
-        }
-        
-        if (settingsChanged) {
-            const settingsFilePath = path.join(process.cwd(), 'src', 'lib', 'settings.json');
-            await fs.writeFile(settingsFilePath, JSON.stringify(settings, null, 2));
-            clearSettingsCache();
-        }
+        // Set new assignment
+        if (location === 'header') settings.headerMenuId = menuId;
+        if (location === 'footer') settings.footerMenuId = menuId;
+
+        await fs.writeFile(settingsPath, JSON.stringify(settings, null, 2));
+        clearSettingsCache();
 
     } catch (error) {
-        console.error("Failed to update menu:", error);
-        return { error: 'Failed to update menu. Please try again.' };
+        console.error("Error updating menu:", error);
+        return { error: "Failed to update menu." };
     }
-    
+
+    revalidatePath('/', 'layout');
     revalidatePath('/admin/menus');
-    revalidatePath('/admin/settings');
-    revalidatePath('/');
     redirect('/admin/menus');
 }
 
 
 export async function deleteMenu(menuId: string) {
     const session = await getSession();
-    if (!session) {
-      return { error: "Unauthorized" };
-    }
-  
-    try {
-      const menus = await getMenus();
-      const updatedMenus = menus.filter(m => m.id !== menuId);
-  
-      if (updatedMenus.length === menus.length) {
-        return { error: 'Menu not found.' };
-      }
-      
-      const menusFilePath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
-      await fs.writeFile(menusFilePath, JSON.stringify(updatedMenus, null, 2));
-      
-      // Check if this menu was assigned and unassign it
-      const settings = await getSettings();
-      let settingsChanged = false;
-      if (settings.headerMenuId === menuId) {
-        settings.headerMenuId = undefined;
-        settingsChanged = true;
-      }
-      if (settings.footerMenuId === menuId) {
-        settings.footerMenuId = undefined;
-        settingsChanged = true;
-      }
-      
-      if(settingsChanged) {
-        const settingsFilePath = path.join(process.cwd(), 'src', 'lib', 'settings.json');
-        await fs.writeFile(settingsFilePath, JSON.stringify(settings, null, 2));
-        clearSettingsCache();
-        revalidatePath('/admin/settings');
-        revalidatePath('/');
-      }
+    if (!session?.userId) { return { error: "Unauthorized." }; }
 
-      revalidatePath('/admin/menus');
-      return { success: 'Menu deleted successfully.' };
-  
+    const menusPath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
+    try {
+        const file = await fs.readFile(menusPath, 'utf-8');
+        let allMenus: Menu[] = JSON.parse(file);
+        
+        allMenus = allMenus.filter(m => m.id !== menuId);
+        await fs.writeFile(menusPath, JSON.stringify(allMenus, null, 2));
+        
+        // Check if this menu was used in settings and clear it
+        const settingsPath = path.join(process.cwd(), 'src', 'lib', 'settings.json');
+        const settingsFile = await fs.readFile(settingsPath, 'utf-8');
+        const settings = JSON.parse(settingsFile);
+
+        let settingsChanged = false;
+        if (settings.headerMenuId === menuId) {
+            settings.headerMenuId = 'none';
+            settingsChanged = true;
+        }
+        if (settings.footerMenuId === menuId) {
+            settings.footerMenuId = 'none';
+            settingsChanged = true;
+        }
+        
+        if (settingsChanged) {
+            await fs.writeFile(settingsPath, JSON.stringify(settings, null, 2));
+            clearSettingsCache();
+        }
+
     } catch (error) {
-      console.error("Failed to delete menu:", error);
-      return { error: 'Failed to delete menu. Please try again.' };
+        console.error("Error deleting menu:", error);
+        return { error: "Failed to delete menu." };
+    }
+
+    revalidatePath('/admin/menus');
+    revalidatePath('/', 'layout');
+    return { success: "Menu deleted successfully." };
+}
+
+export async function getMenus(): Promise<Menu[]> {
+    const menusPath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
+    try {
+        const file = await fs.readFile(menusPath, 'utf-8');
+        return JSON.parse(file) as Menu[];
+    } catch (error) {
+        return [];
     }
 }
-    
-    
-
-    
-
-
-
-
 
     

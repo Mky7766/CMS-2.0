@@ -1,4 +1,3 @@
-
 import fs from 'fs/promises';
 import path from 'path';
 import { cache } from 'react';
@@ -9,6 +8,7 @@ export type SiteSettings = {
   logo: string;
   headerMenuId?: string;
   footerMenuId?: string;
+  footerText?: string;
 };
 
 // In-memory cache for settings
@@ -30,7 +30,8 @@ export const getSettings = cache(async (): Promise<SiteSettings> => {
     const defaultSettings: SiteSettings = {
       siteName: "Nebula CMS",
       tagline: "A modern, git-based CMS",
-      logo: "https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
+      logo: "https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600",
+      footerText: "Built with ❤️ by the open-source community."
     };
     return defaultSettings;
   }
