@@ -1,3 +1,4 @@
+
 import fs from 'fs/promises';
 import path from 'path';
 import { cache } from 'react';
@@ -9,7 +10,7 @@ export type SiteSettings = {
   headerMenuId?: string;
   footerMenuId?: string;
   footerText?: string;
-  blogTemplate?: 'grid' | 'grid-sidebar';
+  blogTemplate?: 'grid' | 'grid-sidebar' | 'list';
   adsTxt?: string;
   robotsTxt?: string;
 };

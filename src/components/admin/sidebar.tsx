@@ -29,6 +29,10 @@ const mainMenuItems = [
   { href: "/admin/users", label: "Users", icon: Users },
 ]
 
+const appearanceMenuItems = [
+    { href: "/admin/appearance/templates", label: "Blog Templates", icon: AppWindow },
+]
+
 const settingsMenuItems = [
     { href: "/admin/settings", label: "General", icon: Settings },
     { href: "/admin/menus", label: "Menus", icon: MenuIcon },
@@ -62,6 +66,25 @@ export default function AppSidebar({ siteName }: { siteName: string }) {
             </SidebarMenuItem>
           ))}
         </SidebarMenu>
+        <SidebarGroup>
+            <SidebarGroupLabel>Appearance</SidebarGroupLabel>
+            <SidebarMenu>
+                 {appearanceMenuItems.map((item) => (
+                    <SidebarMenuItem key={item.href}>
+                        <SidebarMenuButton
+                            asChild
+                            isActive={pathname.startsWith(item.href)}
+                            tooltip={{ children: item.label }}
+                        >
+                            <Link href={item.href}>
+                            <item.icon className="h-4 w-4" />
+                            <span>{item.label}</span>
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                ))}
+            </SidebarMenu>
+        </SidebarGroup>
          <SidebarGroup>
             <SidebarGroupLabel>Settings</SidebarGroupLabel>
             <SidebarMenu>

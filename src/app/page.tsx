@@ -58,6 +58,45 @@ function PostCard({ post }: { post: (typeof posts)[0] }) {
     )
 }
 
+function ListPostCard({ post }: { post: (typeof posts)[0] }) {
+    return (
+        <Card className="flex flex-col md:flex-row overflow-hidden">
+             {post.featuredImage && (
+                <Link href={`/${post.id}`} className="block md:w-1/3">
+                    <Image
+                        src={post.featuredImage.url}
+                        alt={post.featuredImage.alt}
+                        width={400}
+                        height={250}
+                        className="w-full h-full object-cover"
+                        unoptimized={post.featuredImage.url.startsWith('data:')}
+                    />
+                </Link>
+            )}
+            <div className="flex flex-col flex-1">
+                <CardHeader>
+                    <CardTitle className="text-2xl hover:text-primary transition-colors">
+                        <Link href={`/${post.id}`}>{post.title}</Link>
+                    </CardTitle>
+                    <CardDescription>
+                        <time dateTime={post.createdAt}>{new Date(post.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="flex-grow">
+                    <p>{post.content.substring(0, 200)}{post.content.length > 200 ? '...' : ''}</p>
+                </CardContent>
+                <CardFooter className="flex items-center gap-3 mt-auto">
+                        <Avatar className="h-9 w-9">
+                        <AvatarImage src={post.author.avatarUrl} alt={post.author.name} />
+                        <AvatarFallback>{post.author.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm font-medium">{post.author.name}</span>
+                </CardFooter>
+            </div>
+        </Card>
+    )
+}
+
 function GridTemplate({ posts }: { posts: (typeof posts) }) {
     return (
          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -95,6 +134,16 @@ function GridSidebarTemplate({ posts }: { posts: (typeof posts) }) {
     )
 }
 
+function ListTemplate({ posts }: { posts: (typeof posts) }) {
+    return (
+        <div className="space-y-8">
+            {posts.map((post) => (
+                <ListPostCard key={post.id} post={post} />
+            ))}
+        </div>
+    )
+}
+
 
 export default async function Home() {
   const settings = await getSettings();
@@ -102,6 +151,18 @@ export default async function Home() {
   const menus = await getMenus();
   const headerMenu = menus.find(m => m.id === settings.headerMenuId);
   const footerMenu = menus.find(m => m.id === settings.footerMenuId);
+
+  const renderBlogTemplate = () => {
+    switch (settings.blogTemplate) {
+      case 'grid-sidebar':
+        return <GridSidebarTemplate posts={publishedPosts} />;
+      case 'list':
+        return <ListTemplate posts={publishedPosts} />;
+      case 'grid':
+      default:
+        return <GridTemplate posts={publishedPosts} />;
+    }
+  }
 
 
   return (
@@ -137,11 +198,7 @@ export default async function Home() {
                     {settings.tagline || "Welcome to our blog. Here we share the latest stories and insights."}
                 </p>
             </div>
-            {settings.blogTemplate === 'grid-sidebar' ? (
-                <GridSidebarTemplate posts={publishedPosts} />
-            ) : (
-                <GridTemplate posts={publishedPosts} />
-            )}
+            {renderBlogTemplate()}
         </div>
       </main>
       <footer className="border-t bg-muted/20 py-8">
