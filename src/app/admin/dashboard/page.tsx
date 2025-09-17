@@ -69,7 +69,6 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stat.value}</div>
-                <p className="text-xs text-muted-foreground">+2 from last month</p>
               </CardContent>
             </Card>
           );

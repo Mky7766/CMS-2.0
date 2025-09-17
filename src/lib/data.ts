@@ -74,13 +74,3 @@ export function setPosts(newPosts: Post[]) {
 }
 
 export { users, posts };
-
-// This function is now in src/app/actions.ts
-export function clearSettingsCache(): void {}
-
-export const dashboardStats = [
-    { title: "Total Posts", value: "28", icon: "FileText" },
-    { title: "Published Posts", value: "22", icon: "CheckCircle" },
-    { title: "Draft Posts", value: "6", icon: "Edit3" },
-    { title: "Site Views", value: "12,580", icon: "BarChart2" },
-]
