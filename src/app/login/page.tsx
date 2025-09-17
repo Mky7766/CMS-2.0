@@ -18,7 +18,7 @@ export default function LoginPage() {
             <div className="mb-4 flex justify-center">
               <Icons.logo className="h-10 w-10 text-primary" />
             </div>
-            <CardTitle className="text-2xl">Welcome to Nebula CMS</CardTitle>
+            <CardTitle className="text-2xl">Welcome to Vinee CMS</CardTitle>
             <CardDescription>
                 {showSignup 
                     ? "Create the first admin account to get started." 

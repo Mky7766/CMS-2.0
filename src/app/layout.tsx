@@ -1,10 +1,11 @@
+
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: 'Nebula CMS',
+  title: 'Vinee CMS',
   description: 'A full-featured open-source CMS that runs on static site hosting.',
 };
 
