@@ -1,7 +1,6 @@
 
 "use server"
 
-import { customizeTheme } from "@/ai/flows/theme-customization";
 import fs from "fs/promises";
 import path from "path";
 import { redirect } from 'next/navigation';
@@ -10,25 +9,6 @@ import { createSession, deleteSession, getSession } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 import { ImagePlaceholder } from "@/lib/placeholder-images";
 import { SiteSettings, getSettings, clearSettingsCache } from "@/lib/settings";
-
-export async function applyTheme(customThemeCss: string) {
-    try {
-        const defaultThemePath = path.join(process.cwd(), 'src', 'app', 'globals.css');
-        const defaultThemeCss = await fs.readFile(defaultThemePath, 'utf-8');
-
-        const result = await customizeTheme({
-            customThemeCss,
-            defaultThemeCss,
-        });
-
-        return result;
-
-    } catch (error) {
-        console.error("Error applying theme:", error);
-        return { themeCss: "" };
-    }
-}
-
 
 export async function signup(prevState: any, formData: FormData) {
     const email = formData.get('email') as string;

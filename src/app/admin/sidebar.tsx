@@ -15,11 +15,9 @@ import {
   SidebarMenuButton,
   SidebarGroup,
   SidebarGroupLabel,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
 } from "@/components/ui/sidebar"
 import { Icons } from "@/components/icons"
-import { LayoutDashboard, FileText, Image as ImageIcon, Settings, Users, LogOut, Sun, Moon, Palette, Menu as MenuIcon, AppWindow } from "lucide-react"
+import { LayoutDashboard, FileText, Image as ImageIcon, Settings, Users, LogOut, AppWindow, Menu as MenuIcon, Palette } from "lucide-react"
 import { Separator } from "../ui/separator"
 import { logout } from "@/app/actions"
 import { Button } from "../ui/button"
@@ -37,7 +35,6 @@ const settingsMenuItems = [
 ]
 
 const appearanceMenuItems = [
-    { href: "/admin/theme", label: "Colors", icon: Palette },
     { href: "/admin/appearance/templates", label: "Blog Templates", icon: AppWindow },
 ]
 

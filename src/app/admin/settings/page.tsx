@@ -1,4 +1,5 @@
 
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import GeneralSettingsForm from "@/components/admin/general-settings-form";
 import MenuSettingsForm from "@/components/admin/menu-settings-form";
@@ -9,7 +10,6 @@ import path from 'path';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import ThemeForm from "@/components/admin/theme-form";
 
 
 async function getMenus(): Promise<Menu[]> {
@@ -35,15 +35,11 @@ export default async function SettingsPage() {
       <Tabs defaultValue="general" className="w-full">
         <TabsList>
           <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="appearance">Appearance</TabsTrigger>
           <TabsTrigger value="menus">Menus</TabsTrigger>
           <TabsTrigger value="users">Users & Roles</TabsTrigger>
         </TabsList>
         <TabsContent value="general" className="mt-4">
             <GeneralSettingsForm settings={settings} />
-        </TabsContent>
-        <TabsContent value="appearance" className="mt-4">
-            <ThemeForm />
         </TabsContent>
         <TabsContent value="menus" className="mt-4">
           <MenuSettingsForm settings={settings} menus={menus} />
