@@ -1,12 +1,12 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { posts, Menu } from "@/lib/data";
+import { posts, Menu, Page } from "@/lib/data";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
-import { getSettings } from "@/app/actions";
+import { getSettings, getPage } from "@/app/actions";
 import fs from 'fs/promises';
 import path from 'path';
 import HtmlRenderer from "@/components/html-renderer";
@@ -31,6 +31,11 @@ export default async function Home() {
   const menus = await getMenus();
   const headerMenu = menus.find(m => m.id === settings.headerMenuId);
   const footerMenu = menus.find(m => m.id === settings.footerMenuId);
+
+  let homePage: Page | undefined;
+  if (settings.defaultPostCategoryId) {
+      homePage = await getPage(settings.defaultPostCategoryId);
+  }
 
   const renderBlogTemplate = () => {
     switch (settings.blogTemplate) {
@@ -72,13 +77,24 @@ export default async function Home() {
       </header>
       <main className="flex-1">
         <div className="container mx-auto px-4 py-8 md:py-12">
-            <div className="text-center mb-12">
-                <h1 className="text-4xl md:text-6xl font-bold tracking-tight">{settings.siteName || "Vinee Blog"}</h1>
-                <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-                    {settings.tagline || "Welcome to our blog. Here we share the latest stories and insights."}
-                </p>
-            </div>
-            {renderBlogTemplate()}
+            { homePage ? (
+                 <article className="prose prose-lg mx-auto max-w-4xl dark:prose-invert">
+                    <header className="mb-8">
+                        <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">{homePage.title}</h1>
+                    </header>
+                    <HtmlRenderer htmlContent={homePage.content} />
+                </article>
+            ) : (
+                <>
+                    <div className="text-center mb-12">
+                        <h1 className="text-4xl md:text-6xl font-bold tracking-tight">{settings.siteName || "Vinee Blog"}</h1>
+                        <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
+                            {settings.tagline || "Welcome to our blog. Here we share the latest stories and insights."}
+                        </p>
+                    </div>
+                    {renderBlogTemplate()}
+                </>
+            )}
         </div>
       </main>
       <footer className="border-t bg-muted/20 py-8">

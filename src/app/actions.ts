@@ -370,6 +370,11 @@ export async function getPages(): Promise<Page[]> {
     }
 }
 
+export async function getPage(pageId: string): Promise<Page | undefined> {
+    const allPages = await getPages();
+    return allPages.find(p => p.id === pageId);
+}
+
 
 export async function uploadMedia(dataUrl: string, fileName: string) {
     const session = await getSession();
