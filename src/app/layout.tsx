@@ -10,6 +10,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: settings.siteName || 'Vinee CMS',
     description: settings.tagline || 'A full-featured open-source CMS that runs on static site hosting.',
+    icons: {
+      icon: settings.faviconUrl || '/favicon.ico',
+    },
   }
 }
 
@@ -22,7 +25,6 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {settings.faviconUrl && <link rel="icon" href={settings.faviconUrl} sizes="any" />}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet" />
