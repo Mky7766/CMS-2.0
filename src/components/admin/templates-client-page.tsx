@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { updateSettings } from "@/app/actions";
 import { SiteSettings } from "@/lib/settings";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Code } from "lucide-react";
 
 
 const templates = [
@@ -101,6 +101,12 @@ export default function TemplatesClientPage({ settings }: { settings: SiteSettin
                     <CardTitle>{template.name}</CardTitle>
                     <CardDescription>{template.description}</CardDescription>
                   </CardHeader>
+                  <CardFooter>
+                      <Button variant="outline" size="sm" onClick={(e) => { e.preventDefault(); alert('To edit this template, ask the AI assistant to "edit the grid-template.tsx file"'); }}>
+                        <Code className="mr-2 h-4 w-4" />
+                        Edit Code
+                      </Button>
+                  </CardFooter>
                 </Card>
               </Label>
             </div>
@@ -122,4 +128,3 @@ export default function TemplatesClientPage({ settings }: { settings: SiteSettin
     </div>
   );
 }
-
