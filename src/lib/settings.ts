@@ -2,18 +2,8 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { cache } from 'react';
+import type { SiteSettings } from './data';
 
-export type SiteSettings = {
-  siteName: string;
-  tagline: string;
-  logo: string;
-  headerMenuId?: string;
-  footerMenuId?: string;
-  footerText?: string;
-  blogTemplate?: 'grid' | 'grid-sidebar' | 'list';
-  adsTxt?: string;
-  robotsTxt?: string;
-};
 
 // In-memory cache for settings
 let cachedSettings: SiteSettings | null = null;

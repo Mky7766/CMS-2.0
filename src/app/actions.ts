@@ -4,7 +4,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { redirect } from 'next/navigation';
-import { User, users, setUsers, posts, setPosts, Post, Menu } from "@/lib/data";
+import { User, users, setUsers, posts, setPosts, Post, Menu, Template } from "@/lib/data";
 import { createSession, deleteSession, getSession } from "@/lib/session";
 import { revalidatePath } from "next/cache";
 import { ImagePlaceholder } from "@/lib/placeholder-images";
@@ -306,7 +306,7 @@ export async function updateSettings(prevState: any, formData: FormData) {
             headerMenuId: formData.has('header-menu-id') ? formData.get('header-menu-id') as string : currentSettings.headerMenuId,
             footerMenuId: formData.has('footer-menu-id') ? formData.get('footer-menu-id') as string : currentSettings.footerMenuId,
             footerText: formData.has('footer-text') ? formData.get('footer-text') as string : currentSettings.footerText,
-            blogTemplate: formData.has('blog-template') ? formData.get('blog-template') as SiteSettings['blogTemplate'] : currentSettings.blogTemplate,
+            blogTemplate: formData.has('blog-template') ? formData.get('blog-template') as string : currentSettings.blogTemplate,
             adsTxt: formData.has('ads-txt') ? formData.get('ads-txt') as string : currentSettings.adsTxt,
             robotsTxt: formData.has('robots-txt') ? formData.get('robots-txt') as string : currentSettings.robotsTxt,
         };
@@ -318,6 +318,8 @@ export async function updateSettings(prevState: any, formData: FormData) {
         revalidatePath('/ads.txt');
         revalidatePath('/robots.txt');
         revalidatePath('/sitemap.xml');
+        revalidatePath('/admin/appearance/templates');
+
 
         return { success: "Settings updated successfully." };
 
@@ -674,6 +676,43 @@ export async function getMenus(): Promise<Menu[]> {
         return JSON.parse(file) as Menu[];
     } catch (error) {
         return [];
+    }
+}
+
+export async function getTemplates(): Promise<Template[]> {
+    const templatesPath = path.join(process.cwd(), 'src', 'lib', 'templates.json');
+    try {
+        const file = await fs.readFile(templatesPath, 'utf-8');
+        const data = JSON.parse(file);
+        return data as Template[];
+    } catch (error) {
+        // If file doesn't exist, return an empty array
+        return [];
+    }
+}
+
+export async function deleteTemplate(templateId: string) {
+    const session = await getSession();
+    if (!session?.userId) {
+        return { error: "You are not authorized to perform this action." };
+    }
+
+    const templatesPath = path.join(process.cwd(), 'src', 'lib', 'templates.json');
+    try {
+        const templates = await getTemplates();
+        const updatedTemplates = templates.filter(t => t.id !== templateId);
+        
+        if (templates.length === updatedTemplates.length) {
+            return { error: "Template not found." };
+        }
+
+        await fs.writeFile(templatesPath, JSON.stringify(updatedTemplates, null, 2));
+
+        revalidatePath('/admin/appearance/templates');
+        return { success: "Template deleted successfully." };
+    } catch (error) {
+        console.error("Error deleting template:", error);
+        return { error: "Failed to delete template." };
     }
 }
 

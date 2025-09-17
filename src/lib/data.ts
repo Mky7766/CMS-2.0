@@ -40,6 +40,26 @@ export type Menu = {
     items: MenuItem[];
 };
 
+export type Template = {
+    id: string;
+    name: string;
+    description: string;
+    imageUrl: string;
+}
+
+export type SiteSettings = {
+  siteName: string;
+  tagline: string;
+  logo: string;
+  headerMenuId?: string;
+  footerMenuId?: string;
+  footerText?: string;
+  blogTemplate?: string;
+  adsTxt?: string;
+  robotsTxt?: string;
+};
+
+
 let posts: Post[] = postsData;
 
 let users: User[] = usersData;
