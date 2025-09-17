@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { updateSettings } from "@/app/actions";
-import { SiteSettings, Category } from "@/lib/data";
+import { SiteSettings, Page } from "@/lib/data";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -22,10 +22,10 @@ function SubmitButton() {
 
 type WritingSettingsFormProps = {
     settings: SiteSettings;
-    categories: Category[];
+    pages: Page[];
 }
 
-export default function WritingSettingsForm({ settings, categories }: WritingSettingsFormProps) {
+export default function WritingSettingsForm({ settings, pages }: WritingSettingsFormProps) {
   const [state, formAction] = useActionState(updateSettings, null);
   const { toast } = useToast();
 
@@ -58,11 +58,12 @@ export default function WritingSettingsForm({ settings, categories }: WritingSet
                     <p className="text-sm text-muted-foreground">The category assigned to new posts by default.</p>
                     <Select name="default-category-id" defaultValue={settings.defaultPostCategoryId || "uncategorized"}>
                         <SelectTrigger>
-                            <SelectValue placeholder="Select a category" />
+                            <SelectValue placeholder="Select a page" />
                         </SelectTrigger>
                         <SelectContent>
-                            {categories.map((category) => (
-                                <SelectItem key={category.id} value={category.id}>{category.name}</SelectItem>
+                            <SelectItem value="uncategorized">Uncategorized</SelectItem>
+                            {pages.map((page) => (
+                                <SelectItem key={page.id} value={page.id}>{page.title}</SelectItem>
                             ))}
                         </SelectContent>
                     </Select>

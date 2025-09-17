@@ -10,13 +10,14 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
-import { getMenus, getSettings, getCategories } from "@/app/actions";
+import { getMenus, getSettings, getCategories, getPages } from "@/app/actions";
 
 
 export default async function SettingsPage() {
   const settings = await getSettings();
   const menus = await getMenus();
   const categories = await getCategories();
+  const pages = await getPages();
 
   return (
     <div className="space-y-8">
@@ -36,7 +37,7 @@ export default async function SettingsPage() {
             <GeneralSettingsForm settings={settings} />
         </TabsContent>
         <TabsContent value="writing" className="mt-4">
-            <WritingSettingsForm settings={settings} categories={categories} />
+            <WritingSettingsForm settings={settings} pages={pages} />
         </TabsContent>
          <TabsContent value="menus" className="mt-4">
           <MenuSettingsForm settings={settings} menus={menus} />
