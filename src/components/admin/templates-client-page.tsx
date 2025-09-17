@@ -7,9 +7,9 @@ import Image from "next/image";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { updateSettings, deleteTemplate } from "@/app/actions";
+import { updateSettings, deleteTemplate, getTemplates } from "@/app/actions";
 import type { SiteSettings, Template } from "@/lib/data";
-import { CheckCircle, Code, PlusCircle, Trash2 } from "lucide-react";
+import { CheckCircle, Code, PlusCircle, Trash2, Loader } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,6 +20,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { getSettings } from "@/lib/settings";
 
 
 function ActivateButton() {
@@ -40,15 +41,32 @@ function DeactivateButton() {
     )
 }
 
-export default function TemplatesClientPage({ settings, templates: initialTemplates }: { settings: SiteSettings, templates: Template[] }) {
+export default function TemplatesClientPage() {
+  const [settings, setSettings] = useState<SiteSettings | null>(null);
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   const [state, formAction] = useActionState(updateSettings, null);
   const { toast } = useToast();
 
-  const [templates, setTemplates] = useState(initialTemplates);
   const [templateToDelete, setTemplateToDelete] = useState<Template | null>(null);
   const [isDeleting, startDeleteTransition] = useTransition();
   const [isInfoDialogOpen, setIsInfoDialogOpen] = useState(false);
   const [isCreateInfoDialogOpen, setIsCreateInfoDialogOpen] = useState(false);
+
+  useEffect(() => {
+    async function loadData() {
+        setIsLoading(true);
+        const [settingsData, templatesData] = await Promise.all([
+            getSettings(),
+            getTemplates()
+        ]);
+        setSettings(settingsData);
+        setTemplates(templatesData);
+        setIsLoading(false);
+    }
+    loadData();
+  }, [state]);
 
 
   useEffect(() => {
@@ -80,6 +98,38 @@ export default function TemplatesClientPage({ settings, templates: initialTempla
       }
       setTemplateToDelete(null);
     });
+  }
+
+  if (isLoading || !settings) {
+    return (
+        <div className="space-y-8">
+             <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">Blog Templates</h1>
+                    <p className="text-muted-foreground">Choose a layout for your blog's homepage.</p>
+                </div>
+                <Button disabled>
+                    <Loader className="mr-2 h-4 w-4 animate-spin" />
+                    Loading...
+                </Button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {Array.from({length: 3}).map((_, i) => (
+                    <Card key={i}>
+                        <div className="w-full bg-muted animate-pulse aspect-video" />
+                        <CardHeader>
+                            <div className="h-6 w-1/2 bg-muted animate-pulse rounded-md" />
+                            <div className="h-4 w-full bg-muted animate-pulse rounded-md mt-2" />
+                        </CardHeader>
+                         <CardFooter className="flex justify-between items-center">
+                            <div className="h-8 w-24 bg-muted animate-pulse rounded-md" />
+                             <div className="h-8 w-24 bg-muted animate-pulse rounded-md" />
+                         </CardFooter>
+                    </Card>
+                ))}
+            </div>
+        </div>
+    )
   }
 
   return (
