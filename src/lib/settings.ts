@@ -9,6 +9,7 @@ export type SiteSettings = {
   headerMenuId?: string;
   footerMenuId?: string;
   footerText?: string;
+  blogTemplate?: 'grid' | 'grid-sidebar';
 };
 
 // In-memory cache for settings
@@ -28,10 +29,11 @@ export const getSettings = cache(async (): Promise<SiteSettings> => {
     // If the file doesn't exist or is invalid, return default settings
     console.warn("settings.json not found or invalid, using default settings.");
     const defaultSettings: SiteSettings = {
-      siteName: "Nebula CMS",
+      siteName: "Vinee CMS",
       tagline: "A modern, git-based CMS",
       logo: "https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600",
-      footerText: "Built with ❤️ by the open-source community."
+      footerText: "Built with ❤️ by the open-source community.",
+      blogTemplate: "grid"
     };
     return defaultSettings;
   }

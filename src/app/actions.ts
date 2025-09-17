@@ -319,13 +319,14 @@ export async function updateSettings(prevState: any, formData: FormData) {
 
         // This approach allows us to update settings from different forms
         // without wiping out other settings.
-        const updatedSettings = {
+        const updatedSettings: SiteSettings = {
             ...currentSettings,
             siteName: formData.has('site-name') ? formData.get('site-name') as string : currentSettings.siteName,
             tagline: formData.has('tagline') ? formData.get('tagline') as string : currentSettings.tagline,
             headerMenuId: formData.has('header-menu-id') ? formData.get('header-menu-id') as string : currentSettings.headerMenuId,
             footerMenuId: formData.has('footer-menu-id') ? formData.get('footer-menu-id') as string : currentSettings.footerMenuId,
             footerText: formData.has('footer-text') ? formData.get('footer-text') as string : currentSettings.footerText,
+            blogTemplate: formData.has('blog-template') ? formData.get('blog-template') as SiteSettings['blogTemplate'] : currentSettings.blogTemplate,
         };
 
         await fs.writeFile(settingsPath, JSON.stringify(updatedSettings, null, 2));
