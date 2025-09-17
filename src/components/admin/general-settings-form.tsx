@@ -3,6 +3,7 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
+import Image from "next/image";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -12,7 +13,7 @@ import { updateSettings } from "@/app/actions";
 import { SiteSettings } from "@/lib/data";
 import { Textarea } from "../ui/textarea";
 import MediaLibraryModal from "./media-library-modal";
-import { UploadCloud } from "lucide-react";
+import { UploadCloud, Image as ImageIcon } from "lucide-react";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -57,6 +58,7 @@ export default function GeneralSettingsForm({ settings: initialSettings }: Gener
   return (
     <>
     <form action={formAction}>
+        <input type="hidden" name="favicon-url" value={faviconUrl} />
         <Card>
             <CardHeader>
             <CardTitle>General Settings</CardTitle>
@@ -72,12 +74,18 @@ export default function GeneralSettingsForm({ settings: initialSettings }: Gener
                 <Input id="tagline" name="tagline" defaultValue={initialSettings.tagline} />
             </div>
             <div className="space-y-2">
-                <Label htmlFor="favicon-url">Favicon URL</Label>
-                <div className="flex gap-2">
-                    <Input id="favicon-url" name="favicon-url" value={faviconUrl} onChange={(e) => setFaviconUrl(e.target.value)} placeholder="https://your-site.com/favicon.ico" />
+                <Label>Favicon</Label>
+                <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 rounded-md border flex items-center justify-center bg-muted/50">
+                        {faviconUrl ? (
+                            <Image src={faviconUrl} alt="Favicon Preview" width={64} height={64} className="object-contain" unoptimized={faviconUrl.startsWith('data:')}/>
+                        ) : (
+                            <ImageIcon className="w-8 h-8 text-muted-foreground" />
+                        )}
+                    </div>
                     <Button type="button" variant="outline" onClick={() => setIsModalOpen(true)}>
                         <UploadCloud className="mr-2 h-4 w-4" />
-                        Upload
+                        Upload Image
                     </Button>
                 </div>
             </div>
