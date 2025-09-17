@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { updateSettings } from "@/app/actions";
-import { SiteSettings } from "@/lib/settings";
+import { SiteSettings } from "@/lib/data";
 import { Textarea } from "../ui/textarea";
 
 type Template = {
@@ -67,6 +67,10 @@ export default function GeneralSettingsForm({ settings }: GeneralSettingsFormPro
             <div className="space-y-2">
                 <Label htmlFor="tagline">Tagline</Label>
                 <Input id="tagline" name="tagline" defaultValue={settings.tagline} />
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="favicon-url">Favicon URL</Label>
+                <Input id="favicon-url" name="favicon-url" defaultValue={settings.faviconUrl} placeholder="https://your-site.com/favicon.ico" />
             </div>
              <div className="space-y-2">
                 <Label htmlFor="footer-text">Footer Text</Label>

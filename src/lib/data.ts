@@ -52,6 +52,7 @@ export type SiteSettings = {
   siteName: string;
   tagline: string;
   logo: string;
+  faviconUrl?: string;
   headerMenuId?: string;
   footerMenuId?: string;
   footerText?: string;

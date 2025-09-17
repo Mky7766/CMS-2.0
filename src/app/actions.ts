@@ -8,7 +8,7 @@ import { User, users, setUsers, posts, setPosts, Post, Menu, Template } from "@/
 import { createSession, deleteSession, getSession } from "@/lib/session";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { ImagePlaceholder } from "@/lib/placeholder-images";
-import { SiteSettings, clearSettingsCache as clearLibSettingsCache } from "@/lib/data";
+import { SiteSettings } from "@/lib/data";
 import { cache } from 'react'
 
 
@@ -339,6 +339,7 @@ export async function updateSettings(prevState: any, formData: FormData) {
             ...currentSettings,
             siteName: formData.has('site-name') ? formData.get('site-name') as string : currentSettings.siteName,
             tagline: formData.has('tagline') ? formData.get('tagline') as string : currentSettings.tagline,
+            faviconUrl: formData.has('favicon-url') ? formData.get('favicon-url') as string : currentSettings.faviconUrl,
             headerMenuId: formData.has('header-menu-id') ? formData.get('header-menu-id') as string : currentSettings.headerMenuId,
             footerMenuId: formData.has('footer-menu-id') ? formData.get('footer-menu-id') as string : currentSettings.footerMenuId,
             footerText: formData.has('footer-text') ? formData.get('footer-text') as string : currentSettings.footerText,
