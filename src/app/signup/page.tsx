@@ -1,14 +1,26 @@
 
 import { redirect } from 'next/navigation';
-import { users } from '@/lib/data';
 import SignupForm from '@/components/signup-form';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Icons } from "@/components/icons";
 import Link from 'next/link';
+import fs from 'fs/promises';
+import path from 'path';
 
-export default function SignupPage() {
+async function getUsers() {
+    const filePath = path.join(process.cwd(), 'src', 'lib', 'users.json');
+    try {
+        const data = await fs.readFile(filePath, 'utf-8');
+        return JSON.parse(data);
+    } catch (error) {
+        return [];
+    }
+}
+
+export default async function SignupPage() {
+  const allUsers = await getUsers();
   // If users already exist, redirect to login page.
-  if (users.length > 0) {
+  if (allUsers.length > 0) {
     redirect('/login');
   }
 
@@ -27,3 +39,4 @@ export default function SignupPage() {
     </div>
   );
 }
+

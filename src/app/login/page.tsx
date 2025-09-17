@@ -7,9 +7,22 @@ import { Label } from "@/components/ui/label";
 import { Icons } from "@/components/icons";
 import { users } from "@/lib/data";
 import LoginForm from "@/components/login-form";
+import fs from 'fs/promises';
+import path from 'path';
 
-export default function LoginPage() {
-  const showSignup = users.length === 0;
+async function getUsers() {
+    const filePath = path.join(process.cwd(), 'src', 'lib', 'users.json');
+    try {
+        const data = await fs.readFile(filePath, 'utf-8');
+        return JSON.parse(data);
+    } catch (error) {
+        return [];
+    }
+}
+
+export default async function LoginPage() {
+  const allUsers = await getUsers();
+  const showSignup = allUsers.length === 0;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
@@ -31,3 +44,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

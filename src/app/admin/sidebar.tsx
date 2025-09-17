@@ -32,6 +32,7 @@ const mainMenuItems = [
 const settingsMenuItems = [
     { href: "/admin/settings", label: "General", icon: Settings },
     { href: "/admin/menus", label: "Menus", icon: MenuIcon },
+    { href: "/admin/appearance/templates", label: "Blog Templates", icon: Palette },
 ]
 
 export default function AppSidebar({ siteName }: { siteName: string }) {
