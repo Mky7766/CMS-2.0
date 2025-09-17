@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
-import { getSettings } from "@/lib/settings";
+import { getSettings } from "@/app/actions";
 import fs from 'fs/promises';
 import path from 'path';
 import HtmlRenderer from "@/components/html-renderer";

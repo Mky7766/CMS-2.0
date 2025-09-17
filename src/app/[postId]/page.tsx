@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Icons } from "@/components/icons";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { getSettings } from "@/lib/settings";
+import { getSettings } from "@/app/actions";
 import HtmlRenderer from "@/components/html-renderer";
 import fs from 'fs/promises';
 import path from 'path';
@@ -112,3 +112,4 @@ export default async function PostPage({ params }: { params: { postId: string } 
     </div>
   );
 }
+

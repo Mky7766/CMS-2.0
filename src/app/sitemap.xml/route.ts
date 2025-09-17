@@ -1,6 +1,6 @@
 
 import { posts } from "@/lib/data";
-import { getSettings } from "@/lib/settings";
+import { getSettings } from "@/app/actions";
 import { NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {

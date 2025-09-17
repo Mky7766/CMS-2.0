@@ -1,5 +1,5 @@
 
-import { getSettings } from "@/lib/settings";
+import { getSettings } from "@/app/actions";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {

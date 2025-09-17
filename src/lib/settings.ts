@@ -5,35 +5,11 @@ import { cache } from 'react';
 import type { SiteSettings } from './data';
 
 
-// In-memory cache for settings
-let cachedSettings: SiteSettings | null = null;
-
-export const getSettings = cache(async (): Promise<SiteSettings> => {
-  if (cachedSettings) {
-    return cachedSettings;
-  }
-
-  try {
-    const filePath = path.join(process.cwd(), 'src', 'lib', 'settings.json');
-    const data = await fs.readFile(filePath, 'utf-8');
-    const settings = JSON.parse(data) as SiteSettings;
-    return settings;
-  } catch (error) {
-    // If the file doesn't exist or is invalid, return default settings
-    console.warn("settings.json not found or invalid, using default settings.");
-    const defaultSettings: SiteSettings = {
-      siteName: "Vinee CMS",
-      tagline: "A modern, git-based CMS",
-      logo: "https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600",
-      footerText: "Built with ❤️ by the open-source community.",
-      blogTemplate: "grid"
-    };
-    return defaultSettings;
-  }
-});
-
+// This function is now in src/app/actions.ts to be used as a server action
+// and avoid bundling server-side 'fs' module on the client.
 export function clearSettingsCache(): void {
     // Since we are using React's `cache` function, we can't simply nullify
     // a variable. Instead, Next.js's revalidation is the primary mechanism.
     // This function can be kept for potential future direct cache invalidation needs.
 }
+

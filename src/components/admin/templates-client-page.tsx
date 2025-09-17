@@ -7,7 +7,7 @@ import Image from "next/image";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { updateSettings, deleteTemplate, getTemplates } from "@/app/actions";
+import { updateSettings, deleteTemplate, getTemplates, getSettings } from "@/app/actions";
 import type { SiteSettings, Template } from "@/lib/data";
 import { CheckCircle, Code, PlusCircle, Trash2, Loader } from "lucide-react";
 import {
@@ -20,7 +20,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { getSettings } from "@/lib/settings";
 
 
 function ActivateButton() {

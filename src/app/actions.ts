@@ -6,9 +6,45 @@ import path from "path";
 import { redirect } from 'next/navigation';
 import { User, users, setUsers, posts, setPosts, Post, Menu, Template } from "@/lib/data";
 import { createSession, deleteSession, getSession } from "@/lib/session";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { ImagePlaceholder } from "@/lib/placeholder-images";
-import { SiteSettings, getSettings, clearSettingsCache } from "@/lib/settings";
+import { SiteSettings, clearSettingsCache as clearLibSettingsCache } from "@/lib/data";
+import { cache } from 'react'
+
+
+// In-memory cache for settings
+let cachedSettings: SiteSettings | null = null;
+
+export const getSettings = cache(async (): Promise<SiteSettings> => {
+  if (cachedSettings) {
+    return cachedSettings;
+  }
+
+  try {
+    const filePath = path.join(process.cwd(), 'src', 'lib', 'settings.json');
+    const data = await fs.readFile(filePath, 'utf-8');
+    const settings = JSON.parse(data) as SiteSettings;
+    cachedSettings = settings;
+    return settings;
+  } catch (error) {
+    // If the file doesn't exist or is invalid, return default settings
+    console.warn("settings.json not found or invalid, using default settings.");
+    const defaultSettings: SiteSettings = {
+      siteName: "Vinee CMS",
+      tagline: "A modern, git-based CMS",
+      logo: "https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600",
+      footerText: "Built with ❤️ by the open-source community.",
+      blogTemplate: "grid"
+    };
+    return defaultSettings;
+  }
+});
+
+export async function clearSettingsCache(): Promise<void> {
+    cachedSettings = null;
+    revalidateTag('settings');
+}
+
 
 export async function signup(prevState: any, formData: FormData) {
     const email = formData.get('email') as string;
@@ -313,7 +349,7 @@ export async function updateSettings(prevState: any, formData: FormData) {
 
         await fs.writeFile(settingsPath, JSON.stringify(updatedSettings, null, 2));
         
-        clearSettingsCache();
+        await clearSettingsCache();
         revalidatePath('/', 'layout');
         revalidatePath('/ads.txt');
         revalidatePath('/robots.txt');
@@ -558,7 +594,7 @@ export async function saveMenu(prevState: any, formData: FormData) {
             }
 
             await fs.writeFile(settingsPath, JSON.stringify(settings, null, 2));
-            clearSettingsCache();
+            await clearSettingsCache();
             revalidatePath('/', 'layout');
         }
 
@@ -614,7 +650,7 @@ export async function updateMenu(prevState: any, formData: FormData) {
         if (location === 'footer') settings.footerMenuId = menuId;
 
         await fs.writeFile(settingsPath, JSON.stringify(settings, null, 2));
-        clearSettingsCache();
+        await clearSettingsCache();
 
     } catch (error) {
         console.error("Error updating menu:", error);
@@ -656,7 +692,7 @@ export async function deleteMenu(menuId: string) {
         
         if (settingsChanged) {
             await fs.writeFile(settingsPath, JSON.stringify(settings, null, 2));
-            clearSettingsCache();
+            await clearSettingsCache();
         }
 
     } catch (error) {

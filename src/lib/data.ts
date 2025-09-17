@@ -1,3 +1,4 @@
+
 import usersData from './users.json';
 import postsData from './posts.json';
 
@@ -74,6 +75,8 @@ export function setPosts(newPosts: Post[]) {
 
 export { users, posts };
 
+// This function is now in src/app/actions.ts
+export function clearSettingsCache(): void {}
 
 export const dashboardStats = [
     { title: "Total Posts", value: "28", icon: "FileText" },

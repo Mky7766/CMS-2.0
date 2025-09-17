@@ -9,8 +9,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
-import { getMenus } from "@/app/actions";
-import { getSettings } from "@/lib/settings";
+import { getMenus, getSettings } from "@/app/actions";
 
 
 export default async function SettingsPage() {

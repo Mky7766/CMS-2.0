@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import fs from 'fs/promises';
 import path from 'path';
 import { Menu } from "@/lib/data";
-import { getSettings } from "@/lib/settings";
+import { getSettings } from "@/app/actions";
 
 async function getMenus(): Promise<Menu[]> {
     const filePath = path.join(process.cwd(), 'src', 'lib', 'menus.json');

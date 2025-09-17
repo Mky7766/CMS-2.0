@@ -3,7 +3,7 @@
 import AppHeader from "@/components/admin/header";
 import AppSidebar from "@/components/admin/sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { getSettings } from "@/lib/settings";
+import { getSettings } from "@/app/actions";
 
 export default async function AdminLayout({
   children,
