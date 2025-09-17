@@ -47,6 +47,8 @@ export default function TemplatesClientPage({ settings, templates: initialTempla
   const [templates, setTemplates] = useState(initialTemplates);
   const [templateToDelete, setTemplateToDelete] = useState<Template | null>(null);
   const [isDeleting, startDeleteTransition] = useTransition();
+  const [isInfoDialogOpen, setIsInfoDialogOpen] = useState(false);
+
 
   useEffect(() => {
     if (state?.error) {
@@ -109,7 +111,7 @@ export default function TemplatesClientPage({ settings, templates: initialTempla
                 </CardHeader>
                 <CardFooter className="flex justify-between items-center">
                     <div>
-                         <Button variant="ghost" size="sm" onClick={() => alert('To edit this template, ask the AI assistant to "edit the template file"')} className="text-muted-foreground">
+                         <Button variant="ghost" size="sm" onClick={() => setIsInfoDialogOpen(true)} className="text-muted-foreground">
                             <Code className="mr-2 h-4 w-4" />
                             Edit
                         </Button>
@@ -157,6 +159,24 @@ export default function TemplatesClientPage({ settings, templates: initialTempla
             </AlertDialogContent>
         </AlertDialog>
       )}
+
+      <AlertDialog open={isInfoDialogOpen} onOpenChange={setIsInfoDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>How to Edit Templates</AlertDialogTitle>
+            <AlertDialogDescription>
+              To edit the code for a template, please ask the AI assistant. For example, you can say:
+              <br /><br />
+              <em className="text-foreground">&quot;In the Simple Grid template, make the post titles larger.&quot;</em>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setIsInfoDialogOpen(false)}>
+              Got it
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

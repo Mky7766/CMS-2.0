@@ -1,4 +1,3 @@
-
 [
   {
     "id": "grid",
@@ -11,11 +10,5 @@
     "name": "Grid with Sidebar",
     "description": "A grid layout with a right sidebar for recent posts.",
     "imageUrl": "https://picsum.photos/seed/grid-sidebar/600/400"
-  },
-  {
-    "id": "list",
-    "name": "List Layout",
-    "description": "A classic top-to-bottom list of your blog posts.",
-    "imageUrl": "https://picsum.photos/seed/list/600/400"
   }
 ]
