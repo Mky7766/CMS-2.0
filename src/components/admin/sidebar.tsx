@@ -34,11 +34,6 @@ const settingsMenuItems = [
     { href: "/admin/menus", label: "Menus", icon: MenuIcon },
 ]
 
-const appearanceMenuItems = [
-    { href: "/admin/appearance/templates", label: "Blog Templates", icon: AppWindow },
-]
-
-
 export default function AppSidebar({ siteName }: { siteName: string }) {
   const pathname = usePathname()
   
@@ -67,25 +62,6 @@ export default function AppSidebar({ siteName }: { siteName: string }) {
             </SidebarMenuItem>
           ))}
         </SidebarMenu>
-        <SidebarGroup>
-            <SidebarGroupLabel>Appearance</SidebarGroupLabel>
-            <SidebarMenu>
-                 {appearanceMenuItems.map((item) => (
-                    <SidebarMenuItem key={item.href}>
-                        <SidebarMenuButton
-                            asChild
-                            isActive={pathname.startsWith(item.href)}
-                            tooltip={{ children: item.label }}
-                        >
-                            <Link href={item.href}>
-                            <item.icon className="h-4 w-4" />
-                            <span>{item.label}</span>
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                ))}
-            </SidebarMenu>
-        </SidebarGroup>
          <SidebarGroup>
             <SidebarGroupLabel>Settings</SidebarGroupLabel>
             <SidebarMenu>
