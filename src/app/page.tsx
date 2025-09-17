@@ -33,7 +33,7 @@ export default async function Home() {
   const footerMenu = menus.find(m => m.id === settings.footerMenuId);
 
   let homePage: Page | undefined;
-  if (settings.defaultPostCategoryId) {
+  if (settings.defaultPostCategoryId && settings.defaultPostCategoryId !== 'uncategorized') {
       homePage = await getPage(settings.defaultPostCategoryId);
   }
 
