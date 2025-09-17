@@ -17,7 +17,7 @@ import {
   SidebarGroupLabel,
 } from "@/components/ui/sidebar"
 import { Icons } from "@/components/icons"
-import { LayoutDashboard, FileText, Image as ImageIcon, Settings, Users, LogOut, AppWindow, Menu as MenuIcon, Palette } from "lucide-react"
+import { LayoutDashboard, FileText, Image as ImageIcon, Settings, Users, LogOut, AppWindow, Menu as MenuIcon, Palette, File as FileIcon } from "lucide-react"
 import { Separator } from "../ui/separator"
 import { logout } from "@/app/actions"
 import { Button } from "../ui/button"
@@ -25,6 +25,7 @@ import { Button } from "../ui/button"
 const mainMenuItems = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/posts", label: "Posts", icon: FileText },
+  { href: "/admin/pages", label: "Pages", icon: FileIcon },
   { href: "/admin/media", label: "Media", icon: ImageIcon },
   { href: "/admin/users", label: "Users", icon: Users },
 ]
