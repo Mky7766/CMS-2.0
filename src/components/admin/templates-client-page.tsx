@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { updateSettings, deleteTemplate } from "@/app/actions";
 import type { SiteSettings, Template } from "@/lib/data";
-import { CheckCircle, Code, Trash2 } from "lucide-react";
+import { CheckCircle, Code, PlusCircle, Trash2 } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -48,6 +48,7 @@ export default function TemplatesClientPage({ settings, templates: initialTempla
   const [templateToDelete, setTemplateToDelete] = useState<Template | null>(null);
   const [isDeleting, startDeleteTransition] = useTransition();
   const [isInfoDialogOpen, setIsInfoDialogOpen] = useState(false);
+  const [isCreateInfoDialogOpen, setIsCreateInfoDialogOpen] = useState(false);
 
 
   useEffect(() => {
@@ -84,9 +85,15 @@ export default function TemplatesClientPage({ settings, templates: initialTempla
   return (
     <>
       <div className="space-y-8">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Blog Templates</h1>
-          <p className="text-muted-foreground">Choose a layout for your blog's homepage.</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Blog Templates</h1>
+            <p className="text-muted-foreground">Choose a layout for your blog's homepage.</p>
+          </div>
+          <Button onClick={() => setIsCreateInfoDialogOpen(true)}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Create New Template
+          </Button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {templates.map((template) => {
@@ -173,6 +180,24 @@ export default function TemplatesClientPage({ settings, templates: initialTempla
           <AlertDialogFooter>
             <AlertDialogAction onClick={() => setIsInfoDialogOpen(false)}>
               Got it
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+       <AlertDialog open={isCreateInfoDialogOpen} onOpenChange={setIsCreateInfoDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>How to Create a New Template</AlertDialogTitle>
+            <AlertDialogDescription>
+              To create a new custom template, please ask the AI assistant to do it for you. Describe the layout you want, for example:
+              <br /><br />
+              <em className="text-foreground">&quot;Create a new blog template called 'Featured Post' that shows the latest post in a large hero section and the rest in a grid below.&quot;</em>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setIsCreateInfoDialogOpen(false)}>
+              Understood
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
