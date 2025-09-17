@@ -10,6 +10,8 @@ export type SiteSettings = {
   footerMenuId?: string;
   footerText?: string;
   blogTemplate?: 'grid' | 'grid-sidebar';
+  adsTxt?: string;
+  robotsTxt?: string;
 };
 
 // In-memory cache for settings

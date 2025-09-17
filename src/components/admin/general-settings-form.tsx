@@ -30,7 +30,6 @@ function SubmitButton() {
 
 type GeneralSettingsFormProps = {
     settings: SiteSettings;
-    templates: Template[];
 }
 
 export default function GeneralSettingsForm({ settings }: GeneralSettingsFormProps) {

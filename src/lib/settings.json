@@ -5,5 +5,7 @@
   "headerMenuId": "1758020871095",
   "footerMenuId": "1758021746600",
   "footerText": "<p>\r\n  © <span id=\"footer-year\"></span>\r\n  <a href=\"https://your-site.example\" style=\"text-decoration:none; color:inherit;\">\r\n    Vinee CMS\r\n  </a>. All rights reserved.\r\n</p>\r\n\r\n<script>\r\n  document.getElementById('footer-year').textContent = new Date().getFullYear();\r\n</script>\r\n",
-  "blogTemplate": "grid"
+  "blogTemplate": "grid-sidebar",
+  "adsTxt": "",
+  "robotsTxt": ""
 }

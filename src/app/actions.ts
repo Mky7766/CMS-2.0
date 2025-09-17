@@ -307,12 +307,17 @@ export async function updateSettings(prevState: any, formData: FormData) {
             footerMenuId: formData.has('footer-menu-id') ? formData.get('footer-menu-id') as string : currentSettings.footerMenuId,
             footerText: formData.has('footer-text') ? formData.get('footer-text') as string : currentSettings.footerText,
             blogTemplate: formData.has('blog-template') ? formData.get('blog-template') as SiteSettings['blogTemplate'] : currentSettings.blogTemplate,
+            adsTxt: formData.has('ads-txt') ? formData.get('ads-txt') as string : currentSettings.adsTxt,
+            robotsTxt: formData.has('robots-txt') ? formData.get('robots-txt') as string : currentSettings.robotsTxt,
         };
 
         await fs.writeFile(settingsPath, JSON.stringify(updatedSettings, null, 2));
         
         clearSettingsCache();
         revalidatePath('/', 'layout');
+        revalidatePath('/ads.txt');
+        revalidatePath('/robots.txt');
+        revalidatePath('/sitemap.xml');
 
         return { success: "Settings updated successfully." };
 

@@ -77,12 +77,6 @@
       "description": "Neon sign",
       "imageUrl": "https://picsum.photos/seed/111/400/300",
       "imageHint": "neon sign"
-    },
-    {
-      "id": "media-12",
-      "description": "Person working on a laptop",
-      "imageUrl": "https://picsum.photos/seed/112/400/300",
-      "imageHint": "person laptop"
     }
   ]
 }
