@@ -1,10 +1,11 @@
 
 import { posts } from "@/lib/data";
 import { getSettings } from "@/lib/settings";
+import { NextRequest } from "next/server";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const settings = await getSettings();
-  const siteUrl = 'https://your-site-url.example.com'; // Replace with actual site URL from settings if available
+  const siteUrl = new URL(request.url).origin;
 
   const publishedPosts = posts.filter(p => p.status.toLowerCase() === 'published');
 
