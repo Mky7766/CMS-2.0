@@ -36,7 +36,7 @@ export default async function Home() {
         <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
           <Link href="/" className="flex items-center gap-2 font-headline text-xl font-bold">
             <Icons.logo className="h-6 w-6" />
-            {settings.siteName || "Nebula CMS"}
+            {settings.siteName || "Vinee CMS"}
           </Link>
           <div className="flex flex-1 items-center justify-end space-x-4">
             <nav className="flex items-center space-x-1">
@@ -58,7 +58,7 @@ export default async function Home() {
       <main className="flex-1">
         <div className="container mx-auto px-4 py-8 md:py-12">
             <div className="text-center mb-12">
-                <h1 className="text-4xl md:text-6xl font-bold tracking-tight">{settings.siteName || "Nebula Blog"}</h1>
+                <h1 className="text-4xl md:text-6xl font-bold tracking-tight">{settings.siteName || "Vinee Blog"}</h1>
                 <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
                     {settings.tagline || "Welcome to our blog. Here we share the latest stories and insights."}
                 </p>
@@ -102,7 +102,7 @@ export default async function Home() {
         </div>
       </main>
       <footer className="border-t bg-muted/20 py-8">
-        <div className="container">
+        <div className="container flex flex-col items-center">
           {footerMenu && footerMenu.items.length > 0 && (
             <nav className="flex justify-center gap-4 mb-4">
               {footerMenu.items.map((item, index) => (

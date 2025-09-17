@@ -94,7 +94,7 @@ export default async function PostPage({ params }: { params: { postId: string } 
         </div>
       </main>
       <footer className="border-t bg-muted/20 py-8">
-        <div className="container">
+        <div className="container flex flex-col items-center">
            {footerMenu && footerMenu.items.length > 0 && (
             <nav className="flex justify-center gap-4 mb-4">
               {footerMenu.items.map((item, index) => (
