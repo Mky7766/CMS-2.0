@@ -1,6 +1,8 @@
 
 import usersData from './users.json';
 import postsData from './posts.json';
+import pagesData from './pages.json';
+
 
 export type Post = {
   id: string;
@@ -19,6 +21,16 @@ export type Post = {
     alt: string;
   };
 };
+
+export type Page = {
+  id: string;
+  title: string;
+  content: string;
+  status: 'Published' | 'Draft';
+  createdAt: string;
+  authorId: string;
+};
+
 
 export type User = {
     id: string;
@@ -64,6 +76,8 @@ export type SiteSettings = {
 
 let posts: Post[] = postsData;
 
+let pages: Page[] = pagesData;
+
 let users: User[] = usersData;
 
 export function setUsers(newUsers: User[]) {
@@ -74,4 +88,9 @@ export function setPosts(newPosts: Post[]) {
     posts = newPosts;
 }
 
-export { users, posts };
+export function setPages(newPages: Page[]) {
+    pages = newPages;
+}
+
+
+export { users, posts, pages };

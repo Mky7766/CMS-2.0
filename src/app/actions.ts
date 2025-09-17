@@ -4,7 +4,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { redirect } from 'next/navigation';
-import { User, users, setUsers, posts, setPosts, Post, Menu, Template } from "@/lib/data";
+import { User, users, setUsers, posts, setPosts, Post, Menu, Template, Page, pages, setPages } from "@/lib/data";
 import { createSession, deleteSession, getSession } from "@/lib/session";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { ImagePlaceholder } from "@/lib/placeholder-images";
@@ -251,6 +251,121 @@ export async function deletePost(postId: string) {
     revalidatePath(`/${postId}`);
     return { success: "Post deleted successfully." };
 }
+
+export async function createPage(prevState: any, formData: FormData) {
+    const title = formData.get('title') as string;
+    const content = formData.get('content') as string;
+    const permalink = formData.get('permalink') as string;
+    const status = formData.get('status') as 'Published' | 'Draft';
+
+    const session = await getSession();
+    if (!session?.userId) {
+        return { error: "You must be logged in to create a page." };
+    }
+
+    if (pages.some(p => p.id === permalink)) {
+        return { error: `A page with the permalink "${permalink}" already exists.` };
+    }
+
+    const newPage: Page = {
+        id: permalink,
+        title,
+        content,
+        status,
+        createdAt: new Date().toISOString().split('T')[0],
+        authorId: session.userId,
+    };
+
+    const updatedPages = [...pages, newPage];
+
+    try {
+        const pagesFilePath = path.join(process.cwd(), 'src', 'lib', 'pages.json');
+        await fs.writeFile(pagesFilePath, JSON.stringify(updatedPages, null, 2));
+        setPages(updatedPages);
+    } catch (error) {
+        return { error: "Could not save the page. Please try again." };
+    }
+
+    revalidatePath(`/${permalink}`);
+    revalidatePath('/admin/pages');
+    redirect('/admin/pages');
+}
+
+export async function updatePage(prevState: any, formData: FormData) {
+    const pageId = formData.get('pageId') as string;
+    const title = formData.get('title') as string;
+    const content = formData.get('content') as string;
+    const permalink = formData.get('permalink') as string;
+    const status = formData.get('status') as 'Published' | 'Draft';
+
+    const session = await getSession();
+    if (!session?.userId) {
+        return { error: "You must be logged in to update a page." };
+    }
+
+    const pageIndex = pages.findIndex(p => p.id === pageId);
+    if (pageIndex === -1) {
+        return { error: "Page not found." };
+    }
+
+    if (permalink !== pageId && pages.some(p => p.id === permalink)) {
+        return { error: `A page with the permalink "${permalink}" already exists.` };
+    }
+
+    const updatedPage = { ...pages[pageIndex] };
+    updatedPage.id = permalink;
+    updatedPage.title = title;
+    updatedPage.content = content;
+    updatedPage.status = status;
+
+    const updatedPages = [...pages];
+    updatedPages[pageIndex] = updatedPage;
+
+    try {
+        const pagesFilePath = path.join(process.cwd(), 'src', 'lib', 'pages.json');
+        await fs.writeFile(pagesFilePath, JSON.stringify(updatedPages, null, 2));
+        setPages(updatedPages);
+    } catch (error) {
+        return { error: "Could not update the page. Please try again." };
+    }
+
+    revalidatePath(`/${pageId}`);
+    revalidatePath(`/${permalink}`);
+    revalidatePath('/admin/pages');
+    redirect('/admin/pages');
+}
+
+export async function deletePage(pageId: string) {
+    const session = await getSession();
+    if (!session?.userId) {
+        return { error: "You are not authorized to delete this page." };
+    }
+
+    const updatedPages = pages.filter(p => p.id !== pageId);
+
+    try {
+        const pagesFilePath = path.join(process.cwd(), 'src', 'lib', 'pages.json');
+        await fs.writeFile(pagesFilePath, JSON.stringify(updatedPages, null, 2));
+        setPages(updatedPages);
+    } catch (error) {
+        return { error: "Could not delete the page. Please try again." };
+    }
+
+    revalidatePath(`/admin/pages`);
+    revalidatePath(`/${pageId}`);
+    return { success: "Page deleted successfully." };
+}
+
+export async function getPages(): Promise<Page[]> {
+    const pagesPath = path.join(process.cwd(), 'src', 'lib', 'pages.json');
+    try {
+        const file = await fs.readFile(pagesPath, 'utf-8');
+        return JSON.parse(file) as Page[];
+    } catch (error) {
+        return [];
+    }
+}
+
 
 export async function uploadMedia(dataUrl: string, fileName: string) {
     const session = await getSession();
@@ -752,5 +867,3 @@ export async function deleteTemplate(templateId: string) {
         return { error: "Failed to delete template." };
     }
 }
-
-    

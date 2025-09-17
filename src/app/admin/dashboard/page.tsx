@@ -1,8 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { posts } from "@/lib/data";
-import { FileText, CheckCircle, Edit3, ArrowUpRight, User as UserIcon, ExternalLink } from "lucide-react";
+import { posts, pages } from "@/lib/data";
+import { FileText, CheckCircle, Edit3, ArrowUpRight, User as UserIcon, ExternalLink, File as PageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { users } from "@/lib/data";
@@ -14,6 +14,7 @@ const iconMap: { [key: string]: React.ElementType } = {
   CheckCircle,
   Edit3,
   UserIcon,
+  PageIcon
 };
 
 export default function DashboardPage() {
@@ -23,11 +24,12 @@ export default function DashboardPage() {
   const publishedPosts = posts.filter(p => p.status === 'Published').length;
   const draftPosts = posts.filter(p => p.status === 'Draft').length;
   const totalUsers = users.length;
+  const totalPages = pages.length;
 
   const dashboardStats = [
     { title: "Total Posts", value: totalPosts, icon: "FileText" },
     { title: "Published Posts", value: publishedPosts, icon: "CheckCircle" },
-    { title: "Draft Posts", value: draftPosts, icon: "Edit3" },
+    { title: "Total Pages", value: totalPages, icon: "PageIcon" },
     { title: "Total Users", value: totalUsers, icon: "UserIcon" },
   ];
 
