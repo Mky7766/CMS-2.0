@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -11,13 +11,8 @@ import { useToast } from "@/hooks/use-toast";
 import { updateSettings } from "@/app/actions";
 import { SiteSettings } from "@/lib/data";
 import { Textarea } from "../ui/textarea";
-
-type Template = {
-    id: string;
-    name: string;
-    description: string;
-    imageUrl: string;
-}
+import MediaLibraryModal from "./media-library-modal";
+import { UploadCloud } from "lucide-react";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -32,9 +27,11 @@ type GeneralSettingsFormProps = {
     settings: SiteSettings;
 }
 
-export default function GeneralSettingsForm({ settings }: GeneralSettingsFormProps) {
+export default function GeneralSettingsForm({ settings: initialSettings }: GeneralSettingsFormProps) {
   const [state, formAction] = useActionState(updateSettings, null);
   const { toast } = useToast();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [faviconUrl, setFaviconUrl] = useState(initialSettings.faviconUrl || "");
 
   useEffect(() => {
     if (state?.error) {
@@ -51,8 +48,14 @@ export default function GeneralSettingsForm({ settings }: GeneralSettingsFormPro
       });
     }
   }, [state, toast]);
+
+  const handleSelectImage = (imageUrl: string) => {
+    setFaviconUrl(imageUrl);
+    setIsModalOpen(false);
+  }
   
   return (
+    <>
     <form action={formAction}>
         <Card>
             <CardHeader>
@@ -62,22 +65,28 @@ export default function GeneralSettingsForm({ settings }: GeneralSettingsFormPro
             <CardContent className="space-y-4">
             <div className="space-y-2">
                 <Label htmlFor="site-name">Site Name</Label>
-                <Input id="site-name" name="site-name" defaultValue={settings.siteName} />
+                <Input id="site-name" name="site-name" defaultValue={initialSettings.siteName} />
             </div>
             <div className="space-y-2">
                 <Label htmlFor="tagline">Tagline</Label>
-                <Input id="tagline" name="tagline" defaultValue={settings.tagline} />
+                <Input id="tagline" name="tagline" defaultValue={initialSettings.tagline} />
             </div>
             <div className="space-y-2">
                 <Label htmlFor="favicon-url">Favicon URL</Label>
-                <Input id="favicon-url" name="favicon-url" defaultValue={settings.faviconUrl} placeholder="https://your-site.com/favicon.ico" />
+                <div className="flex gap-2">
+                    <Input id="favicon-url" name="favicon-url" value={faviconUrl} onChange={(e) => setFaviconUrl(e.target.value)} placeholder="https://your-site.com/favicon.ico" />
+                    <Button type="button" variant="outline" onClick={() => setIsModalOpen(true)}>
+                        <UploadCloud className="mr-2 h-4 w-4" />
+                        Upload
+                    </Button>
+                </div>
             </div>
              <div className="space-y-2">
                 <Label htmlFor="footer-text">Footer Text</Label>
                 <Textarea 
                     id="footer-text" 
                     name="footer-text" 
-                    defaultValue={settings.footerText} 
+                    defaultValue={initialSettings.footerText} 
                     rows={4}
                     placeholder="Enter footer content. You can use HTML."
                 />
@@ -88,5 +97,11 @@ export default function GeneralSettingsForm({ settings }: GeneralSettingsFormPro
             </CardFooter>
         </Card>
     </form>
+    <MediaLibraryModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSelectImage={handleSelectImage}
+    />
+    </>
   );
 }
