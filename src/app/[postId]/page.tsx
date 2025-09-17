@@ -1,5 +1,5 @@
 
-import { posts, Menu, pages, Page } from "@/lib/data";
+import { posts, Menu, pages, Page, SiteSettings } from "@/lib/data";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -10,6 +10,24 @@ import { getSettings } from "@/app/actions";
 import HtmlRenderer from "@/components/html-renderer";
 import fs from 'fs/promises';
 import path from 'path';
+import { Metadata } from 'next';
+
+export async function generateMetadata({ params }: { params: { postId: string } }): Promise<Metadata> {
+  const post = posts.find(p => p.id === params.postId);
+  const page = pages.find(p => p.id === params.postId);
+  const settings = await getSettings();
+
+  const title = page?.title || post?.title || settings.siteName;
+  
+  return {
+    title: `${title} | ${settings.siteName}`,
+    description: post?.content.substring(0, 150) || settings.tagline,
+    icons: {
+      icon: settings.faviconUrl || '/favicon.ico',
+    },
+  };
+}
+
 
 async function getMenus(): Promise<Menu[]> {
     const filePath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
