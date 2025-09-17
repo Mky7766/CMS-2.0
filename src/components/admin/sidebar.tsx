@@ -13,23 +13,31 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarGroup,
+  SidebarGroupLabel,
 } from "@/components/ui/sidebar"
 import { Icons } from "@/components/icons"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { LayoutDashboard, FileText, Image as ImageIcon, Settings, Users, LogOut, Sun, Moon, Palette, Menu as MenuIcon } from "lucide-react"
+import { LayoutDashboard, FileText, Image as ImageIcon, Settings, Users, LogOut, AppWindow, Menu as MenuIcon, Palette } from "lucide-react"
 import { Separator } from "../ui/separator"
 import { logout } from "@/app/actions"
 import { Button } from "../ui/button"
 
-const menuItems = [
+const mainMenuItems = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/posts", label: "Posts", icon: FileText },
   { href: "/admin/media", label: "Media", icon: ImageIcon },
-  { href: "/admin/menus", label: "Menus", icon: MenuIcon },
-  { href: "/admin/theme", label: "Theme", icon: Palette },
-  { href: "/admin/settings", label: "Settings", icon: Settings },
   { href: "/admin/users", label: "Users", icon: Users },
 ]
+
+const settingsMenuItems = [
+    { href: "/admin/settings", label: "General", icon: Settings },
+    { href: "/admin/menus", label: "Menus", icon: MenuIcon },
+]
+
+const appearanceMenuItems = [
+    { href: "/admin/appearance/templates", label: "Blog Templates", icon: AppWindow },
+]
+
 
 export default function AppSidebar({ siteName }: { siteName: string }) {
   const pathname = usePathname()
@@ -44,7 +52,7 @@ export default function AppSidebar({ siteName }: { siteName: string }) {
       </SidebarHeader>
       <SidebarContent className="flex-1">
         <SidebarMenu>
-          {menuItems.map((item) => (
+          {mainMenuItems.map((item) => (
             <SidebarMenuItem key={item.href}>
               <SidebarMenuButton
                 asChild
@@ -59,6 +67,44 @@ export default function AppSidebar({ siteName }: { siteName: string }) {
             </SidebarMenuItem>
           ))}
         </SidebarMenu>
+        <SidebarGroup>
+            <SidebarGroupLabel>Appearance</SidebarGroupLabel>
+            <SidebarMenu>
+                 {appearanceMenuItems.map((item) => (
+                    <SidebarMenuItem key={item.href}>
+                        <SidebarMenuButton
+                            asChild
+                            isActive={pathname.startsWith(item.href)}
+                            tooltip={{ children: item.label }}
+                        >
+                            <Link href={item.href}>
+                            <item.icon className="h-4 w-4" />
+                            <span>{item.label}</span>
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                ))}
+            </SidebarMenu>
+        </SidebarGroup>
+         <SidebarGroup>
+            <SidebarGroupLabel>Settings</SidebarGroupLabel>
+            <SidebarMenu>
+                 {settingsMenuItems.map((item) => (
+                    <SidebarMenuItem key={item.href}>
+                        <SidebarMenuButton
+                            asChild
+                            isActive={pathname.startsWith(item.href)}
+                            tooltip={{ children: item.label }}
+                        >
+                            <Link href={item.href}>
+                            <item.icon className="h-4 w-4" />
+                            <span>{item.label}</span>
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                ))}
+            </SidebarMenu>
+        </SidebarGroup>
       </SidebarContent>
       <Separator className="my-2 bg-sidebar-border" />
       <SidebarFooter>

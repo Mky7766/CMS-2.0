@@ -25,6 +25,20 @@ async function getMenus(): Promise<Menu[]> {
 export default async function SettingsPage() {
   const settings = await getSettings();
   const menus = await getMenus();
+  const templates = [
+        {
+            name: "Simple Grid",
+            id: "grid",
+            description: "A clean, simple grid layout for your blog posts.",
+            imageUrl: "/images/template-grid.png"
+        },
+        {
+            name: "Grid with Sidebar",
+            id: "grid-sidebar",
+            description: "A grid layout with a right sidebar for widgets.",
+            imageUrl: "/images/template-grid-sidebar.png"
+        }
+    ]
 
   return (
     <div className="space-y-8">
@@ -39,7 +53,7 @@ export default async function SettingsPage() {
           <TabsTrigger value="users">Users & Roles</TabsTrigger>
         </TabsList>
         <TabsContent value="general" className="mt-4">
-            <GeneralSettingsForm settings={settings} />
+            <GeneralSettingsForm settings={settings} templates={templates} />
         </TabsContent>
         <TabsContent value="menus" className="mt-4">
           <MenuSettingsForm settings={settings} menus={menus} />
@@ -52,7 +66,9 @@ export default async function SettingsPage() {
             </CardHeader>
             <CardContent>
               <p>User management interface coming soon.</p>
-              <Button className="mt-4">Invite User</Button>
+              <Button asChild>
+                <Link href="/admin/users">Manage Users</Link>
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>
@@ -60,3 +76,5 @@ export default async function SettingsPage() {
     </div>
   );
 }
+
+    

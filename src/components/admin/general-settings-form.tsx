@@ -12,6 +12,13 @@ import { updateSettings } from "@/app/actions";
 import { SiteSettings } from "@/lib/settings";
 import { Textarea } from "../ui/textarea";
 
+type Template = {
+    id: string;
+    name: string;
+    description: string;
+    imageUrl: string;
+}
+
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
@@ -23,6 +30,7 @@ function SubmitButton() {
 
 type GeneralSettingsFormProps = {
     settings: SiteSettings;
+    templates: Template[];
 }
 
 export default function GeneralSettingsForm({ settings }: GeneralSettingsFormProps) {
@@ -72,7 +80,7 @@ export default function GeneralSettingsForm({ settings }: GeneralSettingsFormPro
                 />
             </div>
             </CardContent>
-            <CardFooter>
+             <CardFooter>
                 <SubmitButton />
             </CardFooter>
         </Card>
