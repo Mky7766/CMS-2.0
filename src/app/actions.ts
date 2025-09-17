@@ -4,7 +4,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { redirect } from 'next/navigation';
-import { User, users, setUsers, posts, setPosts, Post, Menu, Template, Page, pages, setPages } from "@/lib/data";
+import { User, users, setUsers, posts, setPosts, Post, Menu, Template, Page, pages, setPages, Category, categories, setCategories } from "@/lib/data";
 import { createSession, deleteSession, getSession } from "@/lib/session";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { ImagePlaceholder } from "@/lib/placeholder-images";
@@ -115,6 +115,7 @@ export async function savePost(prevState: any, formData: FormData) {
     const status = formData.get('status') as 'Published' | 'Draft' | 'Scheduled';
     const featuredImageUrl = formData.get('featured-image-url') as string;
     const tags = (formData.get('tags-hidden') as string).split(',').filter(t => t.trim() !== '');
+    const categoryId = formData.get('category-id') as string;
 
     const session = await getSession();
     if (!session?.userId) {
@@ -143,6 +144,7 @@ export async function savePost(prevState: any, formData: FormData) {
             avatarUrl: author.avatarUrl,
         },
         authorId: author.id,
+        categoryId,
         tags,
     };
     
@@ -178,6 +180,7 @@ export async function updatePost(prevState: any, formData: FormData) {
     const status = formData.get('status') as 'Published' | 'Draft' | 'Scheduled';
     const featuredImageUrl = formData.get('featured-image-url') as string;
     const tags = (formData.get('tags-hidden') as string).split(',').filter(t => t.trim() !== '');
+    const categoryId = formData.get('category-id') as string;
 
     const session = await getSession();
     if (!session?.userId) {
@@ -200,6 +203,7 @@ export async function updatePost(prevState: any, formData: FormData) {
     updatedPost.content = content;
     updatedPost.status = status;
     updatedPost.tags = tags;
+    updatedPost.categoryId = categoryId;
     
     if (featuredImageUrl) {
         updatedPost.featuredImage = {
@@ -461,6 +465,8 @@ export async function updateSettings(prevState: any, formData: FormData) {
             blogTemplate: formData.has('blog-template') ? formData.get('blog-template') as string : currentSettings.blogTemplate,
             adsTxt: formData.has('ads-txt') ? formData.get('ads-txt') as string : currentSettings.adsTxt,
             robotsTxt: formData.has('robots-txt') ? formData.get('robots-txt') as string : currentSettings.robotsTxt,
+            defaultPostCategoryId: formData.has('default-category-id') ? formData.get('default-category-id') as string : currentSettings.defaultPostCategoryId,
+            defaultPostFormat: formData.has('default-post-format') ? formData.get('default-post-format') as string : currentSettings.defaultPostFormat,
         };
 
         await fs.writeFile(settingsPath, JSON.stringify(updatedSettings, null, 2));
@@ -866,4 +872,99 @@ export async function deleteTemplate(templateId: string) {
         console.error("Error deleting template:", error);
         return { error: "Failed to delete template." };
     }
+}
+
+
+export async function getCategories(): Promise<Category[]> {
+    const filePath = path.join(process.cwd(), 'src', 'lib', 'categories.json');
+    try {
+        const data = await fs.readFile(filePath, 'utf-8');
+        return JSON.parse(data) as Category[];
+    } catch (error) {
+        return [];
+    }
+}
+
+export async function createCategory(prevState: any, formData: FormData) {
+    const session = await getSession();
+    if (!session?.userId) return { error: "Unauthorized." };
+
+    const name = formData.get('name') as string;
+    const slug = formData.get('slug') as string;
+
+    if (!name || !slug) return { error: "Name and slug are required." };
+
+    const currentCategories = await getCategories();
+    if (currentCategories.some(c => c.slug === slug)) {
+        return { error: `A category with the slug "${slug}" already exists.` };
+    }
+    
+    const newCategory: Category = { id: `cat-${Date.now()}`, name, slug };
+    const updatedCategories = [...currentCategories, newCategory];
+
+    try {
+        const filePath = path.join(process.cwd(), 'src', 'lib', 'categories.json');
+        await fs.writeFile(filePath, JSON.stringify(updatedCategories, null, 2));
+        setCategories(updatedCategories);
+    } catch (error) {
+        return { error: "Failed to create category." };
+    }
+    
+    revalidatePath('/admin/categories');
+    return { success: "Category created successfully." };
+}
+
+export async function updateCategory(prevState: any, formData: FormData) {
+    const session = await getSession();
+    if (!session?.userId) return { error: "Unauthorized." };
+
+    const categoryId = formData.get('categoryId') as string;
+    const name = formData.get('name') as string;
+    const slug = formData.get('slug') as string;
+    
+    const currentCategories = await getCategories();
+    const categoryIndex = currentCategories.findIndex(c => c.id === categoryId);
+
+    if (categoryIndex === -1) return { error: "Category not found." };
+    if (currentCategories.some(c => c.slug === slug && c.id !== categoryId)) {
+        return { error: `A category with the slug "${slug}" already exists.` };
+    }
+
+    const updatedCategories = [...currentCategories];
+    updatedCategories[categoryIndex] = { ...updatedCategories[categoryIndex], name, slug };
+
+    try {
+        const filePath = path.join(process.cwd(), 'src', 'lib', 'categories.json');
+        await fs.writeFile(filePath, JSON.stringify(updatedCategories, null, 2));
+        setCategories(updatedCategories);
+    } catch (error) {
+        return { error: "Failed to update category." };
+    }
+
+    revalidatePath('/admin/categories');
+    return { success: "Category updated successfully." };
+}
+
+export async function deleteCategory(categoryId: string) {
+    const session = await getSession();
+    if (!session?.userId) return { error: "Unauthorized." };
+    
+    // Prevent deleting the 'uncategorized' category
+    if (categoryId === 'uncategorized') {
+        return { error: "The default 'Uncategorized' category cannot be deleted." };
+    }
+
+    const currentCategories = await getCategories();
+    const updatedCategories = currentCategories.filter(c => c.id !== categoryId);
+
+    try {
+        const filePath = path.join(process.cwd(), 'src', 'lib', 'categories.json');
+        await fs.writeFile(filePath, JSON.stringify(updatedCategories, null, 2));
+        setCategories(updatedCategories);
+    } catch (error) {
+        return { error: "Failed to delete category." };
+    }
+
+    revalidatePath('/admin/categories');
+    return { success: "Category deleted successfully." };
 }

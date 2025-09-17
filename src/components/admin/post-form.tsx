@@ -12,9 +12,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import RichTextEditor from "@/components/ui/rich-text-editor";
 import { Calendar, Save, UploadCloud, X, Loader } from "lucide-react";
 import { Badge } from "../ui/badge";
-import { savePost, updatePost, uploadMedia } from "@/app/actions";
+import { savePost, updatePost, uploadMedia, getCategories, getSettings } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
-import type { Post } from "@/lib/data";
+import type { Post, Category } from "@/lib/data";
 
 function SubmitButton({ isUpdate }: { isUpdate?: boolean }) {
   const { pending } = useFormStatus();
@@ -50,12 +50,30 @@ export default function PostForm({ post }: PostFormProps) {
   const [isUploading, startUploading] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [settings, setSettings] = useState<any>(null);
+  const [selectedCategory, setSelectedCategory] = useState(post?.categoryId || "");
 
-  // Determine the action and prepare the initial state
   const action = post ? updatePost : savePost;
   const [state, formAction] = useActionState(action, null);
 
   const { toast } = useToast();
+
+  useEffect(() => {
+    async function loadData() {
+        const [cats, siteSettings] = await Promise.all([
+            getCategories(),
+            getSettings()
+        ]);
+        setCategories(cats);
+        setSettings(siteSettings);
+        if (!post) {
+            setSelectedCategory(siteSettings.defaultPostCategoryId || (cats[0] ? cats[0].id : ""));
+        }
+    }
+    loadData();
+  }, [post]);
+
 
   useEffect(() => {
     if (state?.error) {
@@ -70,7 +88,6 @@ export default function PostForm({ post }: PostFormProps) {
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
     setTitle(newTitle);
-    // Only auto-update permalink for new posts or if it was already a slugified version of the old title
     if (!post || (post && post.id === slugify(post.title))) {
         setPermalink(slugify(newTitle));
     }
@@ -115,7 +132,6 @@ export default function PostForm({ post }: PostFormProps) {
         toast({ title: "Error", description: "Failed to read file.", variant: "destructive" });
     };
 
-    // Reset file input
     if(fileInputRef.current) {
         fileInputRef.current.value = "";
     }
@@ -127,7 +143,6 @@ export default function PostForm({ post }: PostFormProps) {
 
   return (
     <form action={formAction} className="grid gap-6 lg:grid-cols-3">
-      {/* Hidden input to pass the original post ID for updates */}
       {post && <input type="hidden" name="postId" value={post.id} />}
       <input type="hidden" name="featured-image-url" value={featuredImageUrl} />
        <input type="hidden" name="content" value={content} />
@@ -227,6 +242,19 @@ export default function PostForm({ post }: PostFormProps) {
             <CardTitle>Organization</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+             <div>
+                <Label htmlFor="category-id">Category</Label>
+                 <Select name="category-id" value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger id="category-id">
+                        <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {categories.map((cat) => (
+                            <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+             </div>
             <div>
                 <Label htmlFor="tags">Tags</Label>
                 <Input 
@@ -304,5 +332,3 @@ export default function PostForm({ post }: PostFormProps) {
     </form>
   );
 }
-
-    

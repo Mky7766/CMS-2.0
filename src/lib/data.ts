@@ -2,6 +2,7 @@
 import usersData from './users.json';
 import postsData from './posts.json';
 import pagesData from './pages.json';
+import categoriesData from './categories.json';
 
 
 export type Post = {
@@ -15,6 +16,7 @@ export type Post = {
     avatarUrl: string;
   };
   authorId: string;
+  categoryId?: string;
   tags?: string[];
   featuredImage?: {
     url: string;
@@ -60,6 +62,13 @@ export type Template = {
     imageUrl: string;
 }
 
+export type Category = {
+    id: string;
+    name: string;
+    slug: string;
+    description?: string;
+}
+
 export type SiteSettings = {
   siteName: string;
   tagline: string;
@@ -71,6 +80,8 @@ export type SiteSettings = {
   blogTemplate?: string;
   adsTxt?: string;
   robotsTxt?: string;
+  defaultPostCategoryId?: string;
+  defaultPostFormat?: string;
 };
 
 
@@ -79,6 +90,8 @@ let posts: Post[] = postsData;
 let pages: Page[] = pagesData;
 
 let users: User[] = usersData;
+
+let categories: Category[] = categoriesData;
 
 export function setUsers(newUsers: User[]) {
   users = newUsers;
@@ -92,5 +105,9 @@ export function setPages(newPages: Page[]) {
     pages = newPages;
 }
 
+export function setCategories(newCategories: Category[]) {
+    categories = newCategories;
+}
 
-export { users, posts, pages };
+
+export { users, posts, pages, categories };
