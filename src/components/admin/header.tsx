@@ -17,6 +17,7 @@ import { Search, Bell, User } from "lucide-react"
 import React, { useEffect, useState } from "react"
 import { logout } from "@/app/actions"
 import Link from "next/link"
+import { ThemeToggle } from "../theme-toggle"
 
 // This is a simplified client-side session fetcher.
 // In a real app, you'd likely use a context provider or a library like next-auth.
@@ -67,6 +68,7 @@ export default function AppHeader() {
         </form>
       </div>
       <div className="flex items-center gap-4">
+        <ThemeToggle />
         <Button variant="ghost" size="icon" className="rounded-full">
             <Bell className="h-5 w-5" />
             <span className="sr-only">Toggle notifications</span>

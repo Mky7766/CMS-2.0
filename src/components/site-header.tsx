@@ -11,6 +11,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import type { SiteSettings, Menu } from "@/lib/data";
+import { ThemeToggle } from "./theme-toggle";
 
 
 type SiteHeaderProps = {
@@ -76,7 +77,7 @@ export default function SiteHeader({ settings, headerMenu }: SiteHeaderProps) {
           )}
         </nav>
 
-        {/* Search Bar */}
+        {/* Search Bar & Theme Toggle */}
         <div className="flex flex-1 items-center justify-end">
             <form 
               onSubmit={handleSearchSubmit} 
@@ -102,6 +103,8 @@ export default function SiteHeader({ settings, headerMenu }: SiteHeaderProps) {
               <Search className="h-5 w-5" />
               <span className="sr-only">Search</span>
             </Button>
+
+            <ThemeToggle />
 
           {/* Mobile Menu */}
           <div className="flex items-center md:hidden">

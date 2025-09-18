@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
 import { getSettings } from './actions';
 import HtmlRenderer from '@/components/html-renderer';
+import { ThemeProvider } from '@/components/theme-provider';
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
@@ -46,9 +47,16 @@ export default async function RootLayout({
         className={cn("font-body antialiased min-h-screen bg-background")}
         style={customStyles}
       >
-        {children}
-        <Toaster />
-        {settings.customBodyCode && <HtmlRenderer htmlContent={settings.customBodyCode} />}
+        <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+        >
+          {children}
+          <Toaster />
+          {settings.customBodyCode && <HtmlRenderer htmlContent={settings.customBodyCode} />}
+        </ThemeProvider>
       </body>
     </html>
   );
