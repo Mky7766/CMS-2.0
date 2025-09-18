@@ -1,4 +1,3 @@
-
 import usersData from './users.json';
 import postsData from './posts.json';
 import pagesData from './pages.json';
