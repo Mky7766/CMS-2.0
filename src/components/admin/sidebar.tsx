@@ -17,7 +17,7 @@ import {
   SidebarGroupLabel,
 } from "@/components/ui/sidebar"
 import { Icons } from "@/components/icons"
-import { LayoutDashboard, FileText, Image as ImageIcon, Settings, Users, LogOut, AppWindow, Menu as MenuIcon, Palette, File as FileIcon } from "lucide-react"
+import { LayoutDashboard, FileText, Image as ImageIcon, Settings, Users, LogOut, AppWindow, Menu as MenuIcon, Palette, File as FileIcon, Folder } from "lucide-react"
 import { Separator } from "../ui/separator"
 import { logout } from "@/app/actions"
 import { Button } from "../ui/button"
@@ -28,6 +28,10 @@ const mainMenuItems = [
   { href: "/admin/pages", label: "Pages", icon: FileIcon },
   { href: "/admin/media", label: "Media", icon: ImageIcon },
   { href: "/admin/users", label: "Users", icon: Users },
+]
+
+const organizationMenuItems = [
+    { href: "/admin/categories", label: "Categories", icon: Folder },
 ]
 
 const appearanceMenuItems = [
@@ -68,6 +72,25 @@ export default function AppSidebar({ siteName }: { siteName: string }) {
             </SidebarMenuItem>
           ))}
         </SidebarMenu>
+        <SidebarGroup>
+            <SidebarGroupLabel>Organization</SidebarGroupLabel>
+            <SidebarMenu>
+                 {organizationMenuItems.map((item) => (
+                    <SidebarMenuItem key={item.href}>
+                        <SidebarMenuButton
+                            asChild
+                            isActive={pathname.startsWith(item.href)}
+                            tooltip={{ children: item.label }}
+                        >
+                            <Link href={item.href}>
+                            <item.icon className="h-4 w-4" />
+                            <span>{item.label}</span>
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                ))}
+            </SidebarMenu>
+        </SidebarGroup>
         <SidebarGroup>
             <SidebarGroupLabel>Appearance</SidebarGroupLabel>
             <SidebarMenu>

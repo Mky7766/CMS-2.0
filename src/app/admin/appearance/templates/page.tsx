@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import TemplatesClientPage from "@/components/admin/templates-client-page";
