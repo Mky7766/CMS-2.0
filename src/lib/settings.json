@@ -1,4 +1,3 @@
-
 {
   "siteName": "Vinee CMS",
   "tagline": "A modern, git-based CMS ",
@@ -15,7 +14,7 @@
   "customHeadCode": "",
   "customBodyCode": "",
   "theme": {
-    "primary": "172 56% 38%",
+    "primary": "290 53% 26%",
     "accent": "207 24% 63%",
     "background": "240 14% 97%"
   }

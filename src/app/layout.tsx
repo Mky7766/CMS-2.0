@@ -9,7 +9,10 @@ import HtmlRenderer from '@/components/html-renderer';
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
   return {
-    title: settings.siteName || 'Vinee CMS',
+    title: {
+      default: settings.siteName || 'Vinee CMS',
+      template: `%s | ${settings.siteName || 'Vinee CMS'}`,
+    },
     description: settings.tagline || 'A full-featured open-source CMS that runs on static site hosting.',
     icons: {
       icon: settings.faviconUrl || '/favicon.ico',
@@ -24,6 +27,13 @@ export default async function RootLayout({
 }>) {
   const settings = await getSettings();
   const theme = settings.theme || {};
+  
+  const customStyles = {
+    '--background': theme.background,
+    '--primary': theme.primary,
+    '--accent': theme.accent,
+  } as React.CSSProperties;
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -34,13 +44,7 @@ export default async function RootLayout({
       </head>
       <body 
         className={cn("font-body antialiased min-h-screen bg-background")}
-        style={
-          {
-            '--background': theme.background || '240 14% 97%',
-            '--primary': theme.primary || '172 56% 38%',
-            '--accent': theme.accent || '207 24% 63%',
-          } as React.CSSProperties
-        }
+        style={customStyles}
       >
         {children}
         <Toaster />
