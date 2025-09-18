@@ -51,7 +51,6 @@ export default function TemplatesClientPage() {
 
   const [templateToDelete, setTemplateToDelete] = useState<Template | null>(null);
   const [isDeleting, startDeleteTransition] = useTransition();
-  const [isInfoDialogOpen, setIsInfoDialogOpen] = useState(false);
   const [isCreateInfoDialogOpen, setIsCreateInfoDialogOpen] = useState(false);
 
   useEffect(() => {
@@ -168,10 +167,6 @@ export default function TemplatesClientPage() {
                 </CardHeader>
                 <CardFooter className="flex justify-between items-center">
                     <div>
-                         <Button variant="ghost" size="sm" onClick={() => setIsInfoDialogOpen(true)} className="text-muted-foreground">
-                            <Code className="mr-2 h-4 w-4" />
-                            Edit
-                        </Button>
                          <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600" onClick={() => setTemplateToDelete(template)}>
                             <Trash2 className="mr-2 h-4 w-4" />
                             Delete
@@ -216,24 +211,6 @@ export default function TemplatesClientPage() {
             </AlertDialogContent>
         </AlertDialog>
       )}
-
-      <AlertDialog open={isInfoDialogOpen} onOpenChange={setIsInfoDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>How to Edit Templates</AlertDialogTitle>
-            <AlertDialogDescription>
-              To edit the code for a template, please ask the AI assistant. For example, you can say:
-              <br /><br />
-              <em className="text-foreground">&quot;In the Simple Grid template, make the post titles larger.&quot;</em>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setIsInfoDialogOpen(false)}>
-              Got it
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
 
        <AlertDialog open={isCreateInfoDialogOpen} onOpenChange={setIsCreateInfoDialogOpen}>
         <AlertDialogContent>
