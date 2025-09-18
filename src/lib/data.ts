@@ -82,6 +82,8 @@ export type SiteSettings = {
   robotsTxt?: string;
   defaultPostCategoryId?: string;
   defaultPostFormat?: string;
+  customHeadCode?: string;
+  customBodyCode?: string;
 };
 
 

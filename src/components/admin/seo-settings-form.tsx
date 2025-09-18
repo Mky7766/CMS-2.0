@@ -48,8 +48,8 @@ export default function SEOSettingsForm({ settings }: SEOSettingsFormProps) {
     <form action={formAction}>
         <Card>
             <CardHeader>
-                <CardTitle>SEO Settings</CardTitle>
-                <CardDescription>Manage settings for search engine optimization.</CardDescription>
+                <CardTitle>SEO & Code</CardTitle>
+                <CardDescription>Manage settings for SEO and custom code injection.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
                 <div className="space-y-2">
@@ -77,6 +77,34 @@ export default function SEOSettingsForm({ settings }: SEOSettingsFormProps) {
                         defaultValue={settings.adsTxt} 
                         rows={8}
                         placeholder="google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0"
+                        className="font-mono text-sm"
+                    />
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="custom-head-code">Custom Code in &lt;head&gt;</Label>
+                     <p className="text-sm text-muted-foreground">
+                        Add custom scripts, meta tags, or styles to the &lt;head&gt; section of your site.
+                    </p>
+                    <Textarea 
+                        id="custom-head-code" 
+                        name="custom-head-code" 
+                        defaultValue={settings.customHeadCode} 
+                        rows={8}
+                        placeholder="<style>...</style> or <script>...</script>"
+                        className="font-mono text-sm"
+                    />
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="custom-body-code">Custom Code before &lt;/body&gt;</Label>
+                     <p className="text-sm text-muted-foreground">
+                        Add scripts, like analytics, just before the closing &lt;/body&gt; tag.
+                    </p>
+                    <Textarea 
+                        id="custom-body-code" 
+                        name="custom-body-code" 
+                        defaultValue={settings.customBodyCode} 
+                        rows={8}
+                        placeholder="<script>...</script>"
                         className="font-mono text-sm"
                     />
                 </div>

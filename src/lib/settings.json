@@ -1,3 +1,4 @@
+
 {
   "siteName": "Vinee CMS",
   "tagline": "A modern, git-based CMS ",
@@ -10,5 +11,7 @@
   "robotsTxt": "",
   "faviconUrl": "https://picsum.photos/seed/109/400/300",
   "defaultPostCategoryId": "uncategorized",
-  "defaultPostFormat": "standard"
+  "defaultPostFormat": "standard",
+  "customHeadCode": "",
+  "customBodyCode": ""
 }

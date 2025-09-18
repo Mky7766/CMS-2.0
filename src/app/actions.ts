@@ -472,6 +472,8 @@ export async function updateSettings(prevState: any, formData: FormData) {
             robotsTxt: formData.has('robots-txt') ? formData.get('robots-txt') as string : currentSettings.robotsTxt,
             defaultPostCategoryId: formData.has('default-category-id') ? formData.get('default-category-id') as string : currentSettings.defaultPostCategoryId,
             defaultPostFormat: formData.has('default-post-format') ? formData.get('default-post-format') as string : currentSettings.defaultPostFormat,
+            customHeadCode: formData.has('custom-head-code') ? formData.get('custom-head-code') as string : currentSettings.customHeadCode,
+            customBodyCode: formData.has('custom-body-code') ? formData.get('custom-body-code') as string : currentSettings.customBodyCode,
         };
 
         await fs.writeFile(settingsPath, JSON.stringify(updatedSettings, null, 2));
