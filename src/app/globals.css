@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -38,6 +39,7 @@
     --sidebar-border: 240 5% 25%;
     --sidebar-ring: 172 56% 45%;
   }
+
   .dark {
     --background: 240 5% 10%;
     --foreground: 0 0% 98%;

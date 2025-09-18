@@ -13,5 +13,10 @@
   "defaultPostCategoryId": "uncategorized",
   "defaultPostFormat": "standard",
   "customHeadCode": "",
-  "customBodyCode": ""
+  "customBodyCode": "",
+  "theme": {
+    "primary": "172 56% 38%",
+    "accent": "207 24% 63%",
+    "background": "240 14% 97%"
+  }
 }

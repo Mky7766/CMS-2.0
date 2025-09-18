@@ -457,8 +457,6 @@ export async function updateSettings(prevState: any, formData: FormData) {
     try {
         const currentSettings = await getSettings();
 
-        // This approach allows us to update settings from different forms
-        // without wiping out other settings.
         const updatedSettings: SiteSettings = {
             ...currentSettings,
             siteName: formData.has('site-name') ? formData.get('site-name') as string : currentSettings.siteName,
@@ -474,6 +472,12 @@ export async function updateSettings(prevState: any, formData: FormData) {
             defaultPostFormat: formData.has('default-post-format') ? formData.get('default-post-format') as string : currentSettings.defaultPostFormat,
             customHeadCode: formData.has('custom-head-code') ? formData.get('custom-head-code') as string : currentSettings.customHeadCode,
             customBodyCode: formData.has('custom-body-code') ? formData.get('custom-body-code') as string : currentSettings.customBodyCode,
+            theme: {
+                ...currentSettings.theme,
+                primary: formData.has('theme-primary') ? formData.get('theme-primary') as string : currentSettings.theme?.primary,
+                accent: formData.has('theme-accent') ? formData.get('theme-accent') as string : currentSettings.theme?.accent,
+                background: formData.has('theme-background') ? formData.get('theme-background') as string : currentSettings.theme?.background,
+            }
         };
 
         await fs.writeFile(settingsPath, JSON.stringify(updatedSettings, null, 2));
@@ -484,6 +488,7 @@ export async function updateSettings(prevState: any, formData: FormData) {
         revalidatePath('/robots.txt');
         revalidatePath('/sitemap.xml');
         revalidatePath('/admin/appearance/templates');
+        revalidatePath('/admin/appearance/customize');
 
 
         return { success: "Settings updated successfully." };

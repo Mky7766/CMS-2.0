@@ -32,6 +32,7 @@ const mainMenuItems = [
 
 const appearanceMenuItems = [
     { href: "/admin/appearance/templates", label: "Blog Templates", icon: AppWindow },
+    { href: "/admin/appearance/customize", label: "Customize", icon: Palette },
 ]
 
 const settingsMenuItems = [

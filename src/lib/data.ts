@@ -84,6 +84,11 @@ export type SiteSettings = {
   defaultPostFormat?: string;
   customHeadCode?: string;
   customBodyCode?: string;
+  theme?: {
+    primary?: string;
+    accent?: string;
+    background?: string;
+  };
 };
 
 
