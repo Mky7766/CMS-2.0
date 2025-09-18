@@ -7,7 +7,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Menu as MenuIcon, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import type { SiteSettings, Menu } from "@/lib/data";
@@ -113,6 +113,9 @@ export default function SiteHeader({ settings, headerMenu }: SiteHeaderProps) {
                 </Button>
               </SheetTrigger>
               <SheetContent side="left">
+                <SheetHeader>
+                  <SheetTitle className="sr-only">Menu</SheetTitle>
+                </SheetHeader>
                 <div className="p-4">
                   <Link href="/" className="flex items-center gap-2 font-headline text-xl font-bold mb-4" onClick={() => setIsMobileMenuOpen(false)}>
                     <Icons.logo className="h-6 w-6" />
@@ -131,7 +134,7 @@ export default function SiteHeader({ settings, headerMenu }: SiteHeaderProps) {
                         </Link>
                       ))
                     ) : (
-                      <Link href="/admin" className="rounded-md px-3 py-2 text-sm font-medium hover:bg-accent" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Link href="/admin" className="rounded-md px-3 py-2 text-sm font-medium hover-bg-accent" onClick={() => setIsMobileMenuOpen(false)}>
                         Dashboard
                       </Link>
                     )}
