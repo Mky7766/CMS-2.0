@@ -13,6 +13,7 @@ import HtmlRenderer from "@/components/html-renderer";
 import GridTemplate from "@/components/blog-templates/grid-template";
 import GridSidebarTemplate from "@/components/blog-templates/grid-sidebar-template";
 import ListTemplate from "@/components/blog-templates/list-template";
+import SiteHeader from "@/components/site-header";
 
 
 async function getMenus(): Promise<Menu[]> {
@@ -52,29 +53,7 @@ export default async function Home() {
 
   return (
     <div className="flex flex-col min-h-screen">
-       <header className="sticky top-0 z-40 w-full border-b bg-background">
-        <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
-          <Link href="/" className="flex items-center gap-2 font-headline text-xl font-bold">
-            <Icons.logo className="h-6 w-6" />
-            {settings.siteName || "Vinee CMS"}
-          </Link>
-          <div className="flex flex-1 items-center justify-end space-x-4">
-            <nav className="flex items-center space-x-1">
-               {headerMenu ? (
-                  headerMenu.items.map((item, index) => (
-                    <Button key={index} variant="ghost" asChild>
-                      <Link href={item.url}>{item.label}</Link>
-                    </Button>
-                  ))
-                ) : (
-                  <Button asChild>
-                    <Link href="/admin">Dashboard</Link>
-                  </Button>
-                )}
-            </nav>
-          </div>
-        </div>
-      </header>
+       <SiteHeader settings={settings} headerMenu={headerMenu} />
       <main className="flex-1">
         <div className="container mx-auto px-4 py-8 md:py-12">
             { homePage ? (
