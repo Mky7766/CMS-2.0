@@ -10,5 +10,6 @@
   "footerMenuId": "1758021746600",
   "defaultPostCategoryId": "uncategorized",
   "defaultPostFormat": "standard",
-  "homepagePageId": "latest-posts"
+  "homepagePageId": "latest-posts",
+  "postsPageId": "none"
 }
