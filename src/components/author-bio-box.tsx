@@ -2,6 +2,7 @@
 import { User } from "@/lib/data";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Card, CardContent } from "./ui/card";
+import { BadgeCheck } from "lucide-react";
 
 type AuthorBioBoxProps = {
     author: User;
@@ -17,7 +18,10 @@ export default function AuthorBioBox({ author }: AuthorBioBoxProps) {
                         <AvatarFallback>{author.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
-                        <h3 className="text-xl font-bold">About {author.name}</h3>
+                        <h3 className="text-xl font-bold flex items-center gap-2">
+                            About {author.name}
+                            {author.role === 'Admin' && <BadgeCheck className="h-5 w-5 text-blue-500" />}
+                        </h3>
                         <p className="mt-2 text-muted-foreground">
                             {author.bio || "This author has not yet written a bio."}
                         </p>

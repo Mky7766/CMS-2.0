@@ -16,6 +16,7 @@ import GridTemplate from "@/components/blog-templates/grid-template";
 import GridSidebarTemplate from "@/components/blog-templates/grid-sidebar-template";
 import ListTemplate from "@/components/blog-templates/list-template";
 import AuthorBioBox from "@/components/author-bio-box";
+import { BadgeCheck } from "lucide-react";
 
 export async function generateMetadata({ params }: { params: { postId: string } }): Promise<Metadata> {
   const post = posts.find(p => p.id === params.postId);
@@ -194,7 +195,10 @@ export default async function PostPage({ params }: { params: { postId: string } 
                             </>
                         )}
                     </Avatar>
-                  <span>{author ? author.name : post.author.name}</span>
+                  <span className="flex items-center gap-1">
+                    {author ? author.name : post.author.name}
+                    {author && author.role === 'Admin' && <BadgeCheck className="h-4 w-4 text-blue-500" />}
+                  </span>
                 </div>
                 <span>&middot;</span>
                  <time dateTime={post.createdAt}>{new Date(post.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
