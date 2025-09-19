@@ -197,7 +197,7 @@ export default async function PostPage({ params }: { params: { postId: string } 
                     </Avatar>
                   <span className="flex items-center gap-1">
                     {author ? author.name : post.author.name}
-                    {author && author.role === 'Admin' && <BadgeCheck className="h-4 w-4 text-blue-500" />}
+                    {author && (author.role === 'Admin' || author.role === 'Editor') && <BadgeCheck className="h-4 w-4 text-blue-500" />}
                   </span>
                 </div>
                 <span>&middot;</span>
