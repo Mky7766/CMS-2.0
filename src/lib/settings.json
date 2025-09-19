@@ -8,6 +8,7 @@
   "theme": {},
   "headerMenuId": "1758020871095",
   "footerMenuId": "1758021746600",
-  "defaultPostCategoryId": "aaj-kuch-huaa-hai",
-  "defaultPostFormat": "standard"
+  "defaultPostCategoryId": "uncategorized",
+  "defaultPostFormat": "standard",
+  "homepagePageId": "blog"
 }

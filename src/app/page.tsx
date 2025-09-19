@@ -34,7 +34,7 @@ export default async function Home() {
   const footerMenu = menus.find(m => m.id === settings.footerMenuId);
 
   let homePage: Page | undefined;
-  if (settings.homepagePageId && settings.homepagePageId !== 'none') {
+  if (settings.homepagePageId && settings.homepagePageId !== 'latest-posts') {
       homePage = await getPage(settings.homepagePageId);
   }
 
