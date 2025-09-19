@@ -44,13 +44,19 @@ async function getMenus(): Promise<Menu[]> {
 }
 
 async function getPage(pageId: string): Promise<Page | undefined> {
-    // This is a simplified fetch, in a real app this would be a DB query
-    return pages.find(p => p.id === pageId);
+    const pagesPath = path.join(process.cwd(), 'src', 'lib', 'pages.json');
+    try {
+        const file = await fs.readFile(pagesPath, 'utf-8');
+        const allPages = JSON.parse(file) as Page[];
+        return allPages.find(p => p.id === pageId);
+    } catch (error) {
+        return undefined;
+    }
 }
 
 export default async function PostPage({ params }: { params: { postId: string } }) {
   const settings = await getSettings();
-  const isPostsPage = settings.postsPageId === params.postId;
+  const isPostsPage = settings.postsPageId && settings.postsPageId === params.postId;
 
   if (isPostsPage) {
     const page = await getPage(params.postId);

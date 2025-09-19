@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
-import { getSettings, getPage } from "@/app/actions";
+import { getSettings } from "@/app/actions";
 import fs from 'fs/promises';
 import path from 'path';
 import HtmlRenderer from "@/components/html-renderer";
@@ -23,6 +23,17 @@ async function getMenus(): Promise<Menu[]> {
         return JSON.parse(data) as Menu[];
     } catch (error) {
         return [];
+    }
+}
+
+async function getPage(pageId: string): Promise<Page | undefined> {
+    const pagesPath = path.join(process.cwd(), 'src', 'lib', 'pages.json');
+    try {
+        const file = await fs.readFile(pagesPath, 'utf-8');
+        const allPages = JSON.parse(file) as Page[];
+        return allPages.find(p => p.id === pageId);
+    } catch (error) {
+        return undefined;
     }
 }
 
