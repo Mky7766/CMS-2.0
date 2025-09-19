@@ -182,10 +182,19 @@ export default async function PostPage({ params }: { params: { postId: string } 
               <div className="mt-4 flex items-center gap-4 text-muted-foreground">
                 <div className="flex items-center gap-2">
                    <Avatar className="h-9 w-9">
-                        <AvatarImage src={post.author.avatarUrl} alt={post.author.name} />
-                        <AvatarFallback>{post.author.name.charAt(0)}</AvatarFallback>
+                        {author ? (
+                            <>
+                                <AvatarImage src={author.avatarUrl} alt={author.name} />
+                                <AvatarFallback>{author.name.charAt(0)}</AvatarFallback>
+                            </>
+                        ) : (
+                             <>
+                                <AvatarImage src={post.author.avatarUrl} alt={post.author.name} />
+                                <AvatarFallback>{post.author.name.charAt(0)}</AvatarFallback>
+                            </>
+                        )}
                     </Avatar>
-                  <span>{post.author.name}</span>
+                  <span>{author ? author.name : post.author.name}</span>
                 </div>
                 <span>&middot;</span>
                  <time dateTime={post.createdAt}>{new Date(post.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
