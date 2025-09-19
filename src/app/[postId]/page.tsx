@@ -1,5 +1,5 @@
 
-import { posts, Menu, pages, Page, SiteSettings } from "@/lib/data";
+import { posts, Menu, pages, Page, SiteSettings, users, User } from "@/lib/data";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -15,6 +15,7 @@ import SiteHeader from "@/components/site-header";
 import GridTemplate from "@/components/blog-templates/grid-template";
 import GridSidebarTemplate from "@/components/blog-templates/grid-sidebar-template";
 import ListTemplate from "@/components/blog-templates/list-template";
+import AuthorBioBox from "@/components/author-bio-box";
 
 export async function generateMetadata({ params }: { params: { postId: string } }): Promise<Metadata> {
   const post = posts.find(p => p.id === params.postId);
@@ -155,6 +156,8 @@ export default async function PostPage({ params }: { params: { postId: string } 
     )
   }
 
+  const author = users.find(u => u.id === post!.authorId);
+
   return (
      <div className="flex flex-col min-h-screen">
         <SiteHeader settings={settings} headerMenu={headerMenu} />
@@ -190,6 +193,11 @@ export default async function PostPage({ params }: { params: { postId: string } 
             </header>
             <HtmlRenderer htmlContent={post.content} />
           </article>
+          {settings.showAuthorBio && author && (
+            <div className="mt-16 max-w-4xl mx-auto">
+                <AuthorBioBox author={author} />
+            </div>
+          )}
         </div>
       </main>
       <footer className="border-t bg-muted/20 py-8">

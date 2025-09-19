@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { updateSettings } from "@/app/actions";
 import { SiteSettings, Page, Category } from "@/lib/data";
+import { Switch } from "../ui/switch";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -50,7 +51,7 @@ export default function WritingSettingsForm({ settings, pages, categories }: Wri
     <form action={formAction}>
         <Card>
             <CardHeader>
-                <CardTitle>Writing & Reading Settings</CardTitle>
+                <CardTitle>Writing &amp; Reading Settings</CardTitle>
                 <CardDescription>Set defaults for creating new content and how content is displayed.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -110,6 +111,18 @@ export default function WritingSettingsForm({ settings, pages, categories }: Wri
                              {/* Other formats could be added here in the future */}
                         </SelectContent>
                     </Select>
+                </div>
+                <div className="flex items-center justify-between rounded-lg border p-4">
+                    <div className="space-y-0.5">
+                        <Label>Show author bio on posts</Label>
+                        <p className="text-sm text-muted-foreground">
+                            Display a box with the author's biography at the end of each post.
+                        </p>
+                    </div>
+                    <Switch
+                        name="show-author-bio"
+                        defaultChecked={settings.showAuthorBio}
+                    />
                 </div>
             </CardContent>
             <CardFooter>

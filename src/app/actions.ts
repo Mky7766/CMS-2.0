@@ -478,6 +478,7 @@ export async function updateSettings(prevState: any, formData: FormData) {
             customBodyCode: formData.has('custom-body-code') ? formData.get('custom-body-code') as string : currentSettings.customBodyCode,
             homepagePageId: formData.has('homepage-page-id') ? formData.get('homepage-page-id') as string : currentSettings.homepagePageId,
             postsPageId: formData.has('posts-page-id') ? formData.get('posts-page-id') as string : currentSettings.postsPageId,
+            showAuthorBio: formData.has('show-author-bio') ? formData.get('show-author-bio') === 'on' : currentSettings.showAuthorBio,
             theme: {
                 ...currentSettings.theme,
                 primary: formData.has('theme-primary') ? formData.get('theme-primary') as string : currentSettings.theme?.primary,
@@ -558,6 +559,7 @@ export async function adminUpdateUser(prevState: any, formData: FormData) {
     const userId = formData.get('userId') as string;
     const name = formData.get('name') as string;
     const role = formData.get('role') as User['role'];
+    const bio = formData.get('bio') as string;
 
     const userIndex = users.findIndex(u => u.id === userId);
     if (userIndex === -1) {
@@ -565,7 +567,7 @@ export async function adminUpdateUser(prevState: any, formData: FormData) {
     }
 
     const updatedUsers = [...users];
-    updatedUsers[userIndex] = { ...updatedUsers[userIndex], name, role };
+    updatedUsers[userIndex] = { ...updatedUsers[userIndex], name, role, bio };
     
     try {
         const usersFilePath = path.join(process.cwd(), 'src', 'lib', 'users.json');
@@ -589,6 +591,8 @@ export async function updateUser(prevState: any, formData: FormData) {
     const name = formData.get('name') as string;
     const password = formData.get('password') as string;
     const confirmPassword = formData.get('confirmPassword') as string;
+    const bio = formData.get('bio') as string;
+
 
     const userIndex = users.findIndex(u => u.id === session.userId);
     if (userIndex === -1) {
@@ -599,6 +603,8 @@ export async function updateUser(prevState: any, formData: FormData) {
     const userToUpdate = { ...updatedUsers[userIndex] };
     
     userToUpdate.name = name;
+    userToUpdate.bio = bio;
+
 
     if (password) {
         if (password !== confirmPassword) {
@@ -987,5 +993,3 @@ export async function deleteCategory(categoryId: string) {
     revalidatePath('/admin/categories');
     return { success: "Category deleted successfully." };
 }
-
-    

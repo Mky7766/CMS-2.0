@@ -43,6 +43,7 @@ export type User = {
     avatarUrl: string;
     role: 'Admin' | 'Editor' | 'Author';
     createdAt: string;
+    bio?: string;
 }
 
 export type MenuItem = {
@@ -92,6 +93,7 @@ export type SiteSettings = {
     accent?: string;
     background?: string;
   };
+  showAuthorBio?: boolean;
 };
 
 
@@ -121,5 +123,3 @@ export function setCategories(newCategories: Category[]) {
 
 
 export { users, posts, pages, categories };
-
-    
