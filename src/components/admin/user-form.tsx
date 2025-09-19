@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { createUser, adminUpdateUser } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import type { User } from "@/lib/data";
+import { Textarea } from "../ui/textarea";
 
 function SubmitButton({ isUpdate }: { isUpdate?: boolean }) {
   const { pending } = useFormStatus();
@@ -79,6 +80,18 @@ export default function UserForm({ user }: UserFormProps) {
                             <Input id="password" name="password" type="password" required />
                         </div>
                     )}
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="bio">Biographical Info</Label>
+                    <Textarea
+                        id="bio"
+                        name="bio"
+                        defaultValue={user?.bio}
+                        placeholder="Share a little about the user."
+                        rows={5}
+                        maxLength={700}
+                    />
+                    <p className="text-sm text-muted-foreground">A brief bio (around 120 words).</p>
                 </div>
             </CardContent>
             <CardFooter className="flex justify-between">

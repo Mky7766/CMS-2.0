@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { updateUser } from "@/app/actions";
 import type { User } from "@/lib/data";
+import { Textarea } from "../ui/textarea";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -57,7 +58,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
         <Card>
             <CardHeader>
             <CardTitle>Edit Profile</CardTitle>
-            <CardDescription>Update your name and password.</CardDescription>
+            <CardDescription>Update your name, bio, and password.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -68,6 +69,18 @@ export default function ProfileForm({ user }: ProfileFormProps) {
                     <Label htmlFor="email">Email</Label>
                     <Input id="email" name="email" type="email" value={user.email} disabled />
                     <p className="text-sm text-muted-foreground">Email address cannot be changed.</p>
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="bio">Biographical Info</Label>
+                    <Textarea 
+                        id="bio"
+                        name="bio"
+                        defaultValue={user.bio}
+                        placeholder="Share a little about yourself."
+                        rows={5}
+                        maxLength={700}
+                    />
+                     <p className="text-sm text-muted-foreground">A brief bio (around 120 words). Displayed on your author profile.</p>
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="password">New Password</Label>

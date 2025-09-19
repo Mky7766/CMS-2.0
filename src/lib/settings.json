@@ -11,5 +11,6 @@
   "defaultPostCategoryId": "uncategorized",
   "defaultPostFormat": "standard",
   "homepagePageId": "aaj-kuch-huaa-hai",
-  "postsPageId": "blog"
+  "postsPageId": "blog",
+  "showAuthorBio": true
 }
