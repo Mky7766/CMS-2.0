@@ -1,3 +1,4 @@
+
 import usersData from './users.json';
 import postsData from './posts.json';
 import pagesData from './pages.json';
@@ -21,6 +22,7 @@ export type Post = {
     url: string;
     alt: string;
   };
+  format?: string;
 };
 
 export type Page = {
@@ -117,3 +119,5 @@ export function setCategories(newCategories: Category[]) {
 
 
 export { users, posts, pages, categories };
+
+    

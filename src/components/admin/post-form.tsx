@@ -53,6 +53,8 @@ export default function PostForm({ post }: PostFormProps) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [settings, setSettings] = useState<any>(null);
   const [selectedCategory, setSelectedCategory] = useState(post?.categoryId || "");
+  const [postFormat, setPostFormat] = useState(post?.format || 'standard');
+
 
   const action = post ? updatePost : savePost;
   const [state, formAction] = useActionState(action, null);
@@ -68,7 +70,8 @@ export default function PostForm({ post }: PostFormProps) {
         setCategories(cats);
         setSettings(siteSettings);
         if (!post) {
-            setSelectedCategory(siteSettings.defaultPostCategoryId || (cats[0] ? cats[0].id : ""));
+            setSelectedCategory(siteSettings.defaultPostCategoryId || (cats.find(c=>c.id ==='uncategorized') ? 'uncategorized' : (cats[0] ? cats[0].id : "")));
+            setPostFormat(siteSettings.defaultPostFormat || 'standard');
         }
     }
     loadData();
@@ -279,6 +282,18 @@ export default function PostForm({ post }: PostFormProps) {
                 </div>
             </div>
             <div>
+                <Label htmlFor="format">Post Format</Label>
+                <Select name="format" value={postFormat} onValueChange={setPostFormat}>
+                    <SelectTrigger id="format">
+                        <SelectValue placeholder="Select a format" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="standard">Standard</SelectItem>
+                        {/* You can add more formats here in the future */}
+                    </SelectContent>
+                </Select>
+             </div>
+            <div>
               <Label>Featured Image</Label>
                 {featuredImageUrl ? (
                     <div className="mt-2 relative">
@@ -332,3 +347,5 @@ export default function PostForm({ post }: PostFormProps) {
     </form>
   );
 }
+
+    

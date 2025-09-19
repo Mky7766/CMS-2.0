@@ -1,5 +1,4 @@
 
-
 "use server"
 
 import fs from "fs/promises";
@@ -117,6 +116,7 @@ export async function savePost(prevState: any, formData: FormData) {
     const featuredImageUrl = formData.get('featured-image-url') as string;
     const tags = (formData.get('tags-hidden') as string).split(',').filter(t => t.trim() !== '');
     const categoryId = formData.get('category-id') as string;
+    const format = formData.get('format') as string;
 
     const session = await getSession();
     if (!session?.userId) {
@@ -147,6 +147,7 @@ export async function savePost(prevState: any, formData: FormData) {
         authorId: author.id,
         categoryId,
         tags,
+        format
     };
     
     if (featuredImageUrl) {
@@ -182,6 +183,7 @@ export async function updatePost(prevState: any, formData: FormData) {
     const featuredImageUrl = formData.get('featured-image-url') as string;
     const tags = (formData.get('tags-hidden') as string).split(',').filter(t => t.trim() !== '');
     const categoryId = formData.get('category-id') as string;
+    const format = formData.get('format') as string;
 
     const session = await getSession();
     if (!session?.userId) {
@@ -205,6 +207,7 @@ export async function updatePost(prevState: any, formData: FormData) {
     updatedPost.status = status;
     updatedPost.tags = tags;
     updatedPost.categoryId = categoryId;
+    updatedPost.format = format;
     
     if (featuredImageUrl) {
         updatedPost.featuredImage = {
@@ -981,3 +984,5 @@ export async function deleteCategory(categoryId: string) {
     revalidatePath('/admin/categories');
     return { success: "Category deleted successfully." };
 }
+
+    
