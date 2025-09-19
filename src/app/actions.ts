@@ -476,6 +476,7 @@ export async function updateSettings(prevState: any, formData: FormData) {
             defaultPostFormat: formData.has('default-post-format') ? formData.get('default-post-format') as string : currentSettings.defaultPostFormat,
             customHeadCode: formData.has('custom-head-code') ? formData.get('custom-head-code') as string : currentSettings.customHeadCode,
             customBodyCode: formData.has('custom-body-code') ? formData.get('custom-body-code') as string : currentSettings.customBodyCode,
+            homepagePageId: formData.has('homepage-page-id') ? formData.get('homepage-page-id') as string : currentSettings.homepagePageId,
             theme: {
                 ...currentSettings.theme,
                 primary: formData.has('theme-primary') ? formData.get('theme-primary') as string : currentSettings.theme?.primary,
@@ -493,6 +494,7 @@ export async function updateSettings(prevState: any, formData: FormData) {
         revalidatePath('/sitemap.xml');
         revalidatePath('/admin/appearance/templates');
         revalidatePath('/admin/appearance/customize');
+        revalidatePath('/admin/settings');
 
 
         return { success: "Settings updated successfully." };

@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { updateSettings } from "@/app/actions";
-import { SiteSettings, Page } from "@/lib/data";
+import { SiteSettings, Page, Category } from "@/lib/data";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -23,9 +23,10 @@ function SubmitButton() {
 type WritingSettingsFormProps = {
     settings: SiteSettings;
     pages: Page[];
+    categories: Category[];
 }
 
-export default function WritingSettingsForm({ settings, pages }: WritingSettingsFormProps) {
+export default function WritingSettingsForm({ settings, pages, categories }: WritingSettingsFormProps) {
   const [state, formAction] = useActionState(updateSettings, null);
   const { toast } = useToast();
 
@@ -49,21 +50,35 @@ export default function WritingSettingsForm({ settings, pages }: WritingSettings
     <form action={formAction}>
         <Card>
             <CardHeader>
-                <CardTitle>Writing Settings</CardTitle>
-                <CardDescription>Set defaults for creating new content.</CardDescription>
+                <CardTitle>Writing & Reading Settings</CardTitle>
+                <CardDescription>Set defaults for creating new content and how content is displayed.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
                 <div className="space-y-2">
-                    <Label>Default Post Category</Label>
-                    <p className="text-sm text-muted-foreground">The category assigned to new posts by default.</p>
-                    <Select name="default-category-id" defaultValue={settings.defaultPostCategoryId || "uncategorized"}>
+                    <Label>Homepage Displays</Label>
+                     <p className="text-sm text-muted-foreground">Choose what to show on your homepage.</p>
+                    <Select name="homepage-page-id" defaultValue={settings.homepagePageId || "latest-posts"}>
                         <SelectTrigger>
                             <SelectValue placeholder="Select a page" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="uncategorized">Uncategorized</SelectItem>
+                            <SelectItem value="latest-posts">Your latest posts</SelectItem>
                             {pages.map((page) => (
                                 <SelectItem key={page.id} value={page.id}>{page.title}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+                 <div className="space-y-2">
+                    <Label>Default Post Category</Label>
+                    <p className="text-sm text-muted-foreground">The category assigned to new posts by default.</p>
+                    <Select name="default-category-id" defaultValue={settings.defaultPostCategoryId || "uncategorized"}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {categories.map((cat) => (
+                                <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
                             ))}
                         </SelectContent>
                     </Select>

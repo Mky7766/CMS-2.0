@@ -37,7 +37,7 @@ export default async function SettingsPage() {
             <GeneralSettingsForm settings={settings} />
         </TabsContent>
         <TabsContent value="writing" className="mt-4">
-            <WritingSettingsForm settings={settings} pages={pages} />
+            <WritingSettingsForm settings={settings} pages={pages} categories={categories}/>
         </TabsContent>
          <TabsContent value="menus" className="mt-4">
           <MenuSettingsForm settings={settings} menus={menus} />
