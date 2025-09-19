@@ -49,17 +49,15 @@ async function getPage(pageId: string): Promise<Page | undefined> {
 }
 
 export default async function PostPage({ params }: { params: { postId: string } }) {
-  const post = posts.find(p => p.id === params.postId);
-  const page = await getPage(params.postId);
-
   const settings = await getSettings();
-  const menus = await getMenus();
-  const headerMenu = menus.find(m => m.id === settings.headerMenuId);
-  const footerMenu = menus.find(m => m.id === settings.footerMenuId);
-
   const isPostsPage = settings.postsPageId === params.postId;
 
   if (isPostsPage) {
+    const page = await getPage(params.postId);
+    const menus = await getMenus();
+    const headerMenu = menus.find(m => m.id === settings.headerMenuId);
+    const footerMenu = menus.find(m => m.id === settings.footerMenuId);
+    
     const publishedPosts = posts.filter(p => p.status.toLowerCase() === 'published').sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     
     const renderBlogTemplate = () => {
@@ -105,6 +103,12 @@ export default async function PostPage({ params }: { params: { postId: string } 
         </div>
     )
   }
+
+  const post = posts.find(p => p.id === params.postId);
+  const page = await getPage(params.postId);
+  const menus = await getMenus();
+  const headerMenu = menus.find(m => m.id === settings.headerMenuId);
+  const footerMenu = menus.find(m => m.id === settings.footerMenuId);
 
 
   if (!post && !page) {
