@@ -14,7 +14,7 @@ import { Calendar, Save, UploadCloud, X, Loader } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { savePost, updatePost, uploadMedia, getCategories, getSettings } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
-import type { Post, Category } from "@/lib/data";
+import type { Post, Category, SiteSettings } from "@/lib/data";
 
 function SubmitButton({ isUpdate }: { isUpdate?: boolean }) {
   const { pending } = useFormStatus();
@@ -51,7 +51,7 @@ export default function PostForm({ post }: PostFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [categories, setCategories] = useState<Category[]>([]);
-  const [settings, setSettings] = useState<any>(null);
+  const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [selectedCategory, setSelectedCategory] = useState(post?.categoryId || "");
   const [postFormat, setPostFormat] = useState(post?.format || 'standard');
 
@@ -72,6 +72,9 @@ export default function PostForm({ post }: PostFormProps) {
         if (!post) {
             setSelectedCategory(siteSettings.defaultPostCategoryId || (cats.find(c=>c.id ==='uncategorized') ? 'uncategorized' : (cats[0] ? cats[0].id : "")));
             setPostFormat(siteSettings.defaultPostFormat || 'standard');
+        } else {
+            setSelectedCategory(post.categoryId || (cats.find(c=>c.id ==='uncategorized') ? 'uncategorized' : (cats[0] ? cats[0].id : "")))
+            setPostFormat(post.format || 'standard');
         }
     }
     loadData();
