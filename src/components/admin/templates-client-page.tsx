@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useActionState, useEffect, useState, useTransition } from "react";
@@ -10,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { updateSettings, deleteTemplate, getTemplates, getSettings } from "@/app/actions";
 import type { SiteSettings, Template } from "@/lib/data";
-import { CheckCircle, Code, PlusCircle, Trash2, Loader } from "lucide-react";
+import { CheckCircle, Code, PlusCircle, Trash2, Loader, Upload } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -51,7 +50,7 @@ export default function TemplatesClientPage() {
 
   const [templateToDelete, setTemplateToDelete] = useState<Template | null>(null);
   const [isDeleting, startDeleteTransition] = useTransition();
-  const [isCreateInfoDialogOpen, setIsCreateInfoDialogOpen] = useState(false);
+  const [isUploadInfoDialogOpen, setIsUploadInfoDialogOpen] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -139,9 +138,9 @@ export default function TemplatesClientPage() {
             <h1 className="text-3xl font-bold tracking-tight">Blog Templates</h1>
             <p className="text-muted-foreground">Choose a layout for your blog's homepage.</p>
           </div>
-          <Button onClick={() => setIsCreateInfoDialogOpen(true)}>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Create New Template
+          <Button onClick={() => setIsUploadInfoDialogOpen(true)}>
+            <Upload className="mr-2 h-4 w-4" />
+            Upload Template
           </Button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -212,18 +211,20 @@ export default function TemplatesClientPage() {
         </AlertDialog>
       )}
 
-       <AlertDialog open={isCreateInfoDialogOpen} onOpenChange={setIsCreateInfoDialogOpen}>
+       <AlertDialog open={isUploadInfoDialogOpen} onOpenChange={setIsUploadInfoDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>How to Create a New Template</AlertDialogTitle>
+            <AlertDialogTitle>How to "Upload" a New Template</AlertDialogTitle>
             <AlertDialogDescription>
-              To create a new custom template, please ask the AI assistant to do it for you. Describe the layout you want, for example:
+              To add a new custom template, please ask the AI assistant to create it for you. Describe the layout you have in mind. For example:
               <br /><br />
               <em className="text-foreground">&quot;Create a new blog template called 'Featured Post' that shows the latest post in a large hero section and the rest in a grid below.&quot;</em>
+              <br /><br />
+              The AI will generate the necessary files and add the template here automatically.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setIsCreateInfoDialogOpen(false)}>
+            <AlertDialogAction onClick={() => setIsUploadInfoDialogOpen(false)}>
               Understood
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -231,4 +232,5 @@ export default function TemplatesClientPage() {
       </AlertDialog>
     </>
   );
-}
+
+    
