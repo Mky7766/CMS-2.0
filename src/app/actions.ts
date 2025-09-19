@@ -477,6 +477,7 @@ export async function updateSettings(prevState: any, formData: FormData) {
             customHeadCode: formData.has('custom-head-code') ? formData.get('custom-head-code') as string : currentSettings.customHeadCode,
             customBodyCode: formData.has('custom-body-code') ? formData.get('custom-body-code') as string : currentSettings.customBodyCode,
             homepagePageId: formData.has('homepage-page-id') ? formData.get('homepage-page-id') as string : currentSettings.homepagePageId,
+            postsPageId: formData.has('posts-page-id') ? formData.get('posts-page-id') as string : currentSettings.postsPageId,
             theme: {
                 ...currentSettings.theme,
                 primary: formData.has('theme-primary') ? formData.get('theme-primary') as string : currentSettings.theme?.primary,

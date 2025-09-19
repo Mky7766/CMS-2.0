@@ -86,6 +86,7 @@ export type SiteSettings = {
   customHeadCode?: string;
   customBodyCode?: string;
   homepagePageId?: string;
+  postsPageId?: string;
   theme?: {
     primary?: string;
     accent?: string;

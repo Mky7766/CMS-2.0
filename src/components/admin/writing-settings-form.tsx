@@ -70,6 +70,21 @@ export default function WritingSettingsForm({ settings, pages, categories }: Wri
                     </Select>
                 </div>
                  <div className="space-y-2">
+                    <Label>Posts page</Label>
+                    <p className="text-sm text-muted-foreground">Choose a page to show your blog posts on.</p>
+                    <Select name="posts-page-id" defaultValue={settings.postsPageId}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select a page" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="none">None</SelectItem>
+                             {pages.map((page) => (
+                                <SelectItem key={page.id} value={page.id}>{page.title}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+                 <div className="space-y-2">
                     <Label>Default Post Category</Label>
                     <p className="text-sm text-muted-foreground">The category assigned to new posts by default.</p>
                     <Select name="default-category-id" defaultValue={settings.defaultPostCategoryId || "uncategorized"}>
