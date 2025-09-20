@@ -1,9 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageView } from "@/lib/data";
-import { Signal, Eye, Users, BarChart, Globe, Twitter, Share2 } from "lucide-react";
+import { Signal, Eye, Users } from "lucide-react";
 import AnalyticsChart from "@/components/admin/analytics-chart";
 import RecentActivityCard from "@/components/admin/recent-activity-card";
 import TrafficSourceChart from "@/components/admin/traffic-source-chart";
+import TopReferrersCard from "@/components/admin/top-referrers-card";
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -21,7 +22,8 @@ async function getAnalyticsData() {
 function getStatsFromPageViews(pageViews: PageView[]) {
     const now = new Date();
     const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
-    
+    const host = 'localhost:3000'; // Replace with actual host if available, but for this logic it's for filtering internal nav.
+
     const recentActivity = pageViews
         .filter(view => new Date(view.timestamp) >= fiveMinutesAgo)
         .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
@@ -80,6 +82,27 @@ function getStatsFromPageViews(pageViews: PageView[]) {
         name,
         value
     }));
+    
+    // Top Referrers
+    const referrerCounts = pageViews.reduce((acc, view) => {
+        if (view.referrer && view.source !== 'Direct') {
+            try {
+                const url = new URL(view.referrer);
+                // Exclude own domain if needed, though getTrafficSource already handles this.
+                if (url.hostname !== host) {
+                    acc[url.hostname] = (acc[url.hostname] || 0) + 1;
+                }
+            } catch (e) {
+                // Ignore invalid URLs
+            }
+        }
+        return acc;
+    }, {} as { [key: string]: number });
+    
+    const topReferrers = Object.entries(referrerCounts)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 5)
+        .map(([name, value]) => ({ name, value }));
 
 
     return {
@@ -89,7 +112,8 @@ function getStatsFromPageViews(pageViews: PageView[]) {
         monthlyData,
         recentActivity,
         uniqueVisitors: uniquePathsLast5Min,
-        trafficSourceData
+        trafficSourceData,
+        topReferrers
     };
 }
 
@@ -104,7 +128,8 @@ export default async function AnalyticsPage() {
     monthlyData,
     recentActivity,
     uniqueVisitors,
-    trafficSourceData
+    trafficSourceData,
+    topReferrers
   } = getStatsFromPageViews(analyticsPageViews);
 
   return (
@@ -157,14 +182,7 @@ export default async function AnalyticsPage() {
 
        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <TrafficSourceChart data={trafficSourceData} />
-            <Card className="lg:col-span-2">
-                 <CardHeader>
-                    <CardTitle>Top Referrers</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <p className="text-muted-foreground">Coming soon...</p>
-                </CardContent>
-            </Card>
+            <TopReferrersCard referrers={topReferrers} />
        </div>
     </div>
   );
