@@ -20,7 +20,7 @@ export default function AuthorBioBox({ author }: AuthorBioBoxProps) {
                     <div className="flex-1">
                         <h3 className="text-xl font-bold flex items-center gap-2">
                             About {author.name}
-                            {(author.role === 'Admin' || author.role === 'Editor') && <BadgeCheck className="h-5 w-5 text-blue-500" />}
+                            {(author.role === 'Admin' || author.role === 'Editor' || author.role === 'Author') && <BadgeCheck className="h-5 w-5 text-blue-500" />}
                         </h3>
                         <p className="mt-2 text-muted-foreground">
                             {author.bio || "This author has not yet written a bio."}
