@@ -1,7 +1,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { posts, Menu, Page } from "@/lib/data";
+import { Menu, Page, Post } from "@/lib/data";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,16 @@ async function getMenus(): Promise<Menu[]> {
     }
 }
 
+async function getPosts(): Promise<Post[]> {
+    const filePath = path.join(process.cwd(), 'src', 'lib', 'posts.json');
+    try {
+        const data = await fs.readFile(filePath, 'utf-8');
+        return JSON.parse(data) as Post[];
+    } catch (error) {
+        return [];
+    }
+}
+
 async function getPage(pageId: string): Promise<Page | undefined> {
     const pagesPath = path.join(process.cwd(), 'src', 'lib', 'pages.json');
     try {
@@ -39,7 +49,8 @@ async function getPage(pageId: string): Promise<Page | undefined> {
 
 export default async function Home() {
   const settings = await getSettings();
-  const publishedPosts = posts.filter(p => p.status.toLowerCase() === 'published').sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const allPosts = await getPosts();
+  const publishedPosts = allPosts.filter(p => p.status.toLowerCase() === 'published').sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   const menus = await getMenus();
   const headerMenu = menus.find(m => m.id === settings.headerMenuId);
   const footerMenu = menus.find(m => m.id === settings.footerMenuId);

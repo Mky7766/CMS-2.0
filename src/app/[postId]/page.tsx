@@ -1,5 +1,5 @@
 
-import { posts, Menu, pages, Page, SiteSettings, users, User } from "@/lib/data";
+import { Menu, pages, Page, SiteSettings, users, User, Post } from "@/lib/data";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -19,16 +19,33 @@ import AuthorBioBox from "@/components/author-bio-box";
 import { BadgeCheck } from "lucide-react";
 import SocialShare from "@/components/social-share";
 
+async function getPosts(): Promise<Post[]> {
+    const filePath = path.join(process.cwd(), 'src', 'lib', 'posts.json');
+    try {
+        const data = await fs.readFile(filePath, 'utf-8');
+        return JSON.parse(data) as Post[];
+    } catch (error) {
+        return [];
+    }
+}
+
+async function getPost(postId: string): Promise<Post | undefined> {
+    const posts = await getPosts();
+    return posts.find(p => p.id === postId);
+}
+
+
 export async function generateMetadata({ params }: { params: { postId: string } }): Promise<Metadata> {
-  const post = posts.find(p => p.id === params.postId);
-  const page = pages.find(p => p.id === params.postId);
+  const post = await getPost(params.postId);
+  const page = await getPage(params.postId);
   const settings = await getSettings();
 
   const title = page?.title || post?.title || settings.siteName;
+  const description = post ? (post.content ? post.content.substring(0, 150) : '') : (settings.tagline || '');
   
   return {
     title: `${title} | ${settings.siteName}`,
-    description: post?.content.substring(0, 150) || settings.tagline,
+    description: description,
     icons: {
       icon: settings.faviconUrl || '/favicon.ico',
     },
@@ -67,7 +84,8 @@ export default async function PostPage({ params }: { params: { postId: string } 
     const headerMenu = menus.find(m => m.id === settings.headerMenuId);
     const footerMenu = menus.find(m => m.id === settings.footerMenuId);
     
-    const publishedPosts = posts.filter(p => p.status.toLowerCase() === 'published').sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    const allPosts = await getPosts();
+    const publishedPosts = allPosts.filter(p => p.status.toLowerCase() === 'published').sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     
     const renderBlogTemplate = () => {
         switch (settings.blogTemplate) {
@@ -113,7 +131,7 @@ export default async function PostPage({ params }: { params: { postId: string } 
     )
   }
 
-  const post = posts.find(p => p.id === params.postId);
+  const post = await getPost(params.postId);
   const page = await getPage(params.postId);
   const menus = await getMenus();
   const headerMenu = menus.find(m => m.id === settings.headerMenuId);
@@ -156,6 +174,10 @@ export default async function PostPage({ params }: { params: { postId: string } 
       </footer>
     </div>
     )
+  }
+  
+  if (!post) {
+      notFound();
   }
 
   const author = users.find(u => u.id === post!.authorId);
