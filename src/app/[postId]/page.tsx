@@ -17,6 +17,7 @@ import GridSidebarTemplate from "@/components/blog-templates/grid-sidebar-templa
 import ListTemplate from "@/components/blog-templates/list-template";
 import AuthorBioBox from "@/components/author-bio-box";
 import { BadgeCheck } from "lucide-react";
+import SocialShare from "@/components/social-share";
 
 export async function generateMetadata({ params }: { params: { postId: string } }): Promise<Metadata> {
   const post = posts.find(p => p.id === params.postId);
@@ -206,8 +207,11 @@ export default async function PostPage({ params }: { params: { postId: string } 
             </header>
             <HtmlRenderer htmlContent={post.content} />
           </article>
+           <div className="mt-12 max-w-4xl mx-auto">
+                <SocialShare post={post} />
+            </div>
           {settings.showAuthorBio && author && (
-            <div className="mt-16 max-w-4xl mx-auto">
+            <div className="mt-8 max-w-4xl mx-auto">
                 <AuthorBioBox author={author} />
             </div>
           )}
