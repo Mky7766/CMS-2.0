@@ -2,59 +2,111 @@
   "pageViews": [
     {
       "path": "/",
-      "timestamp": "2025-09-20T07:05:53.601Z"
+      "timestamp": "2025-09-20T07:05:53.601Z",
+      "referrer": "direct",
+      "source": "Direct"
     },
     {
       "path": "/",
-      "timestamp": "2025-09-20T07:07:37.831Z"
+      "timestamp": "2025-09-20T07:07:37.831Z",
+      "referrer": "https://www.google.com/",
+      "source": "Google"
     },
     {
       "path": "/",
-      "timestamp": "2025-09-20T07:07:44.150Z"
+      "timestamp": "2025-09-20T07:07:44.150Z",
+      "referrer": "https://www.google.com/",
+      "source": "Google"
     },
     {
       "path": "/login",
-      "timestamp": "2025-09-20T07:08:22.250Z"
+      "timestamp": "2025-09-20T07:08:22.250Z",
+      "referrer": "/",
+      "source": "Direct"
     },
     {
       "path": "/",
-      "timestamp": "2025-09-20T07:13:23.576Z"
+      "timestamp": "2025-09-20T07:13:23.576Z",
+      "referrer": "https://t.co/",
+      "source": "Social"
     },
     {
       "path": "/",
-      "timestamp": "2025-09-20T07:13:25.978Z"
+      "timestamp": "2025-09-20T07:13:25.978Z",
+      "referrer": "direct",
+      "source": "Direct"
     },
     {
       "path": "/",
-      "timestamp": "2025-09-20T07:15:16.842Z"
+      "timestamp": "2025-09-20T07:15:16.842Z",
+      "referrer": "direct",
+      "source": "Direct"
     },
     {
       "path": "/",
-      "timestamp": "2025-09-20T07:15:18.809Z"
+      "timestamp": "2025-09-20T07:15:18.809Z",
+      "referrer": "direct",
+      "source": "Direct"
     },
     {
       "path": "/",
-      "timestamp": "2025-09-20T07:16:43.766Z"
+      "timestamp": "2025-09-20T07:16:43.766Z",
+      "referrer": "https://www.google.com/",
+      "source": "Google"
     },
     {
       "path": "/blog",
-      "timestamp": "2025-09-20T07:16:59.699Z"
+      "timestamp": "2025-09-20T07:16:59.699Z",
+      "referrer": "/",
+      "source": "Direct"
     },
     {
       "path": "/book-for-india",
-      "timestamp": "2025-09-20T07:30:17.756Z"
+      "timestamp": "2025-09-20T07:30:17.756Z",
+      "referrer": "https://www.google.com/",
+      "source": "Google"
     },
     {
       "path": "/",
-      "timestamp": "2025-09-20T09:36:02.622Z"
+      "timestamp": "2025-09-20T09:36:02.622Z",
+      "referrer": "direct",
+      "source": "Direct"
     },
     {
       "path": "/",
-      "timestamp": "2025-09-20T09:36:42.312Z"
+      "timestamp": "2025-09-20T09:36:42.312Z",
+      "referrer": "https://www.facebook.com/",
+      "source": "Social"
     },
     {
       "path": "/",
-      "timestamp": "2025-09-20T09:39:49.660Z"
+      "timestamp": "2025-09-20T09:39:49.660Z",
+      "referrer": "direct",
+      "source": "Direct"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-09-20T09:39:52.227Z",
+      "referrer": "https://www.google.com/",
+      "source": "Google"
+    },
+    {
+      "path": "/login",
+      "timestamp": "2025-09-20T09:40:36.246Z",
+      "referrer": "/",
+      "source": "Direct"
+    },
+    {
+      "path": "/login",
+      "timestamp": "2025-09-20T09:41:14.808Z",
+      "referrer": "https://example.com/other",
+      "source": "Other"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-09-20T09:51:55.650Z",
+      "referrer": "direct",
+      "source": "Direct"
     }
   ]
 }

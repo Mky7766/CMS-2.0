@@ -107,6 +107,8 @@ export type SiteSettings = {
 export type PageView = {
     path: string;
     timestamp: string;
+    referrer?: string;
+    source?: 'Direct' | 'Social' | 'Google' | 'Other';
 }
 
 
@@ -136,3 +138,4 @@ export function setCategories(newCategories: Category[]) {
 
 
 export { users, posts, pages, categories };
+

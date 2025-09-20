@@ -29,10 +29,12 @@ export default async function RootLayout({
 }>) {
   const headersList = headers();
   const pathname = headersList.get('x-pathname') || '';
+  const referrer = headersList.get('referer') || undefined;
+  const host = headersList.get('host') || '';
   
   if(pathname) {
     // We don't want to await this, let it run in the background
-    logPageView(pathname);
+    logPageView(pathname, referrer, host);
   }
 
   const settings = await getSettings();

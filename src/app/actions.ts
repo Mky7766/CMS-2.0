@@ -1037,7 +1037,25 @@ export async function getAnalyticsData() {
     }
 }
 
-export async function logPageView(pathname: string) {
+function getTrafficSource(referrer: string | undefined, host: string): PageView['source'] {
+    if (!referrer) {
+        return 'Direct';
+    }
+    
+    const referrerUrl = new URL(referrer);
+    if (referrerUrl.hostname === host) {
+        return 'Direct'; // Internal navigation
+    }
+    if (referrerUrl.hostname.includes('google.')) {
+        return 'Google';
+    }
+    if (['facebook.com', 't.co', 'twitter.com', 'linkedin.com', 'instagram.com'].some(social => referrerUrl.hostname.includes(social))) {
+        return 'Social';
+    }
+    return 'Other';
+}
+
+export async function logPageView(pathname: string, referrer: string | undefined, host: string) {
     // We won't log views for admin pages or API routes.
     if (pathname.startsWith('/admin') || pathname.startsWith('/api')) {
         return;
@@ -1050,6 +1068,8 @@ export async function logPageView(pathname: string) {
         const newView: PageView = {
             path: pathname,
             timestamp: new Date().toISOString(),
+            referrer: referrer || 'direct',
+            source: getTrafficSource(referrer, host)
         };
 
         analyticsData.pageViews.push(newView);

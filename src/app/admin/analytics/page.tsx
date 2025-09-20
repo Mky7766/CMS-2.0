@@ -1,8 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageView } from "@/lib/data";
-import { Signal, Eye, Users } from "lucide-react";
+import { Signal, Eye, Users, BarChart, Globe, Twitter, Share2 } from "lucide-react";
 import AnalyticsChart from "@/components/admin/analytics-chart";
 import RecentActivityCard from "@/components/admin/recent-activity-card";
+import TrafficSourceChart from "@/components/admin/traffic-source-chart";
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -69,6 +70,17 @@ function getStatsFromPageViews(pageViews: PageView[]) {
     // Unique visitors (very basic implementation - unique paths in last 5 mins)
     const uniquePathsLast5Min = new Set(recentActivity.map(v => v.path)).size;
 
+    const sourceCounts = pageViews.reduce((acc, view) => {
+        const source = view.source || 'Other';
+        acc[source] = (acc[source] || 0) + 1;
+        return acc;
+    }, {} as { [key: string]: number });
+
+    const trafficSourceData = Object.entries(sourceCounts).map(([name, value]) => ({
+        name,
+        value
+    }));
+
 
     return {
         activeUsers,
@@ -77,6 +89,7 @@ function getStatsFromPageViews(pageViews: PageView[]) {
         monthlyData,
         recentActivity,
         uniqueVisitors: uniquePathsLast5Min,
+        trafficSourceData
     };
 }
 
@@ -91,6 +104,7 @@ export default async function AnalyticsPage() {
     monthlyData,
     recentActivity,
     uniqueVisitors,
+    trafficSourceData
   } = getStatsFromPageViews(analyticsPageViews);
 
   return (
@@ -140,6 +154,18 @@ export default async function AnalyticsPage() {
         
         <RecentActivityCard recentActivity={recentActivity} />
       </div>
+
+       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <TrafficSourceChart data={trafficSourceData} />
+            <Card className="lg:col-span-2">
+                 <CardHeader>
+                    <CardTitle>Top Referrers</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-muted-foreground">Coming soon...</p>
+                </CardContent>
+            </Card>
+       </div>
     </div>
   );
 }
