@@ -11,6 +11,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs"
 import { getMenus, getSettings, getCategories, getPages } from "@/app/actions";
+import FirebaseSettingsForm from "@/components/admin/firebase-settings-form";
 
 
 export default async function SettingsPage() {
@@ -32,6 +33,7 @@ export default async function SettingsPage() {
             <TabsTrigger value="writing">Writing</TabsTrigger>
             <TabsTrigger value="menus">Menus</TabsTrigger>
             <TabsTrigger value="seo">SEO</TabsTrigger>
+            <TabsTrigger value="integrations">Integrations</TabsTrigger>
         </TabsList>
         <TabsContent value="general" className="mt-4">
             <GeneralSettingsForm settings={settings} />
@@ -44,6 +46,9 @@ export default async function SettingsPage() {
         </TabsContent>
         <TabsContent value="seo" className="mt-4">
             <SEOSettingsForm settings={settings} />
+        </TabsContent>
+        <TabsContent value="integrations" className="mt-4">
+            <FirebaseSettingsForm settings={settings} />
         </TabsContent>
       </Tabs>
     </div>

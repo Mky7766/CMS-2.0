@@ -499,6 +499,15 @@ export async function updateSettings(prevState: any, formData: FormData) {
                 primary: formData.has('theme-primary') ? formData.get('theme-primary') as string : currentSettings.theme?.primary,
                 accent: formData.has('theme-accent') ? formData.get('theme-accent') as string : currentSettings.theme?.accent,
                 background: formData.has('theme-background') ? formData.get('theme-background') as string : currentSettings.theme?.background,
+            },
+            firebaseConfig: {
+                ...currentSettings.firebaseConfig,
+                apiKey: formData.has('firebase-apiKey') ? formData.get('firebase-apiKey') as string : currentSettings.firebaseConfig?.apiKey,
+                authDomain: formData.has('firebase-authDomain') ? formData.get('firebase-authDomain') as string : currentSettings.firebaseConfig?.authDomain,
+                projectId: formData.has('firebase-projectId') ? formData.get('firebase-projectId') as string : currentSettings.firebaseConfig?.projectId,
+                storageBucket: formData.has('firebase-storageBucket') ? formData.get('firebase-storageBucket') as string : currentSettings.firebaseConfig?.storageBucket,
+                messagingSenderId: formData.has('firebase-messagingSenderId') ? formData.get('firebase-messagingSenderId') as string : currentSettings.firebaseConfig?.messagingSenderId,
+                appId: formData.has('firebase-appId') ? formData.get('firebase-appId') as string : currentSettings.firebaseConfig?.appId,
             }
         };
 

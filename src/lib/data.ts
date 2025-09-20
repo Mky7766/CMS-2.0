@@ -79,6 +79,16 @@ export type Category = {
     description?: string;
 }
 
+export type FirebaseConfig = {
+    apiKey?: string;
+    authDomain?: string;
+    projectId?: string;
+    storageBucket?: string;
+    messagingSenderId?: string;
+    appId?: string;
+};
+
+
 export type SiteSettings = {
   siteName: string;
   tagline: string;
@@ -102,6 +112,7 @@ export type SiteSettings = {
     background?: string;
   };
   showAuthorBio?: boolean;
+  firebaseConfig?: FirebaseConfig;
 };
 
 export type PageView = {
@@ -138,4 +149,3 @@ export function setCategories(newCategories: Category[]) {
 
 
 export { users, posts, pages, categories };
-
