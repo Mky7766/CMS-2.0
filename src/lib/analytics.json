@@ -245,6 +245,24 @@
       "timestamp": "2025-09-20T16:36:18.102Z",
       "referrer": "direct",
       "source": "Direct"
+    },
+    {
+      "path": "/3",
+      "timestamp": "2025-09-20T16:40:16.691Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/admin/posts/3/edit",
+      "source": "Other"
+    },
+    {
+      "path": "/blog",
+      "timestamp": "2025-09-20T16:40:54.077Z",
+      "referrer": "direct",
+      "source": "Direct"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-09-20T16:47:39.780Z",
+      "referrer": "direct",
+      "source": "Direct"
     }
   ]
 }

@@ -94,7 +94,7 @@ export default function PostForm({ post }: PostFormProps) {
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
     setTitle(newTitle);
-    if (!post || (post && post.id === slugify(page.title))) {
+    if (!post || (post && post.id === slugify(post.title))) {
         setPermalink(slugify(newTitle));
     }
   };
