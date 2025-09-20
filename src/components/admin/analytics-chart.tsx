@@ -23,33 +23,21 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 
-const dailyData = [
-  { date: "Mon", visitors: 22 },
-  { date: "Tue", visitors: 45 },
-  { date: "Wed", visitors: 76 },
-  { date: "Thu", visitors: 54 },
-  { date: "Fri", visitors: 98 },
-  { date: "Sat", visitors: 124 },
-  { date: "Sun", visitors: 145 },
-];
+type ChartData = { date: string, visitors: number };
 
-const monthlyData = [
-  { date: "Jan", visitors: 450 },
-  { date: "Feb", visitors: 780 },
-  { date: "Mar", visitors: 990 },
-  { date: "Apr", visitors: 820 },
-  { date: "May", visitors: 1230 },
-  { date: "Jun", visitors: 1540 },
-];
+type AnalyticsChartProps = {
+    dailyData: ChartData[];
+    monthlyData: ChartData[];
+}
 
-export default function AnalyticsChart() {
+export default function AnalyticsChart({ dailyData, monthlyData }: AnalyticsChartProps) {
   return (
-    <Card className="lg:col-span-4">
+    <Card className="lg:col-span-2">
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
           <CardTitle>Traffic Analytics</CardTitle>
           <CardDescription>
-            Visitors insights for your website.
+            A simple overview of your website traffic.
           </CardDescription>
         </div>
         <Tabs defaultValue="daily" className="w-[150px]">
@@ -60,7 +48,7 @@ export default function AnalyticsChart() {
         </Tabs>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="daily">
+        <Tabs defaultValue="daily" className="w-full">
           <TabsContent value="daily">
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={dailyData}>

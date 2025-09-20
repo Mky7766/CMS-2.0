@@ -3,9 +3,10 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
-import { getSettings } from './actions';
+import { getSettings, logPageView } from './actions';
 import HtmlRenderer from '@/components/html-renderer';
 import { ThemeProvider } from '@/components/theme-provider';
+import { headers } from 'next/headers';
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
@@ -26,6 +27,14 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headersList = headers();
+  const pathname = headersList.get('x-pathname') || '';
+  
+  if(pathname) {
+    // We don't want to await this, let it run in the background
+    logPageView(pathname);
+  }
+
   const settings = await getSettings();
   const theme = settings.theme || {};
   

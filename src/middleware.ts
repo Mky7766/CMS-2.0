@@ -5,6 +5,10 @@ import { getSession } from '@/lib/session';
 export async function middleware(request: NextRequest) {
   const session = await getSession();
   const { pathname } = request.nextUrl;
+  
+  // Clone the request headers and set a new header `x-pathname`
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-pathname', pathname);
 
   // If the user is not logged in and is trying to access an admin route
   if (!session && pathname.startsWith('/admin')) {
@@ -16,10 +20,15 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/admin/dashboard', request.url));
   }
 
-  return NextResponse.next();
+  // Apply the new headers to the response
+  return NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    }
+  });
 }
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ['/admin/:path*', '/login', '/signup'],
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
 }

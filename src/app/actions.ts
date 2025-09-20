@@ -4,7 +4,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { redirect } from 'next/navigation';
-import { User, users, setUsers, posts, setPosts, Post, Menu, Template, Page, pages, setPages, Category, categories, setCategories } from "@/lib/data";
+import { User, users, setUsers, posts, setPosts, Post, Menu, Template, Page, pages, setPages, Category, categories, setCategories, PageView } from "@/lib/data";
 import { createSession, deleteSession, getSession } from "@/lib/session";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { ImagePlaceholder } from "@/lib/placeholder-images";
@@ -1025,4 +1025,43 @@ export async function deleteCategory(categoryId: string) {
     return { success: "Category deleted successfully." };
 }
 
-    
+
+// Analytics Actions
+export async function getAnalyticsData() {
+    const analyticsPath = path.join(process.cwd(), 'src', 'lib', 'analytics.json');
+    try {
+        const file = await fs.readFile(analyticsPath, 'utf-8');
+        return JSON.parse(file) as { pageViews: PageView[] };
+    } catch (error) {
+        return { pageViews: [] };
+    }
+}
+
+export async function logPageView(pathname: string) {
+    // We won't log views for admin pages or API routes.
+    if (pathname.startsWith('/admin') || pathname.startsWith('/api')) {
+        return;
+    }
+
+    const analyticsPath = path.join(process.cwd(), 'src', 'lib', 'analytics.json');
+    try {
+        const analyticsData = await getAnalyticsData();
+        
+        const newView: PageView = {
+            path: pathname,
+            timestamp: new Date().toISOString(),
+        };
+
+        analyticsData.pageViews.push(newView);
+
+        // To keep the file size manageable, we'll only store the last 1000 page views.
+        if (analyticsData.pageViews.length > 1000) {
+            analyticsData.pageViews = analyticsData.pageViews.slice(-1000);
+        }
+
+        await fs.writeFile(analyticsPath, JSON.stringify(analyticsData, null, 2));
+    } catch (error) {
+        // Silently fail if logging doesn't work. We don't want to break the page render.
+        console.error("Failed to log page view:", error);
+    }
+}

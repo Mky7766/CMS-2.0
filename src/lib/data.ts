@@ -104,6 +104,11 @@ export type SiteSettings = {
   showAuthorBio?: boolean;
 };
 
+export type PageView = {
+    path: string;
+    timestamp: string;
+}
+
 
 let posts: Post[] = postsData;
 
