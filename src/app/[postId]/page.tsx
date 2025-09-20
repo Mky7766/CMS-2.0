@@ -18,6 +18,7 @@ import ListTemplate from "@/components/blog-templates/list-template";
 import AuthorBioBox from "@/components/author-bio-box";
 import { BadgeCheck } from "lucide-react";
 import SocialShare from "@/components/social-share";
+import { getSession } from "@/lib/session";
 
 async function getPosts(): Promise<Post[]> {
     const filePath = path.join(process.cwd(), 'src', 'lib', 'posts.json');
@@ -74,9 +75,11 @@ async function getPage(pageId: string): Promise<Page | undefined> {
     }
 }
 
-export default async function PostPage({ params }: { params: { postId: string } }) {
+export default async function PostPage({ params, searchParams }: { params: { postId: string }, searchParams?: { [key: string]: string | string[] | undefined }}) {
   const settings = await getSettings();
   const isPostsPage = settings.postsPageId && settings.postsPageId === params.postId;
+  const session = await getSession();
+  const isPreview = searchParams?.preview === 'true' && !!session;
 
   if (isPostsPage) {
     const page = await getPage(params.postId);
@@ -138,7 +141,7 @@ export default async function PostPage({ params }: { params: { postId: string } 
   const footerMenu = menus.find(m => m.id === settings.footerMenuId);
 
 
-  if (!post && !page) {
+  if ((!post && !page) || (post && post.status.toLowerCase() !== 'published' && !isPreview)) {
     notFound();
   }
 

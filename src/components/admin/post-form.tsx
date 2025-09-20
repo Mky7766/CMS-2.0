@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import RichTextEditor from "@/components/ui/rich-text-editor";
-import { Calendar, Save, UploadCloud, X, Loader } from "lucide-react";
+import { Calendar, Save, UploadCloud, X, Loader, Eye } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { savePost, updatePost, uploadMedia, getCategories, getSettings } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
@@ -94,7 +94,7 @@ export default function PostForm({ post }: PostFormProps) {
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
     setTitle(newTitle);
-    if (!post || (post && post.id === slugify(post.title))) {
+    if (!post || (post && post.id === slugify(page.title))) {
         setPermalink(slugify(newTitle));
     }
   };
@@ -145,6 +145,13 @@ export default function PostForm({ post }: PostFormProps) {
 
   const removeFeaturedImage = () => {
       setFeaturedImageUrl("");
+  }
+  
+  const handlePreview = () => {
+      if (permalink) {
+          const previewUrl = `/${permalink}?preview=true`;
+          window.open(previewUrl, '_blank');
+      }
   }
 
   return (
@@ -239,7 +246,12 @@ export default function PostForm({ post }: PostFormProps) {
             </div>
           </CardContent>
           <div className="p-6 pt-0 flex justify-between items-center">
-             <Button variant="outline" type="button" onClick={() => window.history.back()}>Cancel</Button>
+            {post && (
+                <Button variant="ghost" type="button" onClick={handlePreview}>
+                    <Eye className="mr-2 h-4 w-4" />
+                    Preview
+                </Button>
+            )}
             <SubmitButton isUpdate={!!post} />
           </div>
         </Card>

@@ -185,6 +185,30 @@
       "timestamp": "2025-09-20T11:25:44.323Z",
       "referrer": "direct",
       "source": "Direct"
+    },
+    {
+      "path": "/login",
+      "timestamp": "2025-09-20T11:25:47.722Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/capra/?origin=https%3A%2F%2Fstudio.firebase.google.com",
+      "source": "Other"
+    },
+    {
+      "path": "/login",
+      "timestamp": "2025-09-20T11:26:16.807Z",
+      "referrer": "https://workstations.cloud.google.com/",
+      "source": "Google"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-09-20T11:33:24.302Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/capra/?origin=https%3A%2F%2Fstudio.firebase.google.com",
+      "source": "Other"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-09-20T11:38:50.395Z",
+      "referrer": "direct",
+      "source": "Direct"
     }
   ]
 }
