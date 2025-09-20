@@ -44,13 +44,50 @@ export async function generateMetadata({ params }: { params: { postId: string } 
   const title = page?.title || post?.title || settings.siteName;
   const description = post ? (post.content ? post.content.substring(0, 150) : '') : (settings.tagline || '');
   
-  return {
+  const metadata: Metadata = {
     title: `${title} | ${settings.siteName}`,
     description: description,
     icons: {
       icon: settings.faviconUrl || '/favicon.ico',
     },
   };
+
+  if (post) {
+      const author = users.find(u => u.id === post.authorId);
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || `https://localhost:3000`;
+
+      const articleSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        mainEntityOfPage: {
+          '@type': 'WebPage',
+          '@id': `${siteUrl}/${post.id}`,
+        },
+        headline: post.title,
+        description: post.content.substring(0, 150),
+        image: post.featuredImage ? post.featuredImage.url : undefined,
+        author: {
+          '@type': 'Person',
+          name: author ? author.name : post.author.name,
+        },
+        publisher: {
+          '@type': 'Organization',
+          name: settings.siteName,
+          logo: {
+            '@type': 'ImageObject',
+            url: settings.logo,
+          },
+        },
+        datePublished: post.createdAt,
+        dateModified: post.createdAt,
+      };
+
+      metadata.other = {
+          'article-schema': <script type="application/ld+json">{JSON.stringify(articleSchema)}</script>
+      }
+  }
+  
+  return metadata;
 }
 
 
