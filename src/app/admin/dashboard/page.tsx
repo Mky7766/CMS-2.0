@@ -1,13 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Post, Page, PageView, User } from "@/lib/data";
-import { FileText, ArrowUpRight, User as UserIcon, ExternalLink, File as PageIcon, Eye, Users, Signal } from "lucide-react";
+import { Post, Page, User } from "@/lib/data";
+import { FileText, User as UserIcon, ExternalLink, File as PageIcon, Users, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import PostActions from "@/components/admin/post-actions";
-import AnalyticsChart from "@/components/admin/analytics-chart";
-import RecentActivityCard from "@/components/admin/recent-activity-card";
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -41,82 +39,12 @@ async function getUsers(): Promise<User[]> {
     }
 }
 
-async function getAnalyticsData() {
-    const analyticsPath = path.join(process.cwd(), 'src', 'lib', 'analytics.json');
-    try {
-        const file = await fs.readFile(analyticsPath, 'utf-8');
-        const data = JSON.parse(file) as { pageViews: PageView[] };
-        return data.pageViews;
-    } catch (error) {
-        return [];
-    }
-}
-
-function getStatsFromPageViews(pageViews: PageView[]) {
-    const now = new Date();
-    const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
-    
-    const recentActivity = pageViews
-        .filter(view => new Date(view.timestamp) >= fiveMinutesAgo)
-        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-
-    const activeUsers = recentActivity.length;
-
-    // For chart data (daily for last 7 days)
-    const dailyCounts: { [key: string]: number } = {};
-    for (let i = 6; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(now.getDate() - i);
-        const day = d.toLocaleDateString('en-US', { weekday: 'short' });
-        dailyCounts[day] = 0;
-    }
-    pageViews.forEach(view => {
-        const viewDate = new Date(view.timestamp);
-        if (viewDate > new Date(new Date().setDate(new Date().getDate() - 7))) {
-            const day = viewDate.toLocaleDateString('en-US', { weekday: 'short' });
-            if (dailyCounts[day] !== undefined) {
-                dailyCounts[day]++;
-            }
-        }
-    });
-
-    // For chart data (monthly for last 6 months)
-    const monthlyCounts: { [key: string]: number } = {};
-    for (let i = 5; i >= 0; i--) {
-        const d = new Date();
-        d.setMonth(now.getMonth() - i);
-        const month = d.toLocaleDateString('en-US', { month: 'short' });
-        monthlyCounts[month] = 0;
-    }
-    pageViews.forEach(view => {
-        const viewDate = new Date(view.timestamp);
-         if (viewDate > new Date(new Date().setMonth(new Date().getMonth() - 6))) {
-            const month = viewDate.toLocaleDateString('en-US', { month: 'short' });
-             if (monthlyCounts[month] !== undefined) {
-                monthlyCounts[month]++;
-            }
-        }
-    });
-
-    const dailyData = Object.entries(dailyCounts).map(([date, visitors]) => ({ date, visitors }));
-    const monthlyData = Object.entries(monthlyCounts).map(([date, visitors]) => ({ date, visitors }));
-
-    return {
-        activeUsers,
-        pageViewsCount: pageViews.length, // Total page views ever logged
-        dailyData,
-        monthlyData,
-        recentActivity
-    };
-}
-
 
 export default async function DashboardPage() {
-  const [allPosts, allPages, allUsers, analyticsPageViews] = await Promise.all([
+  const [allPosts, allPages, allUsers] = await Promise.all([
     getPosts(),
     getPages(),
     getUsers(),
-    getAnalyticsData(),
   ]);
   
   const recentPosts = [...allPosts].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 5);
@@ -125,13 +53,6 @@ export default async function DashboardPage() {
   const totalUsers = allUsers.length;
   const totalPages = allPages.length;
   
-  const { 
-    activeUsers,
-    pageViewsCount,
-    dailyData,
-    monthlyData,
-    recentActivity
-  } = getStatsFromPageViews(analyticsPageViews);
 
   return (
     <div className="space-y-8">
@@ -148,17 +69,7 @@ export default async function DashboardPage() {
         </Button>
       </div>
       
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-         <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Real-time Users</CardTitle>
-                <Signal className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-                <div className="text-2xl font-bold">{activeUsers}</div>
-                <p className="text-xs text-muted-foreground">Users active in the last 5 minutes</p>
-            </CardContent>
-        </Card>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Posts</CardTitle>
@@ -189,12 +100,6 @@ export default async function DashboardPage() {
                  <p className="text-xs text-muted-foreground">Total registered users</p>
             </CardContent>
         </Card>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <AnalyticsChart dailyData={dailyData} monthlyData={monthlyData} />
-        
-        <RecentActivityCard recentActivity={recentActivity} />
       </div>
       
        <div className="grid gap-4 md:grid-cols-1">
