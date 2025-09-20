@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -13,16 +14,16 @@ export default function RecentActivityCard({ recentActivity }: RecentActivityCar
     return (
         <Card className="lg:col-span-1">
             <CardHeader>
-                <CardTitle>Recent Activity</CardTitle>
+                <CardTitle>Recent Activity (Last 5 min)</CardTitle>
                 <CardDescription>
-                    What your visitors have been looking at.
+                    What your visitors have been looking at recently.
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 {recentActivity.length > 0 ? recentActivity.map((view, index) => (
                     <div key={index} className="flex items-center justify-between">
                         <Link href={view.path} className="font-medium hover:underline truncate" title={view.path}>
-                            {view.path}
+                            {view.path === '/' ? 'Homepage' : view.path}
                         </Link>
                         <span className="text-xs text-muted-foreground">
                             {formatDistanceToNow(new Date(view.timestamp), { addSuffix: true })}

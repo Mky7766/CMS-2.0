@@ -54,6 +54,7 @@ async function getAnalyticsData() {
 
 function getStatsFromPageViews(pageViews: PageView[]) {
     const now = new Date();
+    const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
     const oneMonthAgo = new Date();
     oneMonthAgo.setMonth(now.getMonth() - 1);
     
@@ -79,14 +80,13 @@ function getStatsFromPageViews(pageViews: PageView[]) {
     }
     pageViews.forEach(view => {
         const viewDate = new Date(view.timestamp);
-        if (viewDate > new Date(now.setDate(now.getDate() - 7))) {
+        if (viewDate > new Date(new Date().setDate(new Date().getDate() - 7))) {
             const day = viewDate.toLocaleDateString('en-US', { weekday: 'short' });
             if (dailyCounts[day] !== undefined) {
                 dailyCounts[day]++;
             }
         }
     });
-     now.setDate(now.getDate() + 7); // Reset date
 
     const monthlyCounts: { [key: string]: number } = {};
     for (let i = 5; i >= 0; i--) {
@@ -97,19 +97,21 @@ function getStatsFromPageViews(pageViews: PageView[]) {
     }
     pageViews.forEach(view => {
         const viewDate = new Date(view.timestamp);
-         if (viewDate > new Date(now.setMonth(now.getMonth() - 6))) {
+         if (viewDate > new Date(new Date().setMonth(new Date().getMonth() - 6))) {
             const month = viewDate.toLocaleDateString('en-US', { month: 'short' });
              if (monthlyCounts[month] !== undefined) {
                 monthlyCounts[month]++;
             }
         }
     });
-    now.setMonth(now.getMonth() + 6); // Reset date
 
     const dailyData = Object.entries(dailyCounts).map(([date, visitors]) => ({ date, visitors }));
     const monthlyData = Object.entries(monthlyCounts).map(([date, visitors]) => ({ date, visitors }));
     
-    const recentActivity = pageViews.slice(-5).reverse();
+    const recentActivity = pageViews
+        .filter(view => new Date(view.timestamp) >= fiveMinutesAgo)
+        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
 
     return {
         totalVisitors,
@@ -156,7 +158,7 @@ export default async function DashboardPage() {
       <div className="flex items-center justify-between">
         <div>
             <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-            <p className="text-muted-foreground">Welcome back! Here&apos;s a summary of your site.</p>
+            <p className="text-muted-foreground">Welcome back! Here's a summary of your site.</p>
         </div>
         <Button asChild variant="outline">
             <Link href="/" target="_blank">
