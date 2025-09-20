@@ -82,6 +82,18 @@ export default function ProfileForm({ user }: ProfileFormProps) {
                     />
                      <p className="text-sm text-muted-foreground">A brief bio (around 120 words). Displayed on your author profile.</p>
                 </div>
+                <div className="space-y-2">
+                    <Label htmlFor="twitter">Twitter Profile URL</Label>
+                    <Input id="twitter" name="twitter" defaultValue={user.twitter} placeholder="https://twitter.com/username" />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="linkedin">LinkedIn Profile URL</Label>
+                    <Input id="linkedin" name="linkedin" defaultValue={user.linkedin} placeholder="https://linkedin.com/in/username" />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="github">GitHub Profile URL</Label>
+                    <Input id="github" name="github" defaultValue={user.github} placeholder="https://github.com/username" />
+                </div>
                  <div className="space-y-2">
                     <Label htmlFor="password">New Password</Label>
                     <Input id="password" name="password" type="password" placeholder="Leave blank to keep current password"/>

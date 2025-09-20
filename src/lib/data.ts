@@ -44,6 +44,10 @@ export type User = {
     role: 'Admin' | 'Editor' | 'Author';
     createdAt: string;
     bio?: string;
+    twitter?: string;
+    linkedin?: string;
+    github?: string;
+    website?: string;
 }
 
 export type MenuItem = {

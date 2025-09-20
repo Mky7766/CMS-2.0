@@ -592,6 +592,10 @@ export async function updateUser(prevState: any, formData: FormData) {
     const password = formData.get('password') as string;
     const confirmPassword = formData.get('confirmPassword') as string;
     const bio = formData.get('bio') as string;
+    const twitter = formData.get('twitter') as string;
+    const linkedin = formData.get('linkedin') as string;
+    const github = formData.get('github') as string;
+    const website = formData.get('website') as string;
 
 
     const userIndex = users.findIndex(u => u.id === session.userId);
@@ -604,7 +608,10 @@ export async function updateUser(prevState: any, formData: FormData) {
     
     userToUpdate.name = name;
     userToUpdate.bio = bio;
-
+    userToUpdate.twitter = twitter;
+    userToUpdate.linkedin = linkedin;
+    userToUpdate.github = github;
+    userToUpdate.website = website;
 
     if (password) {
         if (password !== confirmPassword) {
