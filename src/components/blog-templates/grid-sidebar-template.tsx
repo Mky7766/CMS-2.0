@@ -1,11 +1,13 @@
 
-import { posts } from "@/lib/data";
+import { posts, users } from "@/lib/data";
 import Link from "next/link";
 import Image from "next/image";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { BadgeCheck } from "lucide-react";
 
 function PostCard({ post }: { post: (typeof posts)[0] }) {
+    const author = users.find(u => u.id === post.authorId);
     return (
         <Card className="flex flex-col overflow-hidden">
             {post.featuredImage && (
@@ -33,10 +35,22 @@ function PostCard({ post }: { post: (typeof posts)[0] }) {
             </CardContent>
             <CardFooter className="flex items-center gap-3 mt-auto">
                 <Avatar className="h-9 w-9">
-                    <AvatarImage src={post.author.avatarUrl} alt={post.author.name} />
-                    <AvatarFallback>{post.author.name.charAt(0)}</AvatarFallback>
+                    {author ? (
+                        <>
+                            <AvatarImage src={author.avatarUrl} alt={author.name} />
+                            <AvatarFallback>{author.name.charAt(0)}</AvatarFallback>
+                        </>
+                    ) : (
+                        <>
+                            <AvatarImage src={post.author.avatarUrl} alt={post.author.name} />
+                            <AvatarFallback>{post.author.name.charAt(0)}</AvatarFallback>
+                        </>
+                    )}
                 </Avatar>
-                <span className="text-sm font-medium">{post.author.name}</span>
+                <span className="text-sm font-medium flex items-center gap-1">
+                    {author ? author.name : post.author.name}
+                    {author && (author.role === 'Admin' || author.role === 'Editor' || author.role === 'Author') && <BadgeCheck className="h-4 w-4 text-blue-500" />}
+                </span>
             </CardFooter>
         </Card>
     )
