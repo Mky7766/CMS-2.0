@@ -58,7 +58,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
         <Card>
             <CardHeader>
             <CardTitle>Edit Profile</CardTitle>
-            <CardDescription>Update your name, bio, and password.</CardDescription>
+            <CardDescription>Update your name, bio, and social links.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -82,17 +82,39 @@ export default function ProfileForm({ user }: ProfileFormProps) {
                     />
                      <p className="text-sm text-muted-foreground">A brief bio (around 120 words). Displayed on your author profile.</p>
                 </div>
-                <div className="space-y-2">
-                    <Label htmlFor="twitter">Twitter Profile URL</Label>
-                    <Input id="twitter" name="twitter" defaultValue={user.twitter} placeholder="https://twitter.com/username" />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="linkedin">LinkedIn Profile URL</Label>
-                    <Input id="linkedin" name="linkedin" defaultValue={user.linkedin} placeholder="https://linkedin.com/in/username" />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="github">GitHub Profile URL</Label>
-                    <Input id="github" name="github" defaultValue={user.github} placeholder="https://github.com/username" />
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="website">Website URL</Label>
+                        <Input id="website" name="website" defaultValue={user.website} placeholder="https://example.com" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="twitter">Twitter Profile URL</Label>
+                        <Input id="twitter" name="twitter" defaultValue={user.twitter} placeholder="https://twitter.com/username" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="linkedin">LinkedIn Profile URL</Label>
+                        <Input id="linkedin" name="linkedin" defaultValue={user.linkedin} placeholder="https://linkedin.com/in/username" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="github">GitHub Profile URL</Label>
+                        <Input id="github" name="github" defaultValue={user.github} placeholder="https://github.com/username" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="facebook">Facebook Profile URL</Label>
+                        <Input id="facebook" name="facebook" defaultValue={user.facebook} placeholder="https://facebook.com/username" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="instagram">Instagram Profile URL</Label>
+                        <Input id="instagram" name="instagram" defaultValue={user.instagram} placeholder="https://instagram.com/username" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="youtube">YouTube Channel URL</Label>
+                        <Input id="youtube" name="youtube" defaultValue={user.youtube} placeholder="https://youtube.com/c/channelname" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="whatsapp">WhatsApp Link</Label>
+                        <Input id="whatsapp" name="whatsapp" defaultValue={user.whatsapp} placeholder="https://wa.me/1234567890" />
+                    </div>
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="password">New Password</Label>

@@ -48,6 +48,10 @@ export type User = {
     linkedin?: string;
     github?: string;
     website?: string;
+    facebook?: string;
+    instagram?: string;
+    youtube?: string;
+    whatsapp?: string;
 }
 
 export type MenuItem = {
