@@ -15,11 +15,11 @@ type TopReferrersCardProps = {
 
 export default function TopReferrersCard({ referrers }: TopReferrersCardProps) {
   return (
-    <Card className="lg:col-span-2">
+    <Card className="lg:col-span-1">
       <CardHeader>
         <CardTitle>Top Referrers</CardTitle>
         <CardDescription>
-          Websites sending the most traffic to your site.
+          Websites sending the most referral traffic.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -46,10 +46,12 @@ export default function TopReferrersCard({ referrers }: TopReferrersCardProps) {
           </div>
         ) : (
           <p className="text-muted-foreground text-center py-8">
-            No referrer data available yet.
+            No referrer data for this period.
           </p>
         )}
       </CardContent>
     </Card>
   );
 }
+
+    
