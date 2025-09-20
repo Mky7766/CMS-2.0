@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Post, Page, PageView, User } from "@/lib/data";
-import { FileText, ArrowUpRight, User as UserIcon, ExternalLink, File as PageIcon, Eye, Users } from "lucide-react";
+import { FileText, ArrowUpRight, User as UserIcon, ExternalLink, File as PageIcon, Eye, Users, Signal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import PostActions from "@/components/admin/post-actions";
@@ -55,22 +55,14 @@ async function getAnalyticsData() {
 function getStatsFromPageViews(pageViews: PageView[]) {
     const now = new Date();
     const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(now.getMonth() - 1);
     
-    const oneDayAgo = new Date();
-    oneDayAgo.setDate(now.getDate() - 1);
+    const recentActivity = pageViews
+        .filter(view => new Date(view.timestamp) >= fiveMinutesAgo)
+        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
-    const thisMonthViews = pageViews.filter(v => new Date(v.timestamp) >= oneMonthAgo);
-    
-    // Unique Visitors (simple version: unique IPs or sessions would be better)
-    const uniquePathsThisMonth = new Set(thisMonthViews.map(v => v.path));
+    const activeUsers = recentActivity.length;
 
-    const totalVisitors = thisMonthViews.length;
-    const uniqueVisitors = uniquePathsThisMonth.size; // Simplified metric
-    const pageViewsCount = pageViews.length; // Total page views ever logged
-
-    // For chart data (daily for last 7 days, monthly for last 6 months)
+    // For chart data (daily for last 7 days)
     const dailyCounts: { [key: string]: number } = {};
     for (let i = 6; i >= 0; i--) {
         const d = new Date();
@@ -88,6 +80,7 @@ function getStatsFromPageViews(pageViews: PageView[]) {
         }
     });
 
+    // For chart data (monthly for last 6 months)
     const monthlyCounts: { [key: string]: number } = {};
     for (let i = 5; i >= 0; i--) {
         const d = new Date();
@@ -107,16 +100,10 @@ function getStatsFromPageViews(pageViews: PageView[]) {
 
     const dailyData = Object.entries(dailyCounts).map(([date, visitors]) => ({ date, visitors }));
     const monthlyData = Object.entries(monthlyCounts).map(([date, visitors]) => ({ date, visitors }));
-    
-    const recentActivity = pageViews
-        .filter(view => new Date(view.timestamp) >= fiveMinutesAgo)
-        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-
 
     return {
-        totalVisitors,
-        uniqueVisitors,
-        pageViewsCount,
+        activeUsers,
+        pageViewsCount: pageViews.length, // Total page views ever logged
         dailyData,
         monthlyData,
         recentActivity
@@ -139,20 +126,13 @@ export default async function DashboardPage() {
   const totalPages = allPages.length;
   
   const { 
-    totalVisitors, 
-    uniqueVisitors, 
+    activeUsers,
     pageViewsCount,
     dailyData,
     monthlyData,
     recentActivity
   } = getStatsFromPageViews(analyticsPageViews);
 
-  const analyticsStats = [
-      { title: "Total Visitors (Month)", value: totalVisitors.toLocaleString(), icon: Users, change: "+20.1%", changeType: "increase" as const },
-      { title: "Unique Visitors (Month)", value: uniqueVisitors.toLocaleString(), icon: UserIcon, change: "+18.3%", changeType: "increase" as const },
-      { title: "Total Page Views", value: pageViewsCount.toLocaleString(), icon: Eye, change: "+5.2%", changeType: "decrease" as const },
-  ]
-  
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
@@ -169,6 +149,16 @@ export default async function DashboardPage() {
       </div>
       
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+         <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Real-time Users</CardTitle>
+                <Signal className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+                <div className="text-2xl font-bold">{activeUsers}</div>
+                <p className="text-xs text-muted-foreground">Users active in the last 5 minutes</p>
+            </CardContent>
+        </Card>
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Posts</CardTitle>
@@ -176,6 +166,7 @@ export default async function DashboardPage() {
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold">{totalPosts}</div>
+                 <p className="text-xs text-muted-foreground">Total posts on your site</p>
             </CardContent>
         </Card>
          <Card>
@@ -185,6 +176,7 @@ export default async function DashboardPage() {
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold">{totalPages}</div>
+                 <p className="text-xs text-muted-foreground">Total pages on your site</p>
             </CardContent>
         </Card>
         <Card>
@@ -194,15 +186,7 @@ export default async function DashboardPage() {
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold">{totalUsers}</div>
-            </CardContent>
-        </Card>
-        <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Page Views</CardTitle>
-                <Eye className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-                <div className="text-2xl font-bold">{pageViewsCount}</div>
+                 <p className="text-xs text-muted-foreground">Total registered users</p>
             </CardContent>
         </Card>
       </div>
