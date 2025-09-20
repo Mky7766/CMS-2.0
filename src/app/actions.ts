@@ -168,6 +168,11 @@ export async function savePost(prevState: any, formData: FormData) {
         return { error: "Could not save the post. Please try again." };
     }
     
+    const settings = await getSettings();
+    if (settings.postsPageId) {
+        revalidatePath(`/${settings.postsPageId}`);
+    }
+
     revalidatePath('/');
     revalidatePath(`/${permalink}`);
     redirect('/admin/posts');
@@ -229,6 +234,11 @@ export async function updatePost(prevState: any, formData: FormData) {
         console.error("Failed to update post:", error);
         return { error: "Could not update the post. Please try again." };
     }
+    
+    const settings = await getSettings();
+    if (settings.postsPageId) {
+        revalidatePath(`/${settings.postsPageId}`);
+    }
 
     revalidatePath('/');
     revalidatePath(`/${postId}`);
@@ -254,6 +264,11 @@ export async function deletePost(postId: string) {
         return { error: "Could not delete the post. Please try again." };
     }
     
+    const settings = await getSettings();
+    if (settings.postsPageId) {
+        revalidatePath(`/${settings.postsPageId}`);
+    }
+
     revalidatePath('/');
     revalidatePath(`/admin/posts`);
     revalidatePath(`/${postId}`);
@@ -1009,3 +1024,5 @@ export async function deleteCategory(categoryId: string) {
     revalidatePath('/admin/categories');
     return { success: "Category deleted successfully." };
 }
+
+    
