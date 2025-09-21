@@ -23,6 +23,7 @@ export type Post = {
     alt: string;
   };
   format?: string;
+  hideTitle?: boolean;
 };
 
 export type Page = {

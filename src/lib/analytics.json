@@ -281,6 +281,125 @@
       "timestamp": "2025-09-21T00:48:00.319Z",
       "referrer": "direct",
       "source": "Direct"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-09-21T03:44:09.668Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/capra/?origin=https%3A%2F%2Fstudio.firebase.google.com",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-09-21T04:00:19.758Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/capra/?origin=https%3A%2F%2Fstudio.firebase.google.com",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-09-21T04:05:04.130Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/capra/?origin=https%3A%2F%2Fstudio.firebase.google.com",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-09-21T07:24:33.005Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/capra/?origin=https%3A%2F%2Fstudio.firebase.google.com",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-09-21T07:26:09.690Z",
+      "referrer": "https://9000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/monospace_preview/?backgroundColor=%231f1f1f&consoleIframeLink=File+in+iframe+does+not+exist.&consoleJSLink=File+does+not+exist.&embedded=1&linkInterceptDisabled=false&projectRoot=%2Fhome%2Fuser%2Fstudio&target=web&webDevToolsEnabled=true",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-09-21T07:26:11.449Z",
+      "referrer": "https://9000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/monospace_preview/?backgroundColor=%231f1f1f&consoleIframeLink=File+in+iframe+does+not+exist.&consoleJSLink=File+does+not+exist.&embedded=1&linkInterceptDisabled=false&projectRoot=%2Fhome%2Fuser%2Fstudio&target=web&webDevToolsEnabled=true",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-09-21T07:27:07.817Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/capra/?origin=https%3A%2F%2Fstudio.firebase.google.com",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-09-21T07:27:59.754Z",
+      "referrer": "https://9000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/monospace_preview/?target=web&linkInterceptDisabled=false&webDevToolsEnabled=true&consoleJSLink=File+does+not+exist.&consoleIframeLink=File+in+iframe+does+not+exist.&embedded=1&backgroundColor=%231f1f1f&projectRoot=%2Fhome%2Fuser%2Fstudio",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-09-21T07:28:00.395Z",
+      "referrer": "https://9000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/monospace_preview/?target=web&linkInterceptDisabled=false&webDevToolsEnabled=true&consoleJSLink=File+does+not+exist.&consoleIframeLink=File+in+iframe+does+not+exist.&embedded=1&backgroundColor=%231f1f1f&projectRoot=%2Fhome%2Fuser%2Fstudio",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-09-21T07:29:05.334Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/capra/?origin=https%3A%2F%2Fstudio.firebase.google.com",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/blog",
+      "timestamp": "2025-09-21T07:36:10.394Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/capra/?origin=https%3A%2F%2Fstudio.firebase.google.com",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/script.js",
+      "timestamp": "2025-09-21T07:42:44.672Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/samsung-phone-under-10000-jhssh",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/samsung-phone-under-10000-jhssh",
+      "timestamp": "2025-09-21T07:45:54.086Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/samsung-phone-under-10000-jhssh",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/script.js",
+      "timestamp": "2025-09-21T07:45:57.519Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/samsung-phone-under-10000-jhssh",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/samsung-phone-under-10000-jhssh",
+      "timestamp": "2025-09-21T07:46:02.427Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/samsung-phone-under-10000-jhssh",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/script.js",
+      "timestamp": "2025-09-21T07:46:05.087Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/samsung-phone-under-10000-jhssh",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-09-21T07:50:02.241Z",
+      "referrer": "direct",
+      "source": "Direct",
+      "country": "Unknown"
     }
   ]
 }

@@ -116,6 +116,7 @@ export async function savePost(prevState: any, formData: FormData) {
     const tags = (formData.get('tags-hidden') as string).split(',').filter(t => t.trim() !== '');
     const categoryId = formData.get('category-id') as string;
     const format = formData.get('format') as string;
+    const hideTitle = formData.get('hide-title') === 'on';
 
     const session = await getSession();
     if (!session?.userId) {
@@ -146,7 +147,8 @@ export async function savePost(prevState: any, formData: FormData) {
         authorId: author.id,
         categoryId,
         tags,
-        format
+        format,
+        hideTitle,
     };
     
     if (featuredImageUrl) {
@@ -188,6 +190,7 @@ export async function updatePost(prevState: any, formData: FormData) {
     const tags = (formData.get('tags-hidden') as string).split(',').filter(t => t.trim() !== '');
     const categoryId = formData.get('category-id') as string;
     const format = formData.get('format') as string;
+    const hideTitle = formData.get('hide-title') === 'on';
 
     const session = await getSession();
     if (!session?.userId) {
@@ -212,6 +215,7 @@ export async function updatePost(prevState: any, formData: FormData) {
     updatedPost.tags = tags;
     updatedPost.categoryId = categoryId;
     updatedPost.format = format;
+    updatedPost.hideTitle = hideTitle;
     
     if (featuredImageUrl) {
         updatedPost.featuredImage = {

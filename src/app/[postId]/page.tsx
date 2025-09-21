@@ -75,7 +75,7 @@ export async function generateMetadata({ params }: { params: { postId: string } 
           name: settings.siteName,
           logo: {
             '@type': 'ImageObject',
-            url: settings.logo,
+            url: settings.logoUrl,
           },
         },
         datePublished: post.createdAt,
@@ -242,7 +242,9 @@ export default async function PostPage({ params, searchParams }: { params: { pos
            )}
           <article className="prose prose-lg mx-auto max-w-4xl dark:prose-invert">
             <header className="mb-8">
-              <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">{post.title}</h1>
+              {!post.hideTitle && (
+                <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">{post.title}</h1>
+              )}
               <div className="mt-4 flex items-center gap-4 text-muted-foreground">
                 <div className="flex items-center gap-2">
                    <Avatar className="h-9 w-9">

@@ -15,6 +15,7 @@ import { Badge } from "../ui/badge";
 import { savePost, updatePost, uploadMedia, getCategories, getSettings } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import type { Post, Category, SiteSettings } from "@/lib/data";
+import { Switch } from "../ui/switch";
 
 function SubmitButton({ isUpdate }: { isUpdate?: boolean }) {
   const { pending } = useFormStatus();
@@ -236,6 +237,18 @@ export default function PostForm({ post }: PostFormProps) {
                   <SelectItem value="Scheduled">Scheduled</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+            <div className="flex items-center justify-between rounded-lg border p-3">
+                <div className="space-y-0.5">
+                    <Label>Hide Title</Label>
+                    <p className="text-xs text-muted-foreground">
+                        If checked, the post title will not be displayed on the page.
+                    </p>
+                </div>
+                <Switch
+                    name="hide-title"
+                    defaultChecked={post?.hideTitle}
+                />
             </div>
             <div>
                 <Label>Schedule Publish</Label>
