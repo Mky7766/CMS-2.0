@@ -31,8 +31,10 @@ type GeneralSettingsFormProps = {
 export default function GeneralSettingsForm({ settings: initialSettings }: GeneralSettingsFormProps) {
   const [state, formAction] = useActionState(updateSettings, null);
   const { toast } = useToast();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFaviconModalOpen, setIsFaviconModalOpen] = useState(false);
+  const [isLogoModalOpen, setIsLogoModalOpen] = useState(false);
   const [faviconUrl, setFaviconUrl] = useState(initialSettings.faviconUrl || "");
+  const [logoUrl, setLogoUrl] = useState(initialSettings.logoUrl || "");
 
   useEffect(() => {
     if (state?.error) {
@@ -50,21 +52,27 @@ export default function GeneralSettingsForm({ settings: initialSettings }: Gener
     }
   }, [state, toast]);
 
-  const handleSelectImage = (imageUrl: string) => {
+  const handleSelectFavicon = (imageUrl: string) => {
     setFaviconUrl(imageUrl);
-    setIsModalOpen(false);
+    setIsFaviconModalOpen(false);
+  }
+
+  const handleSelectLogo = (imageUrl: string) => {
+    setLogoUrl(imageUrl);
+    setIsLogoModalOpen(false);
   }
   
   return (
     <>
     <form action={formAction}>
+        <input type="hidden" name="logo-url" value={logoUrl} />
         <input type="hidden" name="favicon-url" value={faviconUrl} />
         <Card>
             <CardHeader>
             <CardTitle>General Settings</CardTitle>
             <CardDescription>Update your site's basic information.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
             <div className="space-y-2">
                 <Label htmlFor="site-name">Site Name</Label>
                 <Input id="site-name" name="site-name" defaultValue={initialSettings.siteName} />
@@ -72,6 +80,22 @@ export default function GeneralSettingsForm({ settings: initialSettings }: Gener
             <div className="space-y-2">
                 <Label htmlFor="tagline">Tagline</Label>
                 <Input id="tagline" name="tagline" defaultValue={initialSettings.tagline} />
+            </div>
+            <div className="space-y-2">
+                <Label>Site Logo</Label>
+                <div className="flex items-center gap-4">
+                    <div className="w-32 h-16 rounded-md border flex items-center justify-center bg-muted/50 p-1">
+                        {logoUrl ? (
+                            <Image src={logoUrl} alt="Logo Preview" width={120} height={60} className="object-contain h-full w-auto" unoptimized={logoUrl.startsWith('data:')}/>
+                        ) : (
+                            <ImageIcon className="w-8 h-8 text-muted-foreground" />
+                        )}
+                    </div>
+                    <Button type="button" variant="outline" onClick={() => setIsLogoModalOpen(true)}>
+                        <UploadCloud className="mr-2 h-4 w-4" />
+                        Upload Logo
+                    </Button>
+                </div>
             </div>
             <div className="space-y-2">
                 <Label>Favicon</Label>
@@ -83,9 +107,9 @@ export default function GeneralSettingsForm({ settings: initialSettings }: Gener
                             <ImageIcon className="w-8 h-8 text-muted-foreground" />
                         )}
                     </div>
-                    <Button type="button" variant="outline" onClick={() => setIsModalOpen(true)}>
+                    <Button type="button" variant="outline" onClick={() => setIsFaviconModalOpen(true)}>
                         <UploadCloud className="mr-2 h-4 w-4" />
-                        Upload Image
+                        Upload Favicon
                     </Button>
                 </div>
             </div>
@@ -106,9 +130,14 @@ export default function GeneralSettingsForm({ settings: initialSettings }: Gener
         </Card>
     </form>
     <MediaLibraryModal 
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSelectImage={handleSelectImage}
+        isOpen={isLogoModalOpen}
+        onClose={() => setIsLogoModalOpen(false)}
+        onSelectImage={handleSelectLogo}
+    />
+    <MediaLibraryModal 
+        isOpen={isFaviconModalOpen}
+        onClose={() => setIsFaviconModalOpen(false)}
+        onSelectImage={handleSelectFavicon}
     />
     </>
   );

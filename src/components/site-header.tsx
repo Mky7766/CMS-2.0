@@ -3,6 +3,7 @@
 
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Menu as MenuIcon, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -54,8 +55,14 @@ export default function SiteHeader({ settings, headerMenu }: SiteHeaderProps) {
       <div className="container flex h-16 items-center">
         <div className={cn("flex-1 md:flex-none transition-all duration-300", isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100")}>
           <Link href="/" className="flex items-center gap-2 font-headline text-xl font-bold">
-            <Icons.logo className="h-6 w-6" />
-            {settings.siteName || "Vinee CMS"}
+             {settings.logoUrl ? (
+                <Image src={settings.logoUrl} alt={settings.siteName} width={120} height={40} className="h-10 w-auto" unoptimized={settings.logoUrl.startsWith('data:')}/>
+             ) : (
+                <>
+                    <Icons.logo className="h-6 w-6" />
+                    {settings.siteName || "Vinee CMS"}
+                </>
+             )}
           </Link>
         </div>
 
@@ -121,8 +128,14 @@ export default function SiteHeader({ settings, headerMenu }: SiteHeaderProps) {
                 </SheetHeader>
                 <div className="p-4">
                   <Link href="/" className="flex items-center gap-2 font-headline text-xl font-bold mb-4" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Icons.logo className="h-6 w-6" />
-                    <span>{settings.siteName || "Vinee CMS"}</span>
+                    {settings.logoUrl ? (
+                        <Image src={settings.logoUrl} alt={settings.siteName} width={120} height={40} className="h-10 w-auto" unoptimized={settings.logoUrl.startsWith('data:')}/>
+                    ) : (
+                        <>
+                            <Icons.logo className="h-6 w-6" />
+                            <span>{settings.siteName || "Vinee CMS"}</span>
+                        </>
+                    )}
                   </Link>
                   <nav className="flex flex-col space-y-2">
                     {headerMenu ? (

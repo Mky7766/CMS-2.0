@@ -60,7 +60,7 @@
   {
     "id": "book-for-india",
     "title": "Book for India ",
-    "content": "New Book fore in India&nbsp;",
+    "content": "New Book fore in <a href=\"https://bajtimes.com\">India</a>&nbsp;",
     "status": "Published",
     "createdAt": "2025-09-20",
     "author": {

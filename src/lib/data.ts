@@ -92,7 +92,7 @@ export type FirebaseConfig = {
 export type SiteSettings = {
   siteName: string;
   tagline: string;
-  logo: string;
+  logoUrl?: string;
   faviconUrl?: string;
   headerMenuId?: string;
   footerMenuId?: string;
@@ -120,6 +120,7 @@ export type PageView = {
     timestamp: string;
     referrer?: string;
     source?: 'Direct' | 'Social' | 'Google' | 'Other';
+    country?: string;
 }
 
 

@@ -4,7 +4,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { redirect } from 'next/navigation';
-import { User, users, setUsers, posts, setPosts, Post, Menu, Template, Page, pages, setPages, Category, categories, setCategories, PageView } from "@/lib/data";
+import { User, users, setUsers, posts, setPosts, Post, Menu, Template, Page, pages, setPages, Category, categories, setCategories, PageView, CountryTraffic } from "@/lib/data";
 import { createSession, deleteSession, getSession } from "@/lib/session";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { ImagePlaceholder } from "@/lib/placeholder-images";
@@ -32,7 +32,6 @@ export const getSettings = cache(async (): Promise<SiteSettings> => {
     const defaultSettings: SiteSettings = {
       siteName: "Vinee CMS",
       tagline: "A modern, git-based CMS",
-      logo: "https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600",
       footerText: "Built with ❤️ by the open-source community.",
       blogTemplate: "grid"
     };
@@ -480,6 +479,7 @@ export async function updateSettings(prevState: any, formData: FormData) {
             ...currentSettings,
             siteName: formData.has('site-name') ? formData.get('site-name') as string : currentSettings.siteName,
             tagline: formData.has('tagline') ? formData.get('tagline') as string : currentSettings.tagline,
+            logoUrl: formData.has('logo-url') ? formData.get('logo-url') as string : currentSettings.logoUrl,
             faviconUrl: formData.has('favicon-url') ? formData.get('favicon-url') as string : currentSettings.faviconUrl,
             headerMenuId: formData.has('header-menu-id') ? formData.get('header-menu-id') as string : currentSettings.headerMenuId,
             footerMenuId: formData.has('footer-menu-id') ? formData.get('footer-menu-id') as string : currentSettings.footerMenuId,
@@ -1064,7 +1064,7 @@ function getTrafficSource(referrer: string | undefined, host: string): PageView[
     return 'Other';
 }
 
-export async function logPageView(pathname: string, referrer: string | undefined, host: string) {
+export async function logPageView(pathname: string, referrer: string | undefined, host: string, country: string | undefined) {
     // We won't log views for admin pages or API routes.
     if (pathname.startsWith('/admin') || pathname.startsWith('/api')) {
         return;
@@ -1078,7 +1078,8 @@ export async function logPageView(pathname: string, referrer: string | undefined
             path: pathname,
             timestamp: new Date().toISOString(),
             referrer: referrer || 'direct',
-            source: getTrafficSource(referrer, host)
+            source: getTrafficSource(referrer, host),
+            country: country || 'Unknown'
         };
 
         analyticsData.pageViews.push(newView);
