@@ -39,9 +39,10 @@ export async function createSession(userId: string) {
 }
 
 export async function getSession() {
-  const cookie = cookies().get('session')?.value
-  const session = await decrypt(cookie)
-  return session ? session : null
+  const cookieStore = cookies();
+  const sessionCookie = cookieStore.get('session')?.value;
+  const session = await decrypt(sessionCookie);
+  return session ? session : null;
 }
 
 export async function deleteSession() {
