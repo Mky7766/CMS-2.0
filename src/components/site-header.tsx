@@ -60,18 +60,16 @@ export default function SiteHeader({ settings, headerMenu }: SiteHeaderProps) {
       );
     }
     
-    // Check if the logo is an SVG, if so, use a regular img tag
-    // as Next.js Image component doesn't support external SVGs well.
     if (settings.logoUrl.endsWith('.svg')) {
       return (
-        <img src={settings.logoUrl} alt={settings.siteName} className="h-10 w-auto" />
+        <img src={settings.logoUrl} alt={settings.siteName || ''} className="h-10 w-auto" />
       );
     }
 
     return (
       <Image 
         src={settings.logoUrl} 
-        alt={settings.siteName} 
+        alt={settings.siteName || ''}
         width={120} 
         height={40} 
         className="h-10 w-auto" 
