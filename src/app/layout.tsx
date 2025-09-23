@@ -12,15 +12,18 @@ import type { Viewport } from 'next'
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
   const faviconUrl = settings.faviconUrl || '/favicon.ico';
+  
+  const icons = faviconUrl.startsWith('data:') 
+    ? { icon: [{ url: faviconUrl, type: 'image/x-icon' }] }
+    : { icon: [{ url: faviconUrl }] };
+
   return {
     title: {
       default: settings.siteName || 'Vinee CMS',
       template: `%s | ${settings.siteName || 'Vinee CMS'}`,
     },
     description: settings.tagline || 'A full-featured open-source CMS that runs on static site hosting.',
-    icons: {
-      icon: [{ url: faviconUrl }],
-    },
+    icons: icons,
   }
 }
 
@@ -75,4 +78,3 @@ export default async function RootLayout({
     </html>
   );
 }
-
