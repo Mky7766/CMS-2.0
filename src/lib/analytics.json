@@ -631,6 +631,34 @@
       "referrer": "https://9000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/monospace_preview/?target=web&linkInterceptDisabled=false&webDevToolsEnabled=true&consoleJSLink=File+does+not+exist.&consoleIframeLink=File+in+iframe+does+not+exist.&embedded=1&backgroundColor=%231f1f1f&projectRoot=%2Fhome%2Fuser%2Fstudio",
       "source": "Other",
       "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-09-23T11:18:52.582Z",
+      "referrer": "https://workstations.cloud.google.com/",
+      "source": "Google",
+      "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-09-23T11:19:11.370Z",
+      "referrer": "direct",
+      "source": "Direct",
+      "country": "Unknown"
+    },
+    {
+      "path": "/blog",
+      "timestamp": "2025-09-23T11:19:39.181Z",
+      "referrer": "direct",
+      "source": "Direct",
+      "country": "Unknown"
+    },
+    {
+      "path": "/login",
+      "timestamp": "2025-09-23T11:22:32.182Z",
+      "referrer": "direct",
+      "source": "Direct",
+      "country": "Unknown"
     }
   ]
 }
