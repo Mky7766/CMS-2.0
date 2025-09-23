@@ -7,9 +7,11 @@ import { getSettings, logPageView } from './actions';
 import HtmlRenderer from '@/components/html-renderer';
 import { ThemeProvider } from '@/components/theme-provider';
 import { headers } from 'next/headers';
+import type { Viewport } from 'next'
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
+  const faviconUrl = settings.faviconUrl || '/favicon.ico';
   return {
     title: {
       default: settings.siteName || 'Vinee CMS',
@@ -17,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description: settings.tagline || 'A full-featured open-source CMS that runs on static site hosting.',
     icons: {
-      icon: settings.faviconUrl || '/favicon.ico',
+      icon: [{ url: faviconUrl }],
     },
   }
 }
@@ -31,10 +33,11 @@ export default async function RootLayout({
   const pathname = headersList.get('x-pathname') || '';
   const referrer = headersList.get('referer') || undefined;
   const host = headersList.get('host') || '';
-  
-  if(pathname) {
+  const country = headersList.get('x-vercel-ip-country') || undefined;
+
+  if (pathname) {
     // We don't want to await this, let it run in the background
-    logPageView(pathname, referrer, host);
+    logPageView(pathname, referrer, host, country);
   }
 
   const settings = await getSettings();
@@ -72,3 +75,4 @@ export default async function RootLayout({
     </html>
   );
 }
+
