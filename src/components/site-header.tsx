@@ -50,19 +50,42 @@ export default function SiteHeader({ settings, headerMenu }: SiteHeaderProps) {
     }
   };
 
+  const renderLogo = () => {
+    if (!settings.logoUrl) {
+      return (
+        <>
+          <Icons.logo className="h-6 w-6" />
+          <span>{settings.siteName || "Vinee CMS"}</span>
+        </>
+      );
+    }
+    
+    // Check if the logo is an SVG, if so, use a regular img tag
+    // as Next.js Image component doesn't support external SVGs well.
+    if (settings.logoUrl.endsWith('.svg')) {
+      return (
+        <img src={settings.logoUrl} alt={settings.siteName} className="h-10 w-auto" />
+      );
+    }
+
+    return (
+      <Image 
+        src={settings.logoUrl} 
+        alt={settings.siteName} 
+        width={120} 
+        height={40} 
+        className="h-10 w-auto" 
+        unoptimized={settings.logoUrl.startsWith('data:')}
+      />
+    );
+  }
+
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background">
       <div className="container flex h-16 items-center">
         <div className={cn("flex-1 md:flex-none transition-all duration-300", isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100")}>
           <Link href="/" className="flex items-center gap-2 font-headline text-xl font-bold">
-             {settings.logoUrl ? (
-                <Image src={settings.logoUrl} alt={settings.siteName} width={120} height={40} className="h-10 w-auto" unoptimized={settings.logoUrl.startsWith('data:')}/>
-             ) : (
-                <>
-                    <Icons.logo className="h-6 w-6" />
-                    {settings.siteName || "Vinee CMS"}
-                </>
-             )}
+             {renderLogo()}
           </Link>
         </div>
 
@@ -128,14 +151,7 @@ export default function SiteHeader({ settings, headerMenu }: SiteHeaderProps) {
                 </SheetHeader>
                 <div className="p-4">
                   <Link href="/" className="flex items-center gap-2 font-headline text-xl font-bold mb-4" onClick={() => setIsMobileMenuOpen(false)}>
-                    {settings.logoUrl ? (
-                        <Image src={settings.logoUrl} alt={settings.siteName} width={120} height={40} className="h-10 w-auto" unoptimized={settings.logoUrl.startsWith('data:')}/>
-                    ) : (
-                        <>
-                            <Icons.logo className="h-6 w-6" />
-                            <span>{settings.siteName || "Vinee CMS"}</span>
-                        </>
-                    )}
+                    {renderLogo()}
                   </Link>
                   <nav className="flex flex-col space-y-2">
                     {headerMenu ? (
