@@ -80,9 +80,11 @@ export default async function Home() {
         <div className="container mx-auto px-4 py-8 md:py-12">
             { homePage ? (
                  <article className="prose prose-lg mx-auto max-w-4xl dark:prose-invert">
-                    <header className="mb-8">
-                        <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">{homePage.title}</h1>
-                    </header>
+                    {!homePage.hideTitle && (
+                        <header className="mb-8">
+                            <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">{homePage.title}</h1>
+                        </header>
+                    )}
                     <HtmlRenderer htmlContent={homePage.content} />
                 </article>
             ) : (
@@ -117,3 +119,4 @@ export default async function Home() {
     </div>
   );
 }
+

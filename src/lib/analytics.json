@@ -1142,6 +1142,48 @@
       "referrer": "direct",
       "source": "Direct",
       "country": "Unknown"
+    },
+    {
+      "path": "/samsung-phone-under-10000-jhssh",
+      "timestamp": "2025-09-30T07:03:35.421Z",
+      "referrer": "direct",
+      "source": "Direct",
+      "country": "Unknown"
+    },
+    {
+      "path": "/script.js",
+      "timestamp": "2025-09-30T07:03:40.778Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/samsung-phone-under-10000-jhssh",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-09-30T07:03:53.888Z",
+      "referrer": "direct",
+      "source": "Direct",
+      "country": "Unknown"
+    },
+    {
+      "path": "/aaj-kuch-huaa-hai",
+      "timestamp": "2025-09-30T07:04:01.144Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/admin/pages",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-09-30T07:04:36.469Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/capra/?origin=https%3A%2F%2Fstudio.firebase.google.com",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-09-30T07:06:14.314Z",
+      "referrer": "direct",
+      "source": "Direct",
+      "country": "Unknown"
     }
   ]
 }
