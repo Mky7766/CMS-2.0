@@ -81,6 +81,8 @@ export async function signup(prevState: any, formData: FormData) {
     if (existingUser) {
         return { error: 'User with this email already exists.' };
     }
+    
+    const isFirstUser = users.length === 0;
 
     const newUser: User = {
         id: (users.length + 1).toString(),
@@ -88,7 +90,7 @@ export async function signup(prevState: any, formData: FormData) {
         email,
         password, // In a real app, hash and salt this password!
         avatarUrl: `https://picsum.photos/seed/${users.length + 1}/32/32`,
-        role: 'Author',
+        role: isFirstUser ? 'Admin' : 'Author',
         createdAt: new Date().toISOString().split('T')[0],
     };
 
