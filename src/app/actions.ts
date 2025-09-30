@@ -15,6 +15,30 @@ import { cache } from 'react'
 // In-memory cache for settings
 let cachedSettings: SiteSettings | null = null;
 
+export async function saveDatabaseUrl(prevState: any, formData: FormData) {
+    const url = formData.get('db-url') as string;
+    if (!url) {
+        return { error: "Database URL is required." };
+    }
+    
+    try {
+        const envPath = path.join(process.cwd(), '.env');
+        // This is a simplified approach. In a real-world scenario, you'd want to
+        // more carefully parse and update the .env file.
+        await fs.writeFile(envPath, `POSTGRES_URL=${url}\n`);
+    } catch (error) {
+        console.error("Failed to save database URL:", error);
+        return { error: "Could not save the database URL. Please try again." };
+    }
+
+    // We can't easily restart the server from here, so we'll redirect.
+    // The user will need to manually restart the development server for the
+    // new .env variable to be picked up by the Pool.
+    // In a production environment, this would be handled by restarting the process.
+    redirect('/login');
+}
+
+
 export const getSettings = cache(async (): Promise<SiteSettings> => {
   if (cachedSettings) {
     return cachedSettings;
@@ -1103,3 +1127,5 @@ export async function logPageView(pathname: string, referrer: string | undefined
         console.error("Failed to log page view:", error);
     }
 }
+
+    

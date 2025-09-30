@@ -9,18 +9,31 @@ import { users } from "@/lib/data";
 import LoginForm from "@/components/login-form";
 import fs from 'fs/promises';
 import path from 'path';
+import { redirect } from 'next/navigation';
 
 async function getUsers() {
-    const filePath = path.join(process.cwd(), 'src', 'lib', 'users.json');
-    try {
-        const data = await fs.readFile(filePath, 'utf-8');
-        return JSON.parse(data);
-    } catch (error) {
-        return [];
+    if (!process.env.POSTGRES_URL) {
+        // If there's no DB connection, we assume we might need to set one up,
+        // or we're running locally with JSON files.
+        try {
+            const filePath = path.join(process.cwd(), 'src', 'lib', 'users.json');
+            const data = await fs.readFile(filePath, 'utf-8');
+            return JSON.parse(data);
+        } catch (error) {
+            return []; // No users file, implies first run.
+        }
     }
+    // If POSTGRES_URL is set, we assume the DB is the source of truth,
+    // and we don't need to check for the first user from the JSON file.
+    // The login form will handle DB authentication.
+    return [{id: 'db-user'}]; // Return a placeholder to indicate DB is used.
 }
 
 export default async function LoginPage() {
+  if (!process.env.POSTGRES_URL) {
+      redirect('/setup');
+  }
+
   const allUsers = await getUsers();
   const showSignup = allUsers.length === 0;
 
@@ -45,3 +58,4 @@ export default async function LoginPage() {
   );
 }
 
+    
