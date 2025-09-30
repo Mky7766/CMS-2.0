@@ -178,7 +178,7 @@ export default async function PostPage({ params, searchParams }: { params: { pos
   const footerMenu = menus.find(m => m.id === settings.footerMenuId);
 
 
-  if ((!post && !page) || (post && post.status.toLowerCase() !== 'published' && !isPreview)) {
+  if ((!post && !page) || (page && page.status.toLowerCase() !== 'published' && !isPreview) || (post && post.status.toLowerCase() !== 'published' && !isPreview)) {
     notFound();
   }
 
@@ -190,7 +190,9 @@ export default async function PostPage({ params, searchParams }: { params: { pos
         <div className="container mx-auto px-4 py-8 md:py-12">
           <article className="prose prose-lg mx-auto max-w-4xl dark:prose-invert">
             <header className="mb-8">
-              <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">{page.title}</h1>
+              {!page.hideTitle && (
+                <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">{page.title}</h1>
+              )}
             </header>
             <HtmlRenderer htmlContent={page.content} />
           </article>

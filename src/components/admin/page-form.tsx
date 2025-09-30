@@ -13,6 +13,7 @@ import { Save } from "lucide-react";
 import { createPage, updatePage } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import type { Page } from "@/lib/data";
+import { Switch } from "../ui/switch";
 
 function SubmitButton({ isUpdate }: { isUpdate?: boolean }) {
   const { pending } = useFormStatus();
@@ -124,6 +125,18 @@ export default function PageForm({ page }: PageFormProps) {
                   <SelectItem value="Published">Published</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+             <div className="flex items-center justify-between rounded-lg border p-3">
+                <div className="space-y-0.5">
+                    <Label>Hide Title</Label>
+                    <p className="text-xs text-muted-foreground">
+                        If checked, the page title will not be displayed.
+                    </p>
+                </div>
+                <Switch
+                    name="hide-title"
+                    defaultChecked={page?.hideTitle}
+                />
             </div>
           </CardContent>
           <div className="p-6 pt-0 flex justify-between items-center">

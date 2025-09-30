@@ -283,6 +283,7 @@ export async function createPage(prevState: any, formData: FormData) {
     const content = formData.get('content') as string;
     const permalink = formData.get('permalink') as string;
     const status = formData.get('status') as 'Published' | 'Draft';
+    const hideTitle = formData.get('hide-title') === 'on';
 
     const session = await getSession();
     if (!session?.userId) {
@@ -300,6 +301,7 @@ export async function createPage(prevState: any, formData: FormData) {
         status,
         createdAt: new Date().toISOString().split('T')[0],
         authorId: session.userId,
+        hideTitle,
     };
 
     const updatedPages = [...pages, newPage];
@@ -323,6 +325,7 @@ export async function updatePage(prevState: any, formData: FormData) {
     const content = formData.get('content') as string;
     const permalink = formData.get('permalink') as string;
     const status = formData.get('status') as 'Published' | 'Draft';
+    const hideTitle = formData.get('hide-title') === 'on';
 
     const session = await getSession();
     if (!session?.userId) {
@@ -343,6 +346,7 @@ export async function updatePage(prevState: any, formData: FormData) {
     updatedPage.title = title;
     updatedPage.content = content;
     updatedPage.status = status;
+    updatedPage.hideTitle = hideTitle;
 
     const updatedPages = [...pages];
     updatedPages[pageIndex] = updatedPage;

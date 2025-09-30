@@ -33,6 +33,7 @@ export type Page = {
   status: 'Published' | 'Draft';
   createdAt: string;
   authorId: string;
+  hideTitle?: boolean;
 };
 
 
