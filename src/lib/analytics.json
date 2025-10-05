@@ -1289,6 +1289,69 @@
       "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/capra/?origin=https%3A%2F%2Fstudio.firebase.google.com",
       "source": "Other",
       "country": "Unknown"
+    },
+    {
+      "path": "/setup",
+      "timestamp": "2025-10-05T14:59:24.810Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/setup",
+      "timestamp": "2025-10-05T15:04:15.247Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/capra/?origin=https%3A%2F%2Fstudio.firebase.google.com",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/login",
+      "timestamp": "2025-10-05T15:05:14.177Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/setup",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/login",
+      "timestamp": "2025-10-05T15:05:15.302Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/setup",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/login",
+      "timestamp": "2025-10-05T15:06:15.193Z",
+      "referrer": "https://workstations.cloud.google.com/",
+      "source": "Google",
+      "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-10-05T15:06:38.377Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/admin/dashboard",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-10-05T15:09:25.394Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/capra/?origin=https%3A%2F%2Fstudio.firebase.google.com",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-10-05T15:11:12.398Z",
+      "referrer": "direct",
+      "source": "Direct",
+      "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-10-05T15:11:12.809Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/",
+      "source": "Other",
+      "country": "Unknown"
     }
   ]
 }
