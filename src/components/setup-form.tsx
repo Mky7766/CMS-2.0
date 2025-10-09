@@ -48,7 +48,7 @@ export default function SetupForm() {
             required 
           />
            <p className="text-xs text-muted-foreground">
-            Find this in your Supabase project under Settings &gt; Database &gt; Connection string (URI tab).
+            Find this in your Supabase project under Settings > Database > Connection string (URI tab).
           </p>
         </div>
         <SubmitButton />
