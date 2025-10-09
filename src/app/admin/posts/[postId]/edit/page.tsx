@@ -1,8 +1,10 @@
+
 import PostForm from "@/components/admin/post-form";
-import { posts } from "@/lib/data";
+import { getPosts } from "@/app/actions";
 import { notFound } from "next/navigation";
 
-export default function EditPostPage({ params }: { params: { postId: string } }) {
+export default async function EditPostPage({ params }: { params: { postId: string } }) {
+    const posts = await getPosts();
     const post = posts.find(p => p.id === params.postId);
 
     if (!post) {
@@ -19,3 +21,5 @@ export default function EditPostPage({ params }: { params: { postId: string } })
         </div>
     );
 }
+
+    

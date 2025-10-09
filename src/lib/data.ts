@@ -1,16 +1,10 @@
 
-import usersData from './users.json';
-import postsData from './posts.json';
-import pagesData from './pages.json';
-import categoriesData from './categories.json';
-
-
 export type Post = {
   id: string;
   title: string;
   content: string;
   status: 'Published' | 'Draft' | 'Scheduled';
-  createdAt: string;
+  created_at: string;
   author: {
     name: string;
     avatarUrl: string;
@@ -41,7 +35,7 @@ export type User = {
     id: string;
     name: string;
     email: string;
-    password?: string; // Should be handled securely, not stored plaintext
+    password?: string;
     avatarUrl: string;
     role: 'Admin' | 'Editor' | 'Author';
     createdAt: string;
@@ -125,30 +119,4 @@ export type PageView = {
     country?: string;
 }
 
-
-let posts: Post[] = postsData;
-
-let pages: Page[] = pagesData;
-
-let users: User[] = usersData;
-
-let categories: Category[] = categoriesData;
-
-export function setUsers(newUsers: User[]) {
-  users = newUsers;
-}
-
-export function setPosts(newPosts: Post[]) {
-    posts = newPosts;
-}
-
-export function setPages(newPages: Page[]) {
-    pages = newPages;
-}
-
-export function setCategories(newCategories: Category[]) {
-    categories = newCategories;
-}
-
-
-export { users, posts, pages, categories };
+    

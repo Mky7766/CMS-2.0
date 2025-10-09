@@ -1,9 +1,10 @@
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { posts } from "@/lib/data";
+import { Post } from "@/lib/data";
 import { PlusCircle, File, ListFilter } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -13,9 +14,10 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import PostActions from "@/components/admin/post-actions";
+import { getPosts } from "@/app/actions";
 
 type PostTableProps = {
-    posts: typeof posts;
+    posts: Post[];
 }
 
 function PostsTable({ posts }: PostTableProps) {
@@ -70,8 +72,8 @@ function PostsTable({ posts }: PostTableProps) {
     )
 }
 
-export default function PostsPage() {
-  const allPosts = [...posts].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+export default async function PostsPage() {
+  const allPosts = await getPosts();
   const publishedPosts = allPosts.filter(p => p.status.toLowerCase() === "published");
   const draftPosts = allPosts.filter(p => p.status.toLowerCase() === "draft");
   const scheduledPosts = allPosts.filter(p => p.status.toLowerCase() === "scheduled");
@@ -125,3 +127,5 @@ export default function PostsPage() {
     </Tabs>
   );
 }
+
+    

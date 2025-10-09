@@ -1,16 +1,16 @@
 
 import { Suspense } from 'react';
 import Link from "next/link";
-import { posts } from "@/lib/data";
-import { getSettings } from "@/app/actions";
+import { getPosts, getSettings, getMenus } from "@/app/actions";
 import SiteHeader from "@/components/site-header";
 import GridTemplate from '@/components/blog-templates/grid-template';
 import HtmlRenderer from '@/components/html-renderer';
 
 async function SearchResults({ query }: { query: string }) {
-  const allPosts = posts.filter(p => p.status.toLowerCase() === 'published');
+  const allPosts = await getPosts();
+  const publishedPosts = allPosts.filter(p => p.status.toLowerCase() === 'published');
   
-  const filteredPosts = allPosts.filter(post => 
+  const filteredPosts = publishedPosts.filter(post => 
     post.title.toLowerCase().includes(query.toLowerCase()) || 
     post.content.toLowerCase().includes(query.toLowerCase())
   );
@@ -80,15 +80,4 @@ export default async function SearchPage({
   );
 }
 
-async function getMenus() {
-    // This is a temporary function until we have a better data fetching solution
-    const fs = require('fs/promises');
-    const path = require('path');
-    const filePath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
-    try {
-        const data = await fs.readFile(filePath, 'utf-8');
-        return JSON.parse(data);
-    } catch (error) {
-        return [];
-    }
-}
+    

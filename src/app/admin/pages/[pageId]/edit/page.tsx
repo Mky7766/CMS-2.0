@@ -1,10 +1,10 @@
 
 import PageForm from "@/components/admin/page-form";
-import { pages } from "@/lib/data";
+import { getPage } from "@/app/actions";
 import { notFound } from "next/navigation";
 
-export default function EditPagePage({ params }: { params: { pageId: string } }) {
-    const page = pages.find(p => p.id === params.pageId);
+export default async function EditPagePage({ params }: { params: { pageId: string } }) {
+    const page = await getPage(params.pageId);
 
     if (!page) {
         notFound();
@@ -20,3 +20,5 @@ export default function EditPagePage({ params }: { params: { pageId: string } })
         </div>
     );
 }
+
+    

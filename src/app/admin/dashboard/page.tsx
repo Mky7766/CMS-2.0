@@ -1,44 +1,13 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Post, Page, User } from "@/lib/data";
-import { FileText, User as UserIcon, ExternalLink, File as PageIcon, Users, ArrowUpRight } from "lucide-react";
+import { FileText, ExternalLink, File as PageIcon, Users, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import PostActions from "@/components/admin/post-actions";
-import fs from 'fs/promises';
-import path from 'path';
-
-async function getPosts(): Promise<Post[]> {
-    const filePath = path.join(process.cwd(), 'src', 'lib', 'posts.json');
-    try {
-        const data = await fs.readFile(filePath, 'utf-8');
-        return JSON.parse(data);
-    } catch (error) {
-        return [];
-    }
-}
-
-async function getPages(): Promise<Page[]> {
-    const filePath = path.join(process.cwd(), 'src', 'lib', 'pages.json');
-    try {
-        const data = await fs.readFile(filePath, 'utf-8');
-        return JSON.parse(data);
-    } catch (error) {
-        return [];
-    }
-}
-
-async function getUsers(): Promise<User[]> {
-    const filePath = path.join(process.cwd(), 'src', 'lib', 'users.json');
-    try {
-        const data = await fs.readFile(filePath, 'utf-8');
-        return JSON.parse(data);
-    } catch (error) {
-        return [];
-    }
-}
-
+import { getPosts, getPages, getUsers } from "@/app/actions";
 
 export default async function DashboardPage() {
   const [allPosts, allPages, allUsers] = await Promise.all([
@@ -47,7 +16,7 @@ export default async function DashboardPage() {
     getUsers(),
   ]);
   
-  const recentPosts = [...allPosts].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 5);
+  const recentPosts = allPosts.slice(0, 5);
 
   const totalPosts = allPosts.length;
   const totalUsers = allUsers.length;
@@ -93,7 +62,7 @@ export default async function DashboardPage() {
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-                <UserIcon className="h-4 w-4 text-muted-foreground" />
+                <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold">{totalUsers}</div>
@@ -151,3 +120,5 @@ export default async function DashboardPage() {
     </div>
   );
 }
+
+    

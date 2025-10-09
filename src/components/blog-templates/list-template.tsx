@@ -1,12 +1,14 @@
 
-import { posts, users } from "@/lib/data";
+import { Post, User } from "@/lib/data";
 import Link from "next/link";
 import Image from "next/image";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { BadgeCheck } from "lucide-react";
+import { getUsers } from "@/app/actions";
 
-function ListPostCard({ post }: { post: (typeof posts)[0] }) {
+async function ListPostCard({ post }: { post: Post }) {
+    const users = await getUsers();
     const author = users.find(u => u.id === post.authorId);
     return (
         <Card className="flex flex-col md:flex-row overflow-hidden">
@@ -58,7 +60,7 @@ function ListPostCard({ post }: { post: (typeof posts)[0] }) {
     )
 }
 
-export default function ListTemplate({ posts }: { posts: (typeof posts) }) {
+export default function ListTemplate({ posts }: { posts: Post[] }) {
     return (
         <div className="space-y-8">
             {posts.map((post) => (
@@ -67,3 +69,5 @@ export default function ListTemplate({ posts }: { posts: (typeof posts) }) {
         </div>
     )
 }
+
+    

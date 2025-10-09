@@ -1,13 +1,13 @@
 
-import { posts } from "@/lib/data";
-import { getSettings } from "@/app/actions";
+import { getPosts, getSettings } from "@/app/actions";
 import { NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
   const settings = await getSettings();
   const siteUrl = new URL(request.url).origin;
-
-  const publishedPosts = posts.filter(p => p.status.toLowerCase() === 'published');
+  
+  const allPosts = await getPosts();
+  const publishedPosts = allPosts.filter(p => p.status.toLowerCase() === 'published');
 
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -34,3 +34,5 @@ export async function GET(request: NextRequest) {
     },
   });
 }
+
+    

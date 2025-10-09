@@ -4,7 +4,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { redirect } from 'next/navigation';
-import { User, setUsers, Post, Menu, Template, Page, setPages, Category, setCategories, PageView } from "@/lib/data";
+import { User, Post, Menu, Template, Page, Category, PageView } from "@/lib/data";
 import { createSession, deleteSession, getSession } from "@/lib/session";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { ImagePlaceholder } from "@/lib/placeholder-images";
@@ -36,10 +36,8 @@ async function initializeDb() {
     if (!pool) return;
 
     try {
-        // Create extension for UUID generation if it doesn't exist
         await pool.query('CREATE EXTENSION IF NOT EXISTS "pgcrypto";');
         
-        // Create users table if it doesn't exist
         await pool.query(`
             CREATE TABLE IF NOT EXISTS users (
                 id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -61,7 +59,6 @@ async function initializeDb() {
             );
         `);
         
-        // Create posts table if it doesn't exist
         await pool.query(`
             CREATE TABLE IF NOT EXISTS posts (
                 id VARCHAR(255) PRIMARY KEY,
@@ -69,8 +66,8 @@ async function initializeDb() {
                 content TEXT,
                 status VARCHAR(50) NOT NULL,
                 created_at DATE NOT NULL,
-                author_id UUID REFERENCES users(id),
-                author_name VARCHAR(255) NOT NULL,
+                author_id UUID REFERENCES users(id) ON DELETE SET NULL,
+                author_name VARCHAR(255),
                 author_avatar_url TEXT,
                 category_id VARCHAR(255),
                 tags TEXT[],
@@ -81,6 +78,65 @@ async function initializeDb() {
             );
         `);
 
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS pages (
+                id VARCHAR(255) PRIMARY KEY,
+                title VARCHAR(255) NOT NULL,
+                content TEXT,
+                status VARCHAR(50) NOT NULL,
+                created_at DATE NOT NULL,
+                author_id UUID REFERENCES users(id) ON DELETE SET NULL,
+                hide_title BOOLEAN
+            );
+        `);
+
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS menus (
+                id VARCHAR(255) PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                items JSONB
+            );
+        `);
+        
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS categories (
+                id VARCHAR(255) PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                slug VARCHAR(255) UNIQUE NOT NULL,
+                description TEXT
+            );
+        `);
+
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS settings (
+                id VARCHAR(50) PRIMARY KEY DEFAULT 'default',
+                settings_data JSONB
+            );
+        `);
+
+        // Seed initial data if tables are empty
+        const catCheck = await pool.query('SELECT COUNT(*) FROM categories');
+        if (catCheck.rows[0].count === '0') {
+             await pool.query(`
+                INSERT INTO categories (id, name, slug, description) 
+                VALUES ('uncategorized', 'Uncategorized', 'uncategorized', 'Posts that don''t fit into any other category.')
+            `);
+        }
+        
+        const settingsCheck = await pool.query('SELECT COUNT(*) FROM settings');
+        if (settingsCheck.rows[0].count === '0') {
+            const defaultSettings = {
+                siteName: "Vinee CMS",
+                tagline: "A modern, git-based CMS",
+                footerText: "Built with ❤️ by the open-source community.",
+                blogTemplate: "grid",
+                showAuthorBio: true,
+            };
+            await pool.query(`
+                INSERT INTO settings (id, settings_data) 
+                VALUES ('default', $1)
+            `, [JSON.stringify(defaultSettings)]);
+        }
 
     } catch (dbError) {
         console.error("DB initializeDb Error:", dbError);
@@ -110,22 +166,34 @@ export const getSettings = cache(async (): Promise<SiteSettings> => {
   if (cachedSettings) {
     return cachedSettings;
   }
-
-  try {
-    const filePath = path.join(process.cwd(), 'src', 'lib', 'settings.json');
-    const data = await fs.readFile(filePath, 'utf-8');
-    const settings = JSON.parse(data) as SiteSettings;
-    cachedSettings = settings;
-    return settings;
-  } catch (error) {
-    // If the file doesn't exist or is invalid, return default settings
-    console.warn("settings.json not found or invalid, using default settings.");
-    const defaultSettings: SiteSettings = {
+  
+  const defaultSettings: SiteSettings = {
       siteName: "Vinee CMS",
       tagline: "A modern, git-based CMS",
       footerText: "Built with ❤️ by the open-source community.",
       blogTemplate: "grid"
-    };
+  };
+
+  const pool = await getPool();
+  if (!pool) return defaultSettings;
+
+  try {
+    const result = await pool.query('SELECT settings_data FROM settings WHERE id = $1', ['default']);
+    if (result.rows.length > 0) {
+        const settings = result.rows[0].settings_data as SiteSettings;
+        cachedSettings = settings;
+        return settings;
+    } else {
+        // If no settings in DB, seed them.
+        await pool.query(`
+            INSERT INTO settings (id, settings_data) 
+            VALUES ('default', $1)
+        `, [JSON.stringify(defaultSettings)]);
+        cachedSettings = defaultSettings;
+        return defaultSettings;
+    }
+  } catch (error) {
+    console.warn("Database error fetching settings, using default settings.", error);
     return defaultSettings;
   }
 });
@@ -137,21 +205,18 @@ export async function clearSettingsCache(): Promise<void> {
 
 export async function getUsersCount(): Promise<number> {
     const pool = await getPool();
-    if (!pool) return 0; // If no DB, assume no users.
+    if (!pool) return 0;
 
     try {
-        // Check if users table exists first
         const tableCheck = await pool.query("SELECT to_regclass('public.users')");
         if (tableCheck.rows[0].to_regclass === null) {
-            return 0; // Table doesn't exist, so 0 users.
+            return 0;
         }
         
         const result = await pool.query('SELECT COUNT(*) FROM users');
         return parseInt(result.rows[0].count, 10);
     } catch (dbError) {
         console.error("DB getUsersCount Error:", dbError);
-        // This might happen if the DB is configured but not reachable.
-        // We'll return a value that implies setup is needed, but this state is tricky.
         return 0;
     }
 }
@@ -171,7 +236,7 @@ export async function signup(prevState: any, formData: FormData) {
     }
 
     try {
-        await initializeDb(); // Ensure table exists
+        await initializeDb();
         
         const userCountResult = await pool.query('SELECT COUNT(*) FROM users');
         const isFirstUser = parseInt(userCountResult.rows[0].count, 10) === 0;
@@ -181,7 +246,6 @@ export async function signup(prevState: any, formData: FormData) {
             return { error: 'User with this email already exists.' };
         }
         
-        // In a real app, hash and salt this password! For this demo, we store it directly.
         const role = isFirstUser ? 'Admin' : 'Author';
         const name = email.split('@')[0];
         const avatarUrl = `https://picsum.photos/seed/${Math.random()}/32/32`;
@@ -212,6 +276,10 @@ export async function login(prevState: any, formData: FormData) {
     
     const pool = await getPool();
     if (!pool) {
+        const userCount = await getUsersCount();
+        if (userCount === 0) {
+             return { error: 'No users found. Please set up the database and sign up.' };
+        }
         return { error: 'Database connection not available.' };
     }
 
@@ -371,7 +439,6 @@ export async function updatePost(prevState: any, formData: FormData) {
 export async function deletePost(postId: string) {
     const session = await getSession();
     if (!session?.userId) {
-        // In a real app, you'd also check for roles/permissions
         return { error: "You are not authorized to delete this post." };
     }
     
@@ -397,6 +464,9 @@ export async function deletePost(postId: string) {
 }
 
 export async function createPage(prevState: any, formData: FormData) {
+    const pool = await getPool();
+    if (!pool) return { error: "Database not connected." };
+
     const title = formData.get('title') as string;
     const content = formData.get('content') as string;
     const permalink = formData.get('permalink') as string;
@@ -408,29 +478,22 @@ export async function createPage(prevState: any, formData: FormData) {
         return { error: "You must be logged in to create a page." };
     }
     
-    // This action still uses JSON files.
-    const pages = await getPages();
-    if (pages.some(p => p.id === permalink)) {
-        return { error: `A page with the permalink "${permalink}" already exists.` };
-    }
-
-    const newPage: Page = {
-        id: permalink,
-        title,
-        content,
-        status,
-        createdAt: new Date().toISOString().split('T')[0],
-        authorId: session.userId,
-        hideTitle,
-    };
-
-    const updatedPages = [...pages, newPage];
-
     try {
-        const pagesFilePath = path.join(process.cwd(), 'src', 'lib', 'pages.json');
-        await fs.writeFile(pagesFilePath, JSON.stringify(updatedPages, null, 2));
-        setPages(updatedPages);
+        const permalinkCheck = await pool.query('SELECT id FROM pages WHERE id = $1', [permalink]);
+        if (permalinkCheck.rows.length > 0) {
+            return { error: `A page with the permalink "${permalink}" already exists.` };
+        }
+
+        await pool.query(
+            `INSERT INTO pages (id, title, content, status, created_at, author_id, hide_title)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+            [
+                permalink, title, content, status, new Date().toISOString().split('T')[0],
+                session.userId, hideTitle
+            ]
+        );
     } catch (error) {
+        console.error("Failed to create page:", error);
         return { error: "Could not save the page. Please try again." };
     }
 
@@ -440,6 +503,9 @@ export async function createPage(prevState: any, formData: FormData) {
 }
 
 export async function updatePage(prevState: any, formData: FormData) {
+    const pool = await getPool();
+    if (!pool) return { error: "Database not connected." };
+
     const pageId = formData.get('pageId') as string;
     const title = formData.get('title') as string;
     const content = formData.get('content') as string;
@@ -452,31 +518,28 @@ export async function updatePage(prevState: any, formData: FormData) {
         return { error: "You must be logged in to update a page." };
     }
     
-    const pages = await getPages();
-    const pageIndex = pages.findIndex(p => p.id === pageId);
-    if (pageIndex === -1) {
-        return { error: "Page not found." };
-    }
-
-    if (permalink !== pageId && pages.some(p => p.id === permalink)) {
-        return { error: `A page with the permalink "${permalink}" already exists.` };
-    }
-
-    const updatedPage = { ...pages[pageIndex] };
-    updatedPage.id = permalink;
-    updatedPage.title = title;
-    updatedPage.content = content;
-    updatedPage.status = status;
-    updatedPage.hideTitle = hideTitle;
-
-    const updatedPages = [...pages];
-    updatedPages[pageIndex] = updatedPage;
-
     try {
-        const pagesFilePath = path.join(process.cwd(), 'src', 'lib', 'pages.json');
-        await fs.writeFile(pagesFilePath, JSON.stringify(updatedPages, null, 2));
-        setPages(updatedPages);
+        const pageCheck = await pool.query('SELECT id FROM pages WHERE id = $1', [pageId]);
+        if (pageCheck.rows.length === 0) {
+            return { error: "Page not found." };
+        }
+
+        if (permalink !== pageId) {
+            const permalinkCheck = await pool.query('SELECT id FROM pages WHERE id = $1', [permalink]);
+            if (permalinkCheck.rows.length > 0) {
+                return { error: `A page with the permalink "${permalink}" already exists.` };
+            }
+        }
+        
+        await pool.query(
+            `UPDATE pages SET 
+                id = $1, title = $2, content = $3, status = $4, hide_title = $5
+             WHERE id = $6`,
+            [permalink, title, content, status, hideTitle, pageId]
+        );
+
     } catch (error) {
+        console.error("Failed to update page:", error);
         return { error: "Could not update the page. Please try again." };
     }
 
@@ -492,14 +555,13 @@ export async function deletePage(pageId: string) {
         return { error: "You are not authorized to delete this page." };
     }
 
-    const pages = await getPages();
-    const updatedPages = pages.filter(p => p.id !== pageId);
+    const pool = await getPool();
+    if (!pool) return { error: "Database not connected." };
 
     try {
-        const pagesFilePath = path.join(process.cwd(), 'src', 'lib', 'pages.json');
-        await fs.writeFile(pagesFilePath, JSON.stringify(updatedPages, null, 2));
-        setPages(updatedPages);
+        await pool.query('DELETE FROM pages WHERE id = $1', [pageId]);
     } catch (error) {
+        console.error("Failed to delete page:", error);
         return { error: "Could not delete the page. Please try again." };
     }
 
@@ -513,34 +575,15 @@ export async function getPosts(): Promise<Post[]> {
     if (!pool) return [];
     
     try {
-        // Ensure posts table exists, create it if not.
-        // This is a failsafe; it should have been created during signup.
-        await pool.query(`
-            CREATE TABLE IF NOT EXISTS posts (
-                id VARCHAR(255) PRIMARY KEY,
-                title VARCHAR(255) NOT NULL,
-                content TEXT,
-                status VARCHAR(50) NOT NULL,
-                created_at DATE NOT NULL,
-                author_id UUID REFERENCES users(id),
-                author_name VARCHAR(255) NOT NULL,
-                author_avatar_url TEXT,
-                category_id VARCHAR(255),
-                tags TEXT[],
-                format VARCHAR(50),
-                hide_title BOOLEAN,
-                featured_image_url TEXT,
-                featured_image_alt TEXT
-            );
-        `);
-        const result = await pool.query('SELECT * FROM posts');
-        // Convert from db format to Post type
+        await pool.query('SELECT id FROM posts LIMIT 1').catch(() => initializeDb());
+        const result = await pool.query('SELECT * FROM posts ORDER BY created_at DESC');
+        
         return result.rows.map(row => ({
             id: row.id,
             title: row.title,
             content: row.content,
             status: row.status,
-            createdAt: row.created_at,
+            createdAt: new Date(row.created_at).toISOString().split('T')[0],
             authorId: row.author_id,
             author: {
                 name: row.author_name,
@@ -563,18 +606,49 @@ export async function getPosts(): Promise<Post[]> {
 
 
 export async function getPages(): Promise<Page[]> {
-    const pagesPath = path.join(process.cwd(), 'src', 'lib', 'pages.json');
+    const pool = await getPool();
+    if (!pool) return [];
+
     try {
-        const file = await fs.readFile(pagesPath, 'utf-8');
-        return JSON.parse(file) as Page[];
+        await pool.query('SELECT id FROM pages LIMIT 1').catch(() => initializeDb());
+        const result = await pool.query('SELECT * FROM pages ORDER BY created_at DESC');
+
+        return result.rows.map(row => ({
+            id: row.id,
+            title: row.title,
+            content: row.content,
+            status: row.status,
+            createdAt: new Date(row.created_at).toISOString().split('T')[0],
+            authorId: row.author_id,
+            hideTitle: row.hide_title,
+        }));
     } catch (error) {
+        console.error("DB getPages Error:", error);
         return [];
     }
 }
 
 export async function getPage(pageId: string): Promise<Page | undefined> {
-    const allPages = await getPages();
-    return allPages.find(p => p.id === pageId);
+    const pool = await getPool();
+    if (!pool) return undefined;
+
+    try {
+        const result = await pool.query('SELECT * FROM pages WHERE id = $1', [pageId]);
+        if (result.rows.length === 0) return undefined;
+        const row = result.rows[0];
+         return {
+            id: row.id,
+            title: row.title,
+            content: row.content,
+            status: row.status,
+            createdAt: new Date(row.created_at).toISOString().split('T')[0],
+            authorId: row.author_id,
+            hideTitle: row.hide_title,
+        };
+    } catch (error) {
+        console.error("DB getPage Error:", error);
+        return undefined;
+    }
 }
 
 
@@ -653,9 +727,10 @@ export async function updateSettings(prevState: any, formData: FormData) {
     if (!session?.userId) {
         return { error: "You are not authorized to perform this action." };
     }
-    // TODO: In a real app, check if the user has the 'Admin' role.
 
-    const settingsPath = path.join(process.cwd(), 'src', 'lib', 'settings.json');
+    const pool = await getPool();
+    if (!pool) return { error: "Database not connected." };
+    
     try {
         const currentSettings = await getSettings();
 
@@ -695,7 +770,9 @@ export async function updateSettings(prevState: any, formData: FormData) {
             }
         };
 
-        await fs.writeFile(settingsPath, JSON.stringify(updatedSettings, null, 2));
+        await pool.query(`
+            UPDATE settings SET settings_data = $1 WHERE id = 'default'
+        `, [JSON.stringify(updatedSettings)]);
         
         await clearSettingsCache();
         revalidatePath('/', 'layout');
@@ -838,7 +915,7 @@ export async function updateUser(prevState: any, formData: FormData) {
 
 export async function updateUserAvatar(userId: string, dataUrl: string) {
     const session = await getSession();
-    if (!session?.userId || session.userId !== userId) {
+    if (!session?.userId || (session.userId !== userId && session.role !== 'Admin')) {
         return { error: "Unauthorized." };
     }
 
@@ -852,6 +929,7 @@ export async function updateUserAvatar(userId: string, dataUrl: string) {
     }
 
     revalidatePath('/admin/profile');
+    revalidatePath('/admin/users');
     revalidatePath('/admin');
     return { success: "Avatar updated.", newAvatarUrl: dataUrl };
 }
@@ -860,7 +938,6 @@ export async function deleteUser(userId: string) {
     const session = await getSession();
     if (!session?.userId) { return { error: "Unauthorized." }; }
     
-    // Prevent user from deleting themselves
     if (session.userId === userId) {
         return { error: "You cannot delete your own account." };
     }
@@ -869,7 +946,6 @@ export async function deleteUser(userId: string) {
     if (!pool) return { error: "Database not connected." };
 
     try {
-        // Also delete user's posts
         await pool.query('DELETE FROM posts WHERE author_id = $1', [userId]);
         await pool.query('DELETE FROM users WHERE id = $1', [userId]);
     } catch (error) {
@@ -889,12 +965,11 @@ export async function getUserById(userId: string): Promise<User | null> {
         const dbUser = result.rows[0];
         if (!dbUser) return null;
 
-        // Map from db format to User type
         return {
             id: dbUser.id,
             name: dbUser.name,
             email: dbUser.email,
-            password: dbUser.password_hash, // Be careful with this
+            password: dbUser.password_hash,
             avatarUrl: dbUser.avatar_url,
             role: dbUser.role,
             createdAt: dbUser.created_at,
@@ -916,28 +991,19 @@ export async function getUserById(userId: string): Promise<User | null> {
 
 export async function getUsers(): Promise<User[]> {
     const pool = await getPool();
-    if (!pool) {
-        // Fallback to JSON if no DB is configured
-        const usersFilePath = path.join(process.cwd(), 'src', 'lib', 'users.json');
-        try {
-            const data = await fs.readFile(usersFilePath, 'utf-8');
-            return JSON.parse(data);
-        } catch (error) {
-            return [];
-        }
-    }
+    if (!pool) return [];
     
     try {
+        await pool.query('SELECT id FROM users LIMIT 1').catch(() => initializeDb());
         const result = await pool.query('SELECT * FROM users');
-        // Map from db format to User type
         return result.rows.map(dbUser => ({
              id: dbUser.id,
             name: dbUser.name,
             email: dbUser.email,
-            password: dbUser.password_hash, // Be careful with this
+            password: dbUser.password_hash,
             avatarUrl: dbUser.avatar_url,
             role: dbUser.role,
-            createdAt: dbUser.created_at.toISOString().split('T')[0],
+            createdAt: new Date(dbUser.created_at).toISOString().split('T')[0],
             bio: dbUser.bio,
             twitter: dbUser.twitter,
             linkedin: dbUser.linkedin,
@@ -967,7 +1033,7 @@ export async function getUsersClient(): Promise<Omit<User, 'password'>[]> {
             email: dbUser.email,
             avatarUrl: dbUser.avatar_url,
             role: dbUser.role,
-            createdAt: dbUser.created_at.toISOString().split('T')[0],
+            createdAt: new Date(dbUser.created_at).toISOString().split('T')[0],
             bio: dbUser.bio,
             twitter: dbUser.twitter,
             linkedin: dbUser.linkedin,
@@ -998,41 +1064,29 @@ export async function saveMenu(prevState: any, formData: FormData) {
         return { error: "Menu name is required." };
     }
 
+    const pool = await getPool();
+    if (!pool) return { error: "Database not connected." };
+    
     const newMenu: Menu = {
         id: `${Date.now()}`,
         name: menuName,
         items: labels.map((label, index) => ({ label, url: urls[index] })),
     };
 
-    const menusPath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
-    
     try {
-        let allMenus: Menu[] = [];
-        try {
-            const file = await fs.readFile(menusPath, 'utf-8');
-            allMenus = JSON.parse(file);
-        } catch (readError) {
-            // File doesn't exist, start with an empty array
-        }
+        await pool.query(
+            'INSERT INTO menus (id, name, items) VALUES ($1, $2, $3)',
+            [newMenu.id, newMenu.name, JSON.stringify(newMenu.items)]
+        );
 
-        allMenus.push(newMenu);
-        await fs.writeFile(menusPath, JSON.stringify(allMenus, null, 2));
-
-        // If a location was selected, update settings.json
         if (location === 'header' || location === 'footer') {
-            const settingsPath = path.join(process.cwd(), 'src', 'lib', 'settings.json');
-            const settingsFile = await fs.readFile(settingsPath, 'utf-8');
-            const settings = JSON.parse(settingsFile);
-            
-            if (location === 'header') {
-                settings.headerMenuId = newMenu.id;
-            } else if (location === 'footer') {
-                settings.footerMenuId = newMenu.id;
-            }
-
-            await fs.writeFile(settingsPath, JSON.stringify(settings, null, 2));
-            await clearSettingsCache();
-            revalidatePath('/', 'layout');
+             const settings = await getSettings();
+             const newSettings = { ...settings };
+             if (location === 'header') newSettings.headerMenuId = newMenu.id;
+             if (location === 'footer') newSettings.footerMenuId = newMenu.id;
+             await pool.query('UPDATE settings SET settings_data = $1 WHERE id = $2', [JSON.stringify(newSettings), 'default']);
+             await clearSettingsCache();
+             revalidatePath('/', 'layout');
         }
 
     } catch (error) {
@@ -1055,38 +1109,26 @@ export async function updateMenu(prevState: any, formData: FormData) {
     const urls = formData.getAll('item-urls') as string[];
     const location = formData.get('menu-location') as string;
 
-    const menusPath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
+    const pool = await getPool();
+    if (!pool) return { error: "Database not connected." };
 
     try {
-        const file = await fs.readFile(menusPath, 'utf-8');
-        const allMenus: Menu[] = JSON.parse(file);
+        const updatedItems = labels.map((label, index) => ({ label, url: urls[index] }));
+        await pool.query(
+            'UPDATE menus SET name = $1, items = $2 WHERE id = $3',
+            [menuName, JSON.stringify(updatedItems), menuId]
+        );
+
+        const settings = await getSettings();
+        const newSettings = { ...settings };
+
+        if (settings.headerMenuId === menuId) delete newSettings.headerMenuId;
+        if (settings.footerMenuId === menuId) delete newSettings.footerMenuId;
         
-        const menuIndex = allMenus.findIndex(m => m.id === menuId);
-        if (menuIndex === -1) {
-            return { error: "Menu not found." };
-        }
-
-        allMenus[menuIndex] = {
-            id: menuId,
-            name: menuName,
-            items: labels.map((label, index) => ({ label, url: urls[index] })),
-        };
-
-        await fs.writeFile(menusPath, JSON.stringify(allMenus, null, 2));
-
-        const settingsPath = path.join(process.cwd(), 'src', 'lib', 'settings.json');
-        const settingsFile = await fs.readFile(settingsPath, 'utf-8');
-        const settings = JSON.parse(settingsFile);
-
-        // Clear old assignment if it exists
-        if (settings.headerMenuId === menuId) delete settings.headerMenuId;
-        if (settings.footerMenuId === menuId) delete settings.footerMenuId;
+        if (location === 'header') newSettings.headerMenuId = menuId;
+        if (location === 'footer') newSettings.footerMenuId = menuId;
         
-        // Set new assignment
-        if (location === 'header') settings.headerMenuId = menuId;
-        if (location === 'footer') settings.footerMenuId = menuId;
-
-        await fs.writeFile(settingsPath, JSON.stringify(settings, null, 2));
+        await pool.query('UPDATE settings SET settings_data = $1 WHERE id = $2', [JSON.stringify(newSettings), 'default']);
         await clearSettingsCache();
 
     } catch (error) {
@@ -1104,19 +1146,13 @@ export async function deleteMenu(menuId: string) {
     const session = await getSession();
     if (!session?.userId) { return { error: "Unauthorized." }; }
 
-    const menusPath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
-    try {
-        const file = await fs.readFile(menusPath, 'utf-8');
-        let allMenus: Menu[] = JSON.parse(file);
-        
-        allMenus = allMenus.filter(m => m.id !== menuId);
-        await fs.writeFile(menusPath, JSON.stringify(allMenus, null, 2));
-        
-        // Check if this menu was used in settings and clear it
-        const settingsPath = path.join(process.cwd(), 'src', 'lib', 'settings.json');
-        const settingsFile = await fs.readFile(settingsPath, 'utf-8');
-        const settings = JSON.parse(settingsFile);
+    const pool = await getPool();
+    if (!pool) return { error: "Database not connected." };
 
+    try {
+        await pool.query('DELETE FROM menus WHERE id = $1', [menuId]);
+        
+        const settings = await getSettings();
         let settingsChanged = false;
         if (settings.headerMenuId === menuId) {
             settings.headerMenuId = 'none';
@@ -1128,7 +1164,7 @@ export async function deleteMenu(menuId: string) {
         }
         
         if (settingsChanged) {
-            await fs.writeFile(settingsPath, JSON.stringify(settings, null, 2));
+            await pool.query('UPDATE settings SET settings_data = $1 WHERE id = $2', [JSON.stringify(settings), 'default']);
             await clearSettingsCache();
         }
 
@@ -1143,11 +1179,19 @@ export async function deleteMenu(menuId: string) {
 }
 
 export async function getMenus(): Promise<Menu[]> {
-    const menusPath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
+    const pool = await getPool();
+    if (!pool) return [];
+
     try {
-        const file = await fs.readFile(menusPath, 'utf-8');
-        return JSON.parse(file) as Menu[];
+        await pool.query('SELECT id FROM menus LIMIT 1').catch(() => initializeDb());
+        const result = await pool.query('SELECT * FROM menus');
+        return result.rows.map(row => ({
+            id: row.id,
+            name: row.name,
+            items: row.items,
+        }));
     } catch (error) {
+        console.error("DB getMenus Error:", error);
         return [];
     }
 }
@@ -1159,7 +1203,6 @@ export async function getTemplates(): Promise<Template[]> {
         const data = JSON.parse(file);
         return data as Template[];
     } catch (error) {
-        // If file doesn't exist, return an empty array
         return [];
     }
 }
@@ -1191,12 +1234,15 @@ export async function deleteTemplate(templateId: string) {
 
 
 export async function getCategories(): Promise<Category[]> {
-    const filePath = path.join(process.cwd(), 'src', 'lib', 'categories.json');
+    const pool = await getPool();
+    if (!pool) return [{ id: 'uncategorized', name: 'Uncategorized', slug: 'uncategorized' }];
     try {
-        const data = await fs.readFile(filePath, 'utf-8');
-        return JSON.parse(data) as Category[];
+        await pool.query('SELECT id FROM categories LIMIT 1').catch(() => initializeDb());
+        const result = await pool.query('SELECT * FROM categories');
+        return result.rows;
     } catch (error) {
-        return [];
+        console.error("DB getCategories Error:", error);
+        return [{ id: 'uncategorized', name: 'Uncategorized', slug: 'uncategorized' }];
     }
 }
 
@@ -1209,18 +1255,20 @@ export async function createCategory(prevState: any, formData: FormData) {
 
     if (!name || !slug) return { error: "Name and slug are required." };
 
-    const currentCategories = await getCategories();
-    if (currentCategories.some(c => c.slug === slug)) {
-        return { error: `A category with the slug "${slug}" already exists.` };
-    }
-    
-    const newCategory: Category = { id: `cat-${Date.now()}`, name, slug };
-    const updatedCategories = [...currentCategories, newCategory];
+    const pool = await getPool();
+    if (!pool) return { error: "Database not connected." };
 
     try {
-        const filePath = path.join(process.cwd(), 'src', 'lib', 'categories.json');
-        await fs.writeFile(filePath, JSON.stringify(updatedCategories, null, 2));
-        setCategories(updatedCategories);
+        const slugCheck = await pool.query('SELECT id FROM categories WHERE slug = $1', [slug]);
+        if (slugCheck.rows.length > 0) {
+            return { error: `A category with the slug "${slug}" already exists.` };
+        }
+    
+        const newCategory: Omit<Category, 'id'> = { name, slug };
+        await pool.query(
+            'INSERT INTO categories (id, name, slug) VALUES ($1, $2, $3)',
+            [`cat-${Date.now()}`, newCategory.name, newCategory.slug]
+        );
     } catch (error) {
         return { error: "Failed to create category." };
     }
@@ -1236,22 +1284,20 @@ export async function updateCategory(prevState: any, formData: FormData) {
     const categoryId = formData.get('categoryId') as string;
     const name = formData.get('name') as string;
     const slug = formData.get('slug') as string;
+
+    const pool = await getPool();
+    if (!pool) return { error: "Database not connected." };
     
-    const currentCategories = await getCategories();
-    const categoryIndex = currentCategories.findIndex(c => c.id === categoryId);
-
-    if (categoryIndex === -1) return { error: "Category not found." };
-    if (currentCategories.some(c => c.slug === slug && c.id !== categoryId)) {
-        return { error: `A category with the slug "${slug}" already exists.` };
-    }
-
-    const updatedCategories = [...currentCategories];
-    updatedCategories[categoryIndex] = { ...updatedCategories[categoryIndex], name, slug };
-
     try {
-        const filePath = path.join(process.cwd(), 'src', 'lib', 'categories.json');
-        await fs.writeFile(filePath, JSON.stringify(updatedCategories, null, 2));
-        setCategories(updatedCategories);
+        const slugCheck = await pool.query('SELECT id FROM categories WHERE slug = $1 AND id != $2', [slug, categoryId]);
+        if (slugCheck.rows.length > 0) {
+            return { error: `A category with the slug "${slug}" already exists.` };
+        }
+
+        await pool.query(
+            'UPDATE categories SET name = $1, slug = $2 WHERE id = $3',
+            [name, slug, categoryId]
+        );
     } catch (error) {
         return { error: "Failed to update category." };
     }
@@ -1264,23 +1310,23 @@ export async function deleteCategory(categoryId: string) {
     const session = await getSession();
     if (!session?.userId) return { error: "Unauthorized." };
     
-    // Prevent deleting the 'uncategorized' category
     if (categoryId === 'uncategorized') {
         return { error: "The default 'Uncategorized' category cannot be deleted." };
     }
 
-    const currentCategories = await getCategories();
-    const updatedCategories = currentCategories.filter(c => c.id !== categoryId);
-
+    const pool = await getPool();
+    if (!pool) return { error: "Database not connected." };
+    
     try {
-        const filePath = path.join(process.cwd(), 'src', 'lib', 'categories.json');
-        await fs.writeFile(filePath, JSON.stringify(updatedCategories, null, 2));
-        setCategories(updatedCategories);
+        // Here you might want to re-categorize posts before deleting
+        await pool.query('UPDATE posts SET category_id = $1 WHERE category_id = $2', ['uncategorized', categoryId]);
+        await pool.query('DELETE FROM categories WHERE id = $1', [categoryId]);
     } catch (error) {
         return { error: "Failed to delete category." };
     }
 
     revalidatePath('/admin/categories');
+    revalidatePath('/');
     return { success: "Category deleted successfully." };
 }
 
@@ -1314,16 +1360,17 @@ function getTrafficSource(referrer: string | undefined, host: string): PageView[
         }
         return 'Other';
     } catch (e) {
-        // Invalid referrer URL
         return 'Other';
     }
 }
 
 export async function logPageView(pathname: string, referrer: string | undefined, host: string, country: string | undefined) {
-    // We won't log views for admin pages or API routes.
     if (pathname.startsWith('/admin') || pathname.startsWith('/api')) {
         return;
     }
+
+    // This is a fire-and-forget action on a read-only filesystem, so we will skip writing.
+    if (process.env.NODE_ENV === 'production') return;
 
     const analyticsPath = path.join(process.cwd(), 'src', 'lib', 'analytics.json');
     try {
@@ -1339,14 +1386,14 @@ export async function logPageView(pathname: string, referrer: string | undefined
 
         analyticsData.pageViews.push(newView);
 
-        // To keep the file size manageable, we'll only store the last 1000 page views.
         if (analyticsData.pageViews.length > 1000) {
             analyticsData.pageViews = analyticsData.pageViews.slice(-1000);
         }
 
         await fs.writeFile(analyticsPath, JSON.stringify(analyticsData, null, 2));
     } catch (error) {
-        // Silently fail if logging doesn't work. We don't want to break the page render.
         console.error("Failed to log page view:", error);
     }
 }
+
+    

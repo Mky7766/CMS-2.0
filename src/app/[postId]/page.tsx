@@ -1,15 +1,11 @@
 
-import { Menu, pages, Page, SiteSettings, users, User, Post } from "@/lib/data";
+import { Menu, Page, User, Post } from "@/lib/data";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Icons } from "@/components/icons";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { getSettings } from "@/app/actions";
+import { getSettings, getPosts, getMenus, getPage, getUsers } from "@/app/actions";
 import HtmlRenderer from "@/components/html-renderer";
-import fs from 'fs/promises';
-import path from 'path';
 import { Metadata } from 'next';
 import SiteHeader from "@/components/site-header";
 import GridTemplate from "@/components/blog-templates/grid-template";
@@ -19,16 +15,6 @@ import AuthorBioBox from "@/components/author-bio-box";
 import { BadgeCheck } from "lucide-react";
 import SocialShare from "@/components/social-share";
 import { getSession } from "@/lib/session";
-
-async function getPosts(): Promise<Post[]> {
-    const filePath = path.join(process.cwd(), 'src', 'lib', 'posts.json');
-    try {
-        const data = await fs.readFile(filePath, 'utf-8');
-        return JSON.parse(data) as Post[];
-    } catch (error) {
-        return [];
-    }
-}
 
 async function getPost(postId: string): Promise<Post | undefined> {
     const posts = await getPosts();
@@ -40,6 +26,7 @@ export async function generateMetadata({ params }: { params: { postId: string } 
   const post = await getPost(params.postId);
   const page = await getPage(params.postId);
   const settings = await getSettings();
+  const users = await getUsers();
 
   const title = page?.title || post?.title || settings.siteName;
   const description = post ? (post.content ? post.content.substring(0, 150) : '') : (settings.tagline || '');
@@ -54,7 +41,7 @@ export async function generateMetadata({ params }: { params: { postId: string } 
 
   if (post) {
       const author = users.find(u => u.id === post.authorId);
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || `https://localhost:3000`;
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || `http://localhost:3000`;
 
       const articleSchema = {
         '@context': 'https://schema.org',
@@ -91,27 +78,6 @@ export async function generateMetadata({ params }: { params: { postId: string } 
 }
 
 
-async function getMenus(): Promise<Menu[]> {
-    const filePath = path.join(process.cwd(), 'src', 'lib', 'menus.json');
-    try {
-        const data = await fs.readFile(filePath, 'utf-8');
-        return JSON.parse(data) as Menu[];
-    } catch (error) {
-        return [];
-    }
-}
-
-async function getPage(pageId: string): Promise<Page | undefined> {
-    const pagesPath = path.join(process.cwd(), 'src', 'lib', 'pages.json');
-    try {
-        const file = await fs.readFile(pagesPath, 'utf-8');
-        const allPages = JSON.parse(file) as Page[];
-        return allPages.find(p => p.id === pageId);
-    } catch (error) {
-        return undefined;
-    }
-}
-
 export default async function PostPage({ params, searchParams }: { params: { postId: string }, searchParams?: { [key: string]: string | string[] | undefined }}) {
   const settings = await getSettings();
   const isPostsPage = settings.postsPageId && settings.postsPageId === params.postId;
@@ -125,7 +91,7 @@ export default async function PostPage({ params, searchParams }: { params: { pos
     const footerMenu = menus.find(m => m.id === settings.footerMenuId);
     
     const allPosts = await getPosts();
-    const publishedPosts = allPosts.filter(p => p.status.toLowerCase() === 'published').sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    const publishedPosts = allPosts.filter(p => p.status.toLowerCase() === 'published');
     
     const renderBlogTemplate = () => {
         switch (settings.blogTemplate) {
@@ -174,6 +140,7 @@ export default async function PostPage({ params, searchParams }: { params: { pos
   const post = await getPost(params.postId);
   const page = await getPage(params.postId);
   const menus = await getMenus();
+  const allUsers = await getUsers();
   const headerMenu = menus.find(m => m.id === settings.headerMenuId);
   const footerMenu = menus.find(m => m.id === settings.footerMenuId);
 
@@ -222,7 +189,7 @@ export default async function PostPage({ params, searchParams }: { params: { pos
       notFound();
   }
 
-  const author = users.find(u => u.id === post!.authorId);
+  const author = allUsers.find(u => u.id === post!.authorId);
 
   return (
      <div className="flex flex-col min-h-screen">
@@ -302,3 +269,5 @@ export default async function PostPage({ params, searchParams }: { params: { pos
     </div>
   );
 }
+
+    

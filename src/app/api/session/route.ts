@@ -1,7 +1,7 @@
 
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/session';
-import { users } from '@/lib/data';
+import { getUsers } from '@/app/actions';
 
 export async function GET() {
   const session = await getSession();
@@ -9,15 +9,18 @@ export async function GET() {
   if (!session || !session.userId) {
     return NextResponse.json({ user: null }, { status: 401 });
   }
-
-  const user = users.find(u => u.id === session.userId);
+  
+  // Now fetching from DB via server action
+  const allUsers = await getUsers();
+  const user = allUsers.find(u => u.id === session.userId);
 
   if (!user) {
     return NextResponse.json({ user: null }, { status: 404 });
   }
   
-  // Return user data without the password
   const { password, ...userWithoutPassword } = user;
 
   return NextResponse.json({ user: userWithoutPassword });
 }
+
+    
