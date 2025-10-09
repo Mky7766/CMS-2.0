@@ -204,10 +204,10 @@ export async function clearSettingsCache(): Promise<void> {
 }
 
 export async function getUsersCount(): Promise<number> {
-    const pool = await getPool();
-    if (!pool) return -1; // Special value to indicate DB not configured
-
     try {
+        const pool = await getPool();
+        if (!pool) return -1; // Special value to indicate DB not configured
+
         // Check if users table exists first
         const tableCheck = await pool.query("SELECT to_regclass('public.users')");
         if (tableCheck.rows[0].to_regclass === null) {
@@ -218,8 +218,8 @@ export async function getUsersCount(): Promise<number> {
         return parseInt(result.rows[0].count, 10);
     } catch (dbError) {
         console.error("DB getUsersCount Error:", dbError);
-        // If there's an error (e.g., db not ready), assume no users to allow signup.
-        return 0;
+        // If there's a connection error, it could be that the DB is not configured yet.
+        return -1;
     }
 }
 
@@ -232,12 +232,12 @@ export async function signup(prevState: any, formData: FormData) {
         return { error: 'Email and password are required.' };
     }
     
-    const pool = await getPool();
-    if (!pool) {
-        return { error: 'Database not configured. Please go to /setup.' };
-    }
-
     try {
+        const pool = await getPool();
+        if (!pool) {
+            return { error: 'Database not configured. Please go to /setup.' };
+        }
+
         const userCountResult = await pool.query('SELECT COUNT(*) FROM users');
         const isFirstUser = parseInt(userCountResult.rows[0].count, 10) === 0;
         
@@ -264,7 +264,7 @@ export async function signup(prevState: any, formData: FormData) {
 
     } catch (dbError: any) {
         console.error("DB Signup Error:", dbError);
-        return { error: 'Database error during signup. Please try again. ' + dbError.message };
+        return { error: 'Database error during signup. Please try again.' };
     }
     
     redirect('/admin/dashboard');
@@ -278,12 +278,12 @@ export async function login(prevState: any, formData: FormData) {
         return { error: 'Email and password are required.' };
     }
     
-    const pool = await getPool();
-    if (!pool) {
-        return { error: 'Database not configured. Please go to /setup.' };
-    }
-
     try {
+        const pool = await getPool();
+        if (!pool) {
+            return { error: 'Database not configured. Please go to /setup.' };
+        }
+
         const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
         const user = result.rows[0];
         
@@ -294,7 +294,7 @@ export async function login(prevState: any, formData: FormData) {
         await createSession(user.id);
     } catch (dbError: any) {
         console.error("DB Login Error:", dbError);
-        return { error: 'Database error during login. ' + dbError.message };
+        return { error: 'Database error during login. Please try again.' };
     }
 
     redirect('/admin/dashboard');
