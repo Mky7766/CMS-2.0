@@ -1429,6 +1429,48 @@
       "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/capra/?origin=https%3A%2F%2Fstudio.firebase.google.com",
       "source": "Other",
       "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-10-09T11:12:09.475Z",
+      "referrer": "https://workstations.cloud.google.com/",
+      "source": "Google",
+      "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-10-09T11:12:32.285Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-10-09T11:12:33.610Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/login",
+      "timestamp": "2025-10-09T11:12:58.743Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/capra/?origin=https%3A%2F%2Fstudio.firebase.google.com",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-10-09T11:13:54.902Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/capra/?origin=https%3A%2F%2Fstudio.firebase.google.com",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-10-09T11:14:12.109Z",
+      "referrer": "https://workstations.cloud.google.com/",
+      "source": "Google",
+      "country": "Unknown"
     }
   ]
 }
