@@ -1,42 +1,35 @@
 
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Icons } from "@/components/icons";
-import { users } from "@/lib/data";
+import { useActionState, useEffect, useState } from "react";
+import { useFormStatus } from "react-dom";
+import { login, getUsersCount } from "@/app/actions";
+import { useToast } from "@/hooks/use-toast";
 import LoginForm from "@/components/login-form";
-import fs from 'fs/promises';
-import path from 'path';
-import { redirect } from 'next/navigation';
 
-async function getUsers() {
+export default function LoginPage() {
+  const [userCount, setUserCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    async function fetchUserCount() {
+      const count = await getUsersCount();
+      setUserCount(count);
+    }
+    // Only check for users if we're not in a setup flow.
     if (process.env.POSTGRES_URL) {
-        // If POSTGRES_URL is set, we assume the DB is the source of truth,
-        // and we don't need to check for the first user from the JSON file.
-        // The login form will handle DB authentication.
-        // For now, to allow signup, we need a way to check if DB has users.
-        // We'll let the login form decide and assume for now there might be users.
-        return [{id: 'db-user'}]; 
+      fetchUserCount();
+    } else {
+      setUserCount(0); // Assume no users if DB is not configured, to show setup/signup link.
     }
-    // Fallback to JSON if no DB is configured
-    try {
-        const filePath = path.join(process.cwd(), 'src', 'lib', 'users.json');
-        const data = await fs.readFile(filePath, 'utf-8');
-        return JSON.parse(data);
-    } catch (error) {
-        return []; // No users file, implies first run.
-    }
-}
-
-export default async function LoginPage() {
-  const allUsers = await getUsers();
-  const showSignup = allUsers.length === 0;
-
-  if (showSignup && !process.env.POSTGRES_URL) {
-    redirect('/signup');
-  }
+  }, []);
+  
+  const showSignup = userCount === 0;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
@@ -47,13 +40,13 @@ export default async function LoginPage() {
             </div>
             <CardTitle className="text-2xl">Welcome to Vinee CMS</CardTitle>
             <CardDescription>
-                {showSignup 
+                {userCount === null ? "Loading..." : showSignup 
                     ? "Create the first admin account to get started." 
                     : "Enter your credentials to access your dashboard"
                 }
             </CardDescription>
         </CardHeader>
-        <LoginForm showSignupLink={showSignup} />
+        {userCount !== null && <LoginForm showSignupLink={showSignup} />}
       </Card>
     </div>
   );

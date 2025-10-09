@@ -208,15 +208,17 @@ export async function getUsersCount(): Promise<number> {
     if (!pool) return 0;
 
     try {
+        // Check if users table exists first
         const tableCheck = await pool.query("SELECT to_regclass('public.users')");
         if (tableCheck.rows[0].to_regclass === null) {
-            return 0;
+            return 0; // Table doesn't exist, so 0 users.
         }
         
         const result = await pool.query('SELECT COUNT(*) FROM users');
         return parseInt(result.rows[0].count, 10);
     } catch (dbError) {
         console.error("DB getUsersCount Error:", dbError);
+        // If there's an error (e.g., db not ready), assume no users to allow signup.
         return 0;
     }
 }
@@ -232,7 +234,7 @@ export async function signup(prevState: any, formData: FormData) {
     
     const pool = await getPool();
     if (!pool) {
-        return { error: 'Database not configured.' };
+        return { error: 'Database not configured. Please go to /setup.' };
     }
 
     try {
@@ -276,11 +278,7 @@ export async function login(prevState: any, formData: FormData) {
     
     const pool = await getPool();
     if (!pool) {
-        const userCount = await getUsersCount();
-        if (userCount === 0) {
-             return { error: 'No users found. Please set up the database and sign up.' };
-        }
-        return { error: 'Database connection not available.' };
+        return { error: 'Database not configured. Please go to /setup.' };
     }
 
     try {

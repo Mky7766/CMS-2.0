@@ -1,29 +1,11 @@
 
-import { redirect } from 'next/navigation';
+'use client'
+
 import SignupForm from '@/components/signup-form';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Icons } from "@/components/icons";
-import Link from 'next/link';
-import fs from 'fs/promises';
-import path from 'path';
 
-async function getUsers() {
-    const filePath = path.join(process.cwd(), 'src', 'lib', 'users.json');
-    try {
-        const data = await fs.readFile(filePath, 'utf-8');
-        return JSON.parse(data);
-    } catch (error) {
-        return [];
-    }
-}
-
-export default async function SignupPage() {
-  const allUsers = await getUsers();
-  // If users already exist, redirect to login page.
-  if (allUsers.length > 0) {
-    redirect('/login');
-  }
-
+export default function SignupPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-sm">
@@ -39,4 +21,3 @@ export default async function SignupPage() {
     </div>
   );
 }
-
