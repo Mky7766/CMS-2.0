@@ -1555,6 +1555,48 @@
       "referrer": "direct",
       "source": "Direct",
       "country": "Unknown"
+    },
+    {
+      "path": "/login",
+      "timestamp": "2025-10-09T11:50:27.801Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/login",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/login",
+      "timestamp": "2025-10-09T11:53:11.059Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/admin/users",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/login",
+      "timestamp": "2025-10-09T11:54:16.567Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/login",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/login",
+      "timestamp": "2025-10-09T11:54:17.283Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/login",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-10-09T11:54:51.166Z",
+      "referrer": "direct",
+      "source": "Direct",
+      "country": "Unknown"
+    },
+    {
+      "path": "/signup",
+      "timestamp": "2025-10-09T11:54:53.353Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/signup",
+      "source": "Other",
+      "country": "Unknown"
     }
   ]
 }

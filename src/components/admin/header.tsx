@@ -38,8 +38,10 @@ async function getClientSession() {
 
 export default function AppHeader() {
   const [user, setUser] = useState<{name: string, email: string, avatarUrl: string} | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     // Fetch user session
     async function fetchUser() {
         const session = await getClientSession();
@@ -73,41 +75,43 @@ export default function AppHeader() {
             <Bell className="h-5 w-5" />
             <span className="sr-only">Toggle notifications</span>
         </Button>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <Avatar className="h-8 w-8">
-                 {user ? (
-                    <>
-                        <AvatarImage src={user.avatarUrl} alt={user.name} />
-                        <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                    </>
-                 ) : (
-                    <AvatarFallback>
-                        <User className="h-5 w-5" />
-                    </AvatarFallback>
-                 )}
-              </Avatar>
-              <span className="sr-only">Toggle user menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>{user ? user.name : "My Account"}</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-                <Link href="/admin/profile">Profile</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-                <Link href="/admin/settings">Settings</Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-             <form action={logout}>
+        {mounted && (
+            <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="rounded-full">
+                <Avatar className="h-8 w-8">
+                    {user ? (
+                        <>
+                            <AvatarImage src={user.avatarUrl} alt={user.name} />
+                            <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                        </>
+                    ) : (
+                        <AvatarFallback>
+                            <User className="h-5 w-5" />
+                        </AvatarFallback>
+                    )}
+                </Avatar>
+                <span className="sr-only">Toggle user menu</span>
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuLabel>{user ? user.name : "My Account"}</DropdownMenuLabel>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                    <button type="submit" className="w-full text-left">Logout</button>
+                    <Link href="/admin/profile">Profile</Link>
                 </DropdownMenuItem>
-             </form>
-          </DropdownMenuContent>
-        </DropdownMenu>
+                <DropdownMenuItem asChild>
+                    <Link href="/admin/settings">Settings</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <form action={logout}>
+                    <DropdownMenuItem asChild>
+                        <button type="submit" className="w-full text-left">Logout</button>
+                    </DropdownMenuItem>
+                </form>
+            </DropdownMenuContent>
+            </DropdownMenu>
+        )}
       </div>
     </header>
   )
