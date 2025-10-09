@@ -211,7 +211,6 @@ export async function getUsersCount(): Promise<number> {
         // Check if users table exists first
         const tableCheck = await pool.query("SELECT to_regclass('public.users')");
         if (tableCheck.rows[0].to_regclass === null) {
-            await initializeDb(); // Try to initialize if table does not exist
             return 0; // Table doesn't exist, so 0 users.
         }
         
@@ -239,8 +238,6 @@ export async function signup(prevState: any, formData: FormData) {
     }
 
     try {
-        await initializeDb();
-        
         const userCountResult = await pool.query('SELECT COUNT(*) FROM users');
         const isFirstUser = parseInt(userCountResult.rows[0].count, 10) === 0;
         
