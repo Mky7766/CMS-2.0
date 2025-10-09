@@ -25,8 +25,8 @@ import {
 function ActivateButton() {
   const { pending } = useFormStatus();
   return (
-    <Button type=\"submit\" disabled={pending} size=\"sm\">
-      {pending ? \"Activating...\" : \"Activate\"}
+    <Button type="submit" disabled={pending} size="sm">
+      {pending ? "Activating..." : "Activate"}
     </Button>
   );
 }
@@ -34,8 +34,8 @@ function ActivateButton() {
 function DeactivateButton() {
     const { pending } = useFormStatus();
     return (
-        <Button type=\"submit\" disabled={pending} size=\"sm\" variant=\"outline\">
-            {pending ? \"Deactivating...\" : \"Deactivate\"}
+        <Button type="submit" disabled={pending} size="sm" variant="outline">
+            {pending ? "Deactivating..." : "Deactivate"}
         </Button>
     )
 }
@@ -70,14 +70,14 @@ export default function TemplatesClientPage() {
   useEffect(() => {
     if (state?.error) {
       toast({
-        title: \"Error\",
+        title: "Error",
         description: state.error,
-        variant: \"destructive\",
+        variant: "destructive",
       });
     }
     if (state?.success) {
       toast({
-        title: \"Success\",
+        title: "Success",
         description: state.success,
       });
     }
@@ -90,9 +90,9 @@ export default function TemplatesClientPage() {
       const result = await deleteTemplate(templateToDelete.id);
       if (result.success) {
         setTemplates(currentTemplates => currentTemplates.filter(t => t.id !== templateToDelete.id));
-        toast({ title: \"Success\", description: result.success });
+        toast({ title: "Success", description: result.success });
       } else {
-        toast({ title: \"Error\", description: result.error, variant: \"destructive\" });
+        toast({ title: "Error", description: result.error, variant: "destructive" });
       }
       setTemplateToDelete(null);
     });
@@ -100,28 +100,28 @@ export default function TemplatesClientPage() {
 
   if (isLoading || !settings) {
     return (
-        <div className=\"space-y-8\">
-             <div className=\"flex items-center justify-between\">
+        <div className="space-y-8">
+             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className=\"text-3xl font-bold tracking-tight\">Blog Templates</h1>
-                    <p className=\"text-muted-foreground\">Choose a layout for your blog's homepage.</p>
+                    <h1 className="text-3xl font-bold tracking-tight">Blog Templates</h1>
+                    <p className="text-muted-foreground">Choose a layout for your blog's homepage.</p>
                 </div>
                 <Button disabled>
-                    <Loader className=\"mr-2 h-4 w-4 animate-spin\" />
+                    <Loader className="mr-2 h-4 w-4 animate-spin" />
                     Loading...
                 </Button>
             </div>
-            <div className=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6\">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {Array.from({length: 3}).map((_, i) => (
                     <Card key={i}>
-                        <div className=\"w-full bg-muted animate-pulse aspect-video\" />
+                        <div className="w-full bg-muted animate-pulse aspect-video" />
                         <CardHeader>
-                            <div className=\"h-6 w-1/2 bg-muted animate-pulse rounded-md\" />
-                            <div className=\"h-4 w-full bg-muted animate-pulse rounded-md mt-2\" />
+                            <div className="h-6 w-1/2 bg-muted animate-pulse rounded-md" />
+                            <div className="h-4 w-full bg-muted animate-pulse rounded-md mt-2" />
                         </CardHeader>
-                         <CardFooter className=\"flex justify-between items-center\">
-                            <div className=\"h-8 w-24 bg-muted animate-pulse rounded-md\" />
-                             <div className=\"h-8 w-24 bg-muted animate-pulse rounded-md\" />
+                         <CardFooter className="flex justify-between items-center">
+                            <div className="h-8 w-24 bg-muted animate-pulse rounded-md" />
+                             <div className="h-8 w-24 bg-muted animate-pulse rounded-md" />
                          </CardFooter>
                     </Card>
                 ))}
@@ -132,25 +132,25 @@ export default function TemplatesClientPage() {
 
   return (
     <>
-      <div className=\"space-y-8\">
-        <div className=\"flex items-center justify-between\">
+      <div className="space-y-8">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className=\"text-3xl font-bold tracking-tight\">Blog Templates</h1>
-            <p className=\"text-muted-foreground\">Choose a layout for your blog's homepage.</p>
+            <h1 className="text-3xl font-bold tracking-tight">Blog Templates</h1>
+            <p className="text-muted-foreground">Choose a layout for your blog's homepage.</p>
           </div>
           <Button onClick={() => setIsUploadInfoDialogOpen(true)}>
-            <Upload className=\"mr-2 h-4 w-4\" />
+            <Upload className="mr-2 h-4 w-4" />
             Upload Template
           </Button>
         </div>
-        <div className=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6\">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {templates.map((template) => {
             const isActive = settings.blogTemplate === template.id;
             return (
               <Card key={template.id} className={`relative overflow-hidden ${isActive ? 'ring-2 ring-primary' : ''}`}>
                 {isActive && (
-                  <div className=\"absolute top-2 right-2 z-10 h-6 w-6 rounded-full bg-primary text-primary-foreground items-center justify-center flex\">
-                    <CheckCircle className=\"h-4 w-4\" />
+                  <div className="absolute top-2 right-2 z-10 h-6 w-6 rounded-full bg-primary text-primary-foreground items-center justify-center flex">
+                    <CheckCircle className="h-4 w-4" />
                   </div>
                 )}
                 <Image
@@ -158,27 +158,27 @@ export default function TemplatesClientPage() {
                   alt={template.name}
                   width={600}
                   height={400}
-                  className=\"w-full object-cover aspect-video\"
+                  className="w-full object-cover aspect-video"
                 />
                 <CardHeader>
                   <CardTitle>{template.name}</CardTitle>
                   <CardDescription>{template.description}</CardDescription>
                 </CardHeader>
-                <CardFooter className=\"flex justify-between items-center\">
+                <CardFooter className="flex justify-between items-center">
                     <div>
-                         <Button variant=\"ghost\" size=\"sm\" className=\"text-red-500 hover:text-red-600\" onClick={() => setTemplateToDelete(template)}>
-                            <Trash2 className=\"mr-2 h-4 w-4\" />
+                         <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600" onClick={() => setTemplateToDelete(template)}>
+                            <Trash2 className="mr-2 h-4 w-4" />
                             Delete
                         </Button>
                     </div>
                     {isActive ? (
                         <form action={formAction}>
-                            <input type=\"hidden\" name=\"blog-template\" value=\"grid\" />
+                            <input type="hidden" name="blog-template" value="grid" />
                             <DeactivateButton />
                         </form>
                     ) : (
                         <form action={formAction}>
-                            <input type=\"hidden\" name=\"blog-template\" value={template.id} />
+                            <input type="hidden" name="blog-template" value={template.id} />
                             <ActivateButton />
                         </form>
                     )}
@@ -202,9 +202,9 @@ export default function TemplatesClientPage() {
                     <AlertDialogAction 
                       onClick={handleDeleteTemplate} 
                       disabled={isDeleting}
-                      className=\"bg-red-600 hover:bg-red-700\"
+                      className="bg-red-600 hover:bg-red-700"
                     >
-                      {isDeleting ? \"Deleting...\" : \"Delete\"}
+                      {isDeleting ? "Deleting..." : "Delete"}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
@@ -214,11 +214,11 @@ export default function TemplatesClientPage() {
        <AlertDialog open={isUploadInfoDialogOpen} onOpenChange={setIsUploadInfoDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>How to \"Upload\" a New Template</AlertDialogTitle>
+            <AlertDialogTitle>How to "Upload" a New Template</AlertDialogTitle>
             <AlertDialogDescription>
               To add a new custom template, please ask the AI assistant to create it for you. Describe the layout you have in mind. For example:
               <br /><br />
-              <em className=\"text-foreground\">&quot;Create a new blog template called 'Featured Post' that shows the latest post in a large hero section and the rest in a grid below.&quot;</em>
+              <em className="text-foreground">&quot;Create a new blog template called 'Featured Post' that shows the latest post in a large hero section and the rest in a grid below.&quot;</em>
               <br /><br />
               The AI will generate the necessary files and add the template here automatically.
             </AlertDialogDescription>

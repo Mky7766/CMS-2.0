@@ -1471,6 +1471,27 @@
       "referrer": "https://workstations.cloud.google.com/",
       "source": "Google",
       "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-10-09T11:15:22.785Z",
+      "referrer": "https://9000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/monospace_preview/?backgroundColor=%231f1f1f&consoleIframeLink=File+in+iframe+does+not+exist.&consoleJSLink=File+does+not+exist.&embedded=1&linkInterceptDisabled=false&projectRoot=%2Fhome%2Fuser%2Fstudio&target=web&webDevToolsEnabled=true",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-10-09T11:15:25.011Z",
+      "referrer": "https://9000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/monospace_preview/?backgroundColor=%231f1f1f&consoleIframeLink=File+in+iframe+does+not+exist.&consoleJSLink=File+does+not+exist.&embedded=1&linkInterceptDisabled=false&projectRoot=%2Fhome%2Fuser%2Fstudio&target=web&webDevToolsEnabled=true",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-10-09T11:18:05.727Z",
+      "referrer": "direct",
+      "source": "Direct",
+      "country": "Unknown"
     }
   ]
 }
