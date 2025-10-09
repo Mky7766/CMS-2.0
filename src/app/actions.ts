@@ -31,7 +31,7 @@ async function getPool(): Promise<Pool | null> {
 }
 
 
-async function initializeDb() {
+export async function initializeDb() {
     const pool = await getPool();
     if (!pool) return;
 
@@ -205,12 +205,13 @@ export async function clearSettingsCache(): Promise<void> {
 
 export async function getUsersCount(): Promise<number> {
     const pool = await getPool();
-    if (!pool) return 0;
+    if (!pool) return -1; // Special value to indicate DB not configured
 
     try {
         // Check if users table exists first
         const tableCheck = await pool.query("SELECT to_regclass('public.users')");
         if (tableCheck.rows[0].to_regclass === null) {
+            await initializeDb(); // Try to initialize if table does not exist
             return 0; // Table doesn't exist, so 0 users.
         }
         
@@ -242,13 +243,17 @@ export async function signup(prevState: any, formData: FormData) {
         
         const userCountResult = await pool.query('SELECT COUNT(*) FROM users');
         const isFirstUser = parseInt(userCountResult.rows[0].count, 10) === 0;
+        
+        if (!isFirstUser) {
+            return { error: 'An account already exists. Please login.' };
+        }
 
         const existingUserResult = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
         if (existingUserResult.rows.length > 0) {
             return { error: 'User with this email already exists.' };
         }
         
-        const role = isFirstUser ? 'Admin' : 'Author';
+        const role = 'Admin';
         const name = email.split('@')[0];
         const avatarUrl = `https://picsum.photos/seed/${Math.random()}/32/32`;
 
@@ -290,9 +295,9 @@ export async function login(prevState: any, formData: FormData) {
         }
         
         await createSession(user.id);
-    } catch (dbError) {
+    } catch (dbError: any) {
         console.error("DB Login Error:", dbError);
-        return { error: 'Database error during login. Please try again.' };
+        return { error: 'Database error during login. ' + dbError.message };
     }
 
     redirect('/admin/dashboard');
@@ -1393,5 +1398,3 @@ export async function logPageView(pathname: string, referrer: string | undefined
         console.error("Failed to log page view:", error);
     }
 }
-
-    

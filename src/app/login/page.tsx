@@ -15,21 +15,23 @@ import LoginForm from "@/components/login-form";
 
 export default function LoginPage() {
   const [userCount, setUserCount] = useState<number | null>(null);
+  const [dbConfigured, setDbConfigured] = useState(true);
 
   useEffect(() => {
     async function fetchUserCount() {
-      const count = await getUsersCount();
-      setUserCount(count);
+        const count = await getUsersCount();
+        if (count === -1) { // Special value to indicate DB not configured
+            setDbConfigured(false);
+            setUserCount(0);
+        } else {
+            setDbConfigured(true);
+            setUserCount(count);
+        }
     }
-    // Only check for users if we're not in a setup flow.
-    if (process.env.POSTGRES_URL) {
-      fetchUserCount();
-    } else {
-      setUserCount(0); // Assume no users if DB is not configured, to show setup/signup link.
-    }
+    fetchUserCount();
   }, []);
   
-  const showSignup = userCount === 0;
+  const showSignup = userCount === 0 && dbConfigured;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
@@ -42,11 +44,20 @@ export default function LoginPage() {
             <CardDescription>
                 {userCount === null ? "Loading..." : showSignup 
                     ? "Create the first admin account to get started." 
+                    : !dbConfigured
+                    ? "Database is not configured yet."
                     : "Enter your credentials to access your dashboard"
                 }
             </CardDescription>
         </CardHeader>
-        {userCount !== null && <LoginForm showSignupLink={showSignup} />}
+        {userCount !== null && dbConfigured && <LoginForm showSignupLink={showSignup} />}
+        {userCount !== null && !dbConfigured && (
+            <CardFooter>
+                 <Button asChild className="w-full">
+                    <Link href="/setup">Go to Setup</Link>
+                </Button>
+            </CardFooter>
+        )}
       </Card>
     </div>
   );

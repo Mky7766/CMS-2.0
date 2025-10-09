@@ -1,11 +1,19 @@
 
-'use client'
+'use server'
 
 import SignupForm from '@/components/signup-form';
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Icons } from "@/components/icons";
+import { getUsersCount } from '@/app/actions';
+import { redirect } from 'next/navigation';
 
-export default function SignupPage() {
+export default async function SignupPage() {
+  const userCount = await getUsersCount();
+  
+  if (userCount > 0) {
+    redirect('/login');
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-sm">

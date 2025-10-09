@@ -1597,6 +1597,20 @@
       "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/signup",
       "source": "Other",
       "country": "Unknown"
+    },
+    {
+      "path": "/signup",
+      "timestamp": "2025-10-09T11:54:56.811Z",
+      "referrer": "https://6000-firebase-studio-1757936812554.cluster-nle52mxuvfhlkrzyrq6g2cwb52.cloudworkstations.dev/signup",
+      "source": "Other",
+      "country": "Unknown"
+    },
+    {
+      "path": "/",
+      "timestamp": "2025-10-09T11:57:52.636Z",
+      "referrer": "direct",
+      "source": "Direct",
+      "country": "Unknown"
     }
   ]
 }
