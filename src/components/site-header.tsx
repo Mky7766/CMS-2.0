@@ -25,11 +25,16 @@ export default function SiteHeader({ settings, headerMenu }: SiteHeaderProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const query = searchParams.get('q');
-
+  
+  const [mounted, setMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchValue, setSearchValue] = useState(query || "");
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     setIsSearchOpen(false);
@@ -77,6 +82,23 @@ export default function SiteHeader({ settings, headerMenu }: SiteHeaderProps) {
       />
     );
   }
+
+  if (!mounted) {
+    // Render a placeholder or null on the server to avoid hydration mismatch
+    return (
+        <header className="sticky top-0 z-40 w-full border-b bg-background">
+            <div className="container flex h-16 items-center">
+                 <div className="flex-1 md:flex-none">
+                     <Link href="/" className="flex items-center gap-2 font-headline text-xl font-bold">
+                        <Icons.logo className="h-6 w-6" />
+                        <span>{settings.siteName || "Vinee CMS"}</span>
+                    </Link>
+                 </div>
+            </div>
+        </header>
+    );
+  }
+
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background">
